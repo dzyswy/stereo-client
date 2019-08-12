@@ -2,9 +2,14 @@ if (POLICY CMP0074)
   cmake_policy(SET CMP0074 NEW)
 endif()
 
+project(remote_stereo)
 
+
+ADD_DEFINITIONS(-DASIO_STANDALONE)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/rpclib/include)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/asio/include)
 #include_directories(${CMAKE_CURRENT_SOURCE_DIR}/regctl)
 
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} REMOTE_STEREO_SRCS)
@@ -13,9 +18,7 @@ aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} REMOTE_STEREO_SRCS)
 
 ADD_LIBRARY(remote_stereo SHARED ${REMOTE_STEREO_SRCS})
 TARGET_LINK_LIBRARIES(remote_stereo 
-	"-Wl,--whole-archive" 
-	rpc
-	"-Wl,--no-whole-archive")
+	rpc)
 ADD_LIBRARY(remote_stereo_static STATIC ${REMOTE_STEREO_SRCS})
 set_target_properties(remote_stereo_static PROPERTIES OUTPUT_NAME "remote_stereo")
 set_target_properties(remote_stereo PROPERTIES CLEAN_DIRECT_OUTPUT 1)

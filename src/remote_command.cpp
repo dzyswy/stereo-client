@@ -37,7 +37,6 @@ int remote_command::set_value(const char *cmd, int value, int timeout)
 
 int remote_command::set_value(const char *cmd, float value, int timeout)
 {
-	std::unique_lock<std::mutex> lock(mux_);
 	try {
 		try {
 			rpc::client client(ip_, port_);
