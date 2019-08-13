@@ -23,12 +23,6 @@ struct point_space_status_rpclib {
 
 
 
-camera_command::camera_command(const char *ip, int port) : 
-	remote_command(ip, port)
-{
-	
-}	
-
 int camera_command::set_poly_mask(vector<pair<int, int> > &value, int timeout)
 {
 

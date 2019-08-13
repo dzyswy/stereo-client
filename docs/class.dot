@@ -1,0 +1,63 @@
+digraph class {
+	node [shape = "record", fontname = "Consolas"] 
+	edge [arrowhead = "empty", fontname = "Consolas"]
+	
+	rpc [label = "{rpc}"]
+	asio [label = "{asio}"] 
+	visca [label = "{visca}"] 
+	
+	remote_command [label = "{remote_command}"] 
+	camera_command [label = "{camera_command}"] 
+	system_command [label = "{system_command}"] 
+	
+	
+	
+	discovery_receiver_impl [label = "{discovery_receiver_impl}"]	
+	discovery_receiver [label = "{discovery_receiver}"] 
+	
+	stream_receiver_impl [label = "{stream_receiver_impl}"] 
+	stream_receiver [label = "{stream_receiver}"] 
+	stereo_stream [label = "{stereo_stream}"] 
+	 
+	ptz_ctl_visca [label = "{ptz_ctl_visca}"] 
+	
+	
+	stereo_filter [label = "{stereo_filter}"] 
+	
+	fit_calib [label = "{fit_calib}"] 
+	
+	ptz_track [label = "{ptz_track}"]
+	
+	qt_gui [label = "{qt_gui}"]
+	
+	remote_command -> rpc [arrowhead="normal", style="normal"]
+	camera_command -> remote_command [arrowhead="normal", style="normal"]
+	system_command -> remote_command [arrowhead="normal", style="normal"]
+	
+	discovery_receiver_impl -> asio [arrowhead="normal", style="normal"]
+	discovery_receiver -> discovery_receiver_impl [arrowhead="normal", style="normal"]
+	
+	stream_receiver_impl -> asio [arrowhead="normal", style="normal"]
+	stream_receiver -> stream_receiver_impl [arrowhead="normal", style="normal"]
+	stereo_stream -> stream_receiver [arrowhead="normal", style="normal"]
+	
+	stereo_filter -> stereo_stream [arrowhead="normal", style="dashed"]
+	
+	ptz_ctl_visca -> visca [arrowhead="normal", style="normal"]
+	
+	fit_calib -> camera_command [arrowhead="normal", style="dashed"]
+	fit_calib -> ptz_ctl_visca [arrowhead="normal", style="dashed"]
+	
+	ptz_track -> stereo_filter [arrowhead="normal", style="dashed"]
+	ptz_track -> ptz_ctl_visca [arrowhead="normal", style="dashed"]
+	ptz_track -> fit_calib [arrowhead="normal", style="dashed"]
+	
+	qt_gui -> ptz_ctl_visca [arrowhead="normal", style="dashed"]
+	qt_gui -> camera_command [arrowhead="normal", style="dashed"]
+	qt_gui -> system_command [arrowhead="normal", style="dashed"]
+	qt_gui -> stereo_stream [arrowhead="normal", style="dashed"]
+	qt_gui -> stereo_filter [arrowhead="normal", style="dashed"]
+	qt_gui -> fit_calib [arrowhead="normal", style="dashed"]
+	qt_gui -> ptz_track [arrowhead="normal", style="dashed"]
+	qt_gui -> discovery_receiver [arrowhead="normal", style="dashed"]
+}

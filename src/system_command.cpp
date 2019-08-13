@@ -13,13 +13,6 @@ using namespace std;
 
 
 
-
-system_command::system_command(const char *ip, int port) : 
-	remote_command(ip, port)
-{
-	
-}	
-
 int system_command::download_update_system(std::string host, std::string file, std::string user, std::string passwd, int force, int timeout)
 {
 	try {

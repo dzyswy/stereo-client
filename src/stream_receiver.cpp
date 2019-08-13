@@ -26,8 +26,11 @@ class stream_receiver_impl
 public:	
 	stream_receiver_impl(std::string ip, int port, int stream_number);
 	~stream_receiver_impl();
+	int query_frame(int timeout = 5);
 	int query_frame(std::vector<unsigned char> &image, int timeout = 5);
-	
+	void get_frame(std::vector<unsigned char> &image);
+	void get_detect_boxes(vector<struct http_output_detect_box> &detect_boxes);
+	void get_gyro_angle(struct gyro_status &gyro_angle);
 	
 protected:
 	void do_connect(ip::tcp::endpoint &ep);
@@ -46,6 +49,8 @@ protected:
 	std::mutex mux_;
 	std::condition_variable cond_;
 	vector<unsigned char> frame_buffer_;
+	vector<struct http_output_detect_box> detect_boxes_;
+	struct gyro_status gyro_angle_;
 	
 	std::thread *run_thread_;	
 	
@@ -80,6 +85,15 @@ stream_receiver_impl::~stream_receiver_impl()
 	}
 }
 
+int stream_receiver_impl::query_frame(int timeout)
+{
+	std::unique_lock<std::mutex> lock(mux_);
+	if (cond_.wait_for(lock, std::chrono::seconds(timeout)) == std::cv_status::timeout)
+		return -1;
+	
+	return 0;
+}
+
 int stream_receiver_impl::query_frame(std::vector<unsigned char> &image, int timeout)
 {
 	std::unique_lock<std::mutex> lock(mux_);
@@ -91,6 +105,23 @@ int stream_receiver_impl::query_frame(std::vector<unsigned char> &image, int tim
 	return 0;
 }
 
+void stream_receiver_impl::get_frame(std::vector<unsigned char> &image)
+{
+	std::unique_lock<std::mutex> lock(mux_);
+	image = frame_buffer_;
+}
+
+void stream_receiver_impl::get_detect_boxes(vector<struct http_output_detect_box> &detect_boxes)
+{
+	std::unique_lock<std::mutex> lock(mux_);
+	detect_boxes = detect_boxes_;
+}
+
+void stream_receiver_impl::get_gyro_angle(struct gyro_status &gyro_angle)
+{
+	std::unique_lock<std::mutex> lock(mux_);
+	gyro_angle = gyro_angle_;
+}
 
 void stream_receiver_impl::do_connect(ip::tcp::endpoint &ep)
 {
@@ -186,12 +217,12 @@ void stream_receiver_impl::do_read_boundary()
 					
 					if (sof_ && (response_.size() > frame_size))
 					{
-						{
-							std::unique_lock<std::mutex> lock(mux_);
-							frame_buffer_.resize(frame_size);
-							response_.sgetn((char *)&frame_buffer_[0], frame_size);
-							sof_ = 0;	
-						}
+						
+						std::unique_lock<std::mutex> lock(mux_);
+						frame_buffer_.resize(frame_size);
+						response_.sgetn((char *)&frame_buffer_[0], frame_size);
+						sof_ = 0;	
+						
 						cond_.notify_all();
 					}	
 					
@@ -220,15 +251,30 @@ stream_receiver::~stream_receiver()
 	delete impl_;
 }
 
+int stream_receiver::query_frame(int timeout)
+{
+	return impl_->query_frame(timeout);
+}
+
 int stream_receiver::query_frame(std::vector<unsigned char> &image, int timeout)
 {
 	return impl_->query_frame(image, timeout);
 }
 
+void stream_receiver::get_frame(std::vector<unsigned char> &image)
+{
+	impl_->get_frame(image);
+}
 
+void stream_receiver::get_detect_boxes(vector<struct http_output_detect_box> &detect_boxes)
+{
+	impl_->get_detect_boxes(detect_boxes);
+}
 
-
-
+void stream_receiver::get_gyro_angle(struct gyro_status &gyro_angle)
+{
+	impl_->get_gyro_angle(gyro_angle);
+}
 
 
 
