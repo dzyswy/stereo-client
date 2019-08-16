@@ -9,16 +9,19 @@ ADD_DEFINITIONS(-DASIO_STANDALONE)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/rpclib/include)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/json/include)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/asio/include)
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/regctl)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/stream_struct)
 
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} REMOTE_STEREO_SRCS)
-#aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/regctl REMOTE_STEREO_SRCS)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/stream_struct REMOTE_STEREO_SRCS)
+
+SET(LIBS ${LIBS} jsoncpp)
+SET(LIBS ${LIBS} rpc)
 
 
 ADD_LIBRARY(remote_stereo SHARED ${REMOTE_STEREO_SRCS})
-TARGET_LINK_LIBRARIES(remote_stereo 
-	rpc)
+TARGET_LINK_LIBRARIES(remote_stereo ${LIBS})
 ADD_LIBRARY(remote_stereo_static STATIC ${REMOTE_STEREO_SRCS})
 set_target_properties(remote_stereo_static PROPERTIES OUTPUT_NAME "remote_stereo")
 set_target_properties(remote_stereo PROPERTIES CLEAN_DIRECT_OUTPUT 1)

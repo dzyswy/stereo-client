@@ -12,6 +12,11 @@
 #include <sys/time.h>
 #include <asio.hpp>
 
+#include "json_detect_boxes.h"
+#include "json_gyro_angle.h"
+
+
+
 
 #define BOUNDARYSTRING "--BOUNDARYSTRING\r\n"
 
@@ -21,22 +26,27 @@ using namespace asio;
 using namespace asio::ip;
 
 
-class stream_receiver_impl
+class stream_receiver_impl : public std::enable_shared_from_this<stream_receiver_impl>
 {
 public:	
-	stream_receiver_impl(std::string ip, int port, int stream_number);
+	stream_receiver_impl(const stream_receiver_impl&) = delete;
+	stream_receiver_impl& operator=(const stream_receiver_impl&) = delete;
+
+	explicit stream_receiver_impl(std::string ip, int port, int stream_id);
 	~stream_receiver_impl();
+	
 	int query_frame(int timeout = 5);
-	int query_frame(std::vector<unsigned char> &image, int timeout = 5);
 	void get_frame(std::vector<unsigned char> &image);
-	void get_detect_boxes(vector<struct http_output_detect_box> &detect_boxes);
-	void get_gyro_angle(struct gyro_status &gyro_angle);
+	void get_detect_boxes(vector<struct stereo_detect_box> &detect_boxes);
+	void get_gyro_angle(struct stereo_gyro_angle &gyro_angle);
 	
 protected:
 	void do_connect(ip::tcp::endpoint &ep);
-	void do_write_stream_request();
-	void do_read_stream_response();
-	void do_read_boundary();
+	void do_write();
+	void do_read();
+	void do_boundary();
+	void do_headers();
+	void do_content();
 	
 protected:
 	asio::io_context io_context_;
@@ -44,28 +54,27 @@ protected:
 	asio::streambuf request_;
 	asio::streambuf response_;
 	
-	int sof_;
 
 	std::mutex mux_;
 	std::condition_variable cond_;
+	int frame_size_;
 	vector<unsigned char> frame_buffer_;
-	vector<struct http_output_detect_box> detect_boxes_;
-	struct gyro_status gyro_angle_;
+	vector<struct stereo_detect_box> detect_boxes_;
+	struct stereo_gyro_angle gyro_angle_;
 	
 	std::thread *run_thread_;	
 	
 };
 
 
-stream_receiver_impl::stream_receiver_impl(std::string ip, int port, int stream_number) : 
+stream_receiver_impl::stream_receiver_impl(std::string ip, int port, int stream_id) : 
 	socket_(io_context_), 
-	sof_(0)
+	frame_size_(0)
 {
-	cout << "stream_receiver: " << ip << "@" << port << endl;
-	
+
 	std::ostream request_stream(&request_);
 	request_stream << "GET ";
-	request_stream << "/stream_" << stream_number << " ";
+	request_stream << "/" << stream_id << " ";
     request_stream << "HTTP/1.1\r\n\r\n";
 	
 	
@@ -94,16 +103,6 @@ int stream_receiver_impl::query_frame(int timeout)
 	return 0;
 }
 
-int stream_receiver_impl::query_frame(std::vector<unsigned char> &image, int timeout)
-{
-	std::unique_lock<std::mutex> lock(mux_);
-	
-	if (cond_.wait_for(lock, std::chrono::seconds(timeout)) == std::cv_status::timeout)
-		return -1;
-	
-	image = frame_buffer_;
-	return 0;
-}
 
 void stream_receiver_impl::get_frame(std::vector<unsigned char> &image)
 {
@@ -111,13 +110,13 @@ void stream_receiver_impl::get_frame(std::vector<unsigned char> &image)
 	image = frame_buffer_;
 }
 
-void stream_receiver_impl::get_detect_boxes(vector<struct http_output_detect_box> &detect_boxes)
+void stream_receiver_impl::get_detect_boxes(vector<struct stereo_detect_box> &detect_boxes)
 {
 	std::unique_lock<std::mutex> lock(mux_);
 	detect_boxes = detect_boxes_;
 }
 
-void stream_receiver_impl::get_gyro_angle(struct gyro_status &gyro_angle)
+void stream_receiver_impl::get_gyro_angle(struct stereo_gyro_angle &gyro_angle)
 {
 	std::unique_lock<std::mutex> lock(mux_);
 	gyro_angle = gyro_angle_;
@@ -125,156 +124,306 @@ void stream_receiver_impl::get_gyro_angle(struct gyro_status &gyro_angle)
 
 void stream_receiver_impl::do_connect(ip::tcp::endpoint &ep)
 {
+	auto self(shared_from_this());
 	socket_.async_connect(ep, 
-		[this] (std::error_code ec) 
+		[this, self] (std::error_code ec) 
 		{
 			if (!ec) 
 			{
-				do_write_stream_request();
+				cout << "do_connect\n";
+			//	do_write();
+			}
+			else
+			{
+				 printf( "do_connect %d.\n", ec);
+			}	
+			
+		});
+}
+
+void stream_receiver_impl::do_write()
+{
+	auto self(shared_from_this());
+	asio::async_write(socket_, request_,
+		[this, self] (std::error_code ec, std::size_t length) 
+		{
+			if (!ec)
+			{
+				cout << "do_write\n";
+				do_read();
 			}	
 		});
 }
 
-void stream_receiver_impl::do_write_stream_request()
+void stream_receiver_impl::do_read()
 {
-	asio::async_write(socket_, request_,
-			[this] (std::error_code ec, std::size_t length) 
+	auto self(shared_from_this());
+	asio::async_read_until(socket_, response_, "\r\n\r\n",
+		[this, self] (std::error_code ec, std::size_t n) 
+		{
+			if (!ec)
 			{
-				if (!ec)
-				{
-					do_read_stream_response();
-				}	
-			});
+				std::istream rs(&response_);
+				std::string header;
+				while (std::getline(rs, header) && header != "\r");
+				cout << "do_read\n";
+				do_boundary();
+			}	
+		});
 }
 
-void stream_receiver_impl::do_read_stream_response()
+void stream_receiver_impl::do_boundary()
 {
-	asio::async_read_until(socket_, response_, BOUNDARYSTRING,
-			[this] (std::error_code ec, std::size_t n) 
+	auto self(shared_from_this());
+	asio::async_read_until(socket_, response_, "--BOUNDARYSTRING\r\n",
+		[this, self] (std::error_code ec, std::size_t n) 
+		{
+			if (!ec)
 			{
-				if (!ec)
-				{
-					std::istream rs(&response_);
-					std::string header;
-					while (std::getline(rs, header) && header != "--BOUNDARYSTRING\r");
-			 
-					sof_ = 0;
-					do_read_boundary();
-				}	
-			});
+				std::istream rs(&response_);
+				std::string header;
+				while (std::getline(rs, header) && header != "--BOUNDARYSTRING\r");
+				cout << "do_boundary\n";
+				do_headers();
+			}	
+		});
 }
 
-
-void stream_receiver_impl::do_read_boundary()
+void stream_receiver_impl::do_headers()
 {
-	asio::async_read_until(socket_, response_, BOUNDARYSTRING,
-			[this] (std::error_code ec, std::size_t n)
+	
+	auto self(shared_from_this());
+	asio::async_read_until(socket_, response_, "\r\n\r\n",
+		[this, self] (std::error_code ec, std::size_t n) 
+		{
+			int ret;
+			if (!ec)
 			{
-				if (!ec)
+				std::istream rs(&response_);
+				std::string header;
+				while (std::getline(rs, header) && header != "\r")
 				{
-					std::istream rs(&response_);
-					std::string header;
-					int frame_size = 0;
-					int slen = 0;
-			 
-					while (std::getline(rs, header))
+					int len;
+					if (header.substr(0, 15) == "Content-Length:") 
 					{
-						if (header.substr(0, 15) == "Content-Length:") {
-							string str_size = header.substr(16, header.length() - 17);
-							frame_size = atoi(str_size.c_str());
-							sof_ = 1;
-						//	cout << "frame_size: " << frame_size << endl;
+						string frame_size_s = header.substr(16, header.length() - 17);
+						int frame_size = atoi(frame_size_s.c_str());
+						{
+							std::unique_lock<std::mutex> lock(mux_);
+							frame_size_ = (frame_size <= 0) ? 1:frame_size;
 						}
-						
-						/*
-						slen = strlen("Content-detect-boxes:");
-						if (header.substr(0, slen) == "Content-detect-boxes:") {
-							string detect_boxes_str = header.substr(slen + 1, header.length() - (slen + 2));
-						//	cout << "detect_boxes_str: " << detect_boxes_str << endl;
-							detect_boxes_.clear();
-							ret = deserialize_detect_boxes(detect_boxes_str, detect_boxes_);
-							if (ret < 0) {
-								cout << "fail to deserialize detect boxes\n";
-								detect_boxes_.clear();
-							}
-						}
-						
-						slen = strlen("Content-gyro-status:");
-						if (header.substr(0, slen) == "Content-gyro-status:") {
-							string gyro_angle_str = header.substr(slen + 1, header.length() - (slen + 2));
-						//	cout << "gyro_angle_str: " << gyro_angle_str << endl;
-							ret = deserialize_gyro_status(gyro_angle_str, gyro_angle_);
-							if (ret < 0) {
-								cout << "fail to deserialize_gyro_status\n";
-							}
-						}
-						*/
-						if (header == "\r") {
-							break;
-						}
-							
-					}	
-					
-					if (sof_ && (response_.size() > frame_size))
+					}
+					/* 
+					len = strlen("Content-detect-boxes:");
+					if (header.substr(0, len) == "Content-detect-boxes:") 
 					{
-						
-						std::unique_lock<std::mutex> lock(mux_);
-						frame_buffer_.resize(frame_size);
-						response_.sgetn((char *)&frame_buffer_[0], frame_size);
-						sof_ = 0;	
-						
-						cond_.notify_all();
-					}	
+						string detect_boxes_s = header.substr(len + 1, header.length() - (len + 2));
+						vector<struct stereo_detect_box> detect_boxes;
+						json_detect_boxes detect_boxes_j(detect_boxes);
+						ret = detect_boxes_j.from_string(detect_boxes_s);
+						if (ret == 0)
+						{
+							std::unique_lock<std::mutex> lock(mux_);
+							detect_boxes_ = detect_boxes;
+						}	
+					}
 					
-					
-					while (std::getline(rs, header))
-					{
-						if (header == "--BOUNDARYSTRING\r")
-							break;
-					}	
-					
-					do_read_boundary();
+					len = strlen("Content-gyro-status:");
+					if (header.substr(0, len) == "Content-gyro-status:") {
+						string gyro_angle_s = header.substr(len + 1, header.length() - (len + 2));
+						struct stereo_gyro_angle gyro_angle;
+						json_gyro_angle gyro_angle_j(gyro_angle);
+						ret = gyro_angle_j.from_string(gyro_angle_s);
+						if (ret == 0)
+						{
+							std::unique_lock<std::mutex> lock(mux_);
+							gyro_angle_ = gyro_angle;
+						}	
+					}*/
 				}	
-			});
+				cout << "do_headers\n";
+				do_content();
+			}	
+		});
 }
 
-
-
-
-stream_receiver::stream_receiver(std::string ip, int port, int stream_number)
+void stream_receiver_impl::do_content()
 {
-	impl_ = new stream_receiver_impl(ip, port, stream_number);
+	auto self(shared_from_this());
+	asio::async_read(socket_, response_, asio::transfer_at_least(frame_size_ + 2),
+		[this, self] (std::error_code ec, std::size_t n) 
+		{
+			if (!ec)
+			{
+				if (n >= (frame_size_ + 2))
+				{
+					std::unique_lock<std::mutex> lock(mux_);
+					frame_buffer_.resize(frame_size_);
+					response_.sgetn((char *)&frame_buffer_[0], frame_size_);
+					char c = response_.sgetc();
+					if (c != '\r')
+					{
+						frame_buffer_.resize(0);
+					}	
+					cond_.notify_all();
+				}	
+				cout << "do_content\n";
+				do_boundary();
+			}	
+		});
 }
+
+
+
+
+
+
+
+stream_receiver::stream_receiver()
+{
+	going = 0;
+	reconnect_count_ = 0;
+}
+
 
 stream_receiver::~stream_receiver()
 {
-	delete impl_;
+	disconnect_stream();
 }
+
+
+int stream_receiver::connect_stream(const char *ip, int port, int stream_id)
+{
+	std::unique_lock<std::mutex> lock(mux_);
+	
+	if (going)
+		return -1;
+	
+	ip_ = ip;
+	port_ = port;
+	stream_id_ = stream_id;
+	
+	going = 1;
+	run_thread_ = new std::thread([this] () {stream_process();});
+}
+
+
+int stream_receiver::disconnect_stream()
+{
+	std::unique_lock<std::mutex> lock(mux_);
+	
+	going = 0;
+	if (run_thread_)
+	{
+		run_thread_->join();
+		delete run_thread_;
+		run_thread_ = NULL;
+	}
+	
+	return 0;
+}
+
 
 int stream_receiver::query_frame(int timeout)
 {
-	return impl_->query_frame(timeout);
-}
-
-int stream_receiver::query_frame(std::vector<unsigned char> &image, int timeout)
-{
-	return impl_->query_frame(image, timeout);
+	std::unique_lock<std::mutex> lock(mux_);
+	if (cond_.wait_for(lock, std::chrono::seconds(timeout)) == std::cv_status::timeout)
+		return -1;
+	
+	return 0;
 }
 
 void stream_receiver::get_frame(std::vector<unsigned char> &image)
 {
-	impl_->get_frame(image);
+	std::unique_lock<std::mutex> lock(mux_);
+	image = frame_buffer_;
 }
 
-void stream_receiver::get_detect_boxes(vector<struct http_output_detect_box> &detect_boxes)
+void stream_receiver::get_detect_boxes(vector<struct stereo_detect_box> &detect_boxes)
 {
-	impl_->get_detect_boxes(detect_boxes);
+	std::unique_lock<std::mutex> lock(mux_);
+	detect_boxes = detect_boxes_;
 }
 
-void stream_receiver::get_gyro_angle(struct gyro_status &gyro_angle)
+void stream_receiver::get_gyro_angle(struct stereo_gyro_angle &gyro_angle)
 {
-	impl_->get_gyro_angle(gyro_angle);
+	std::unique_lock<std::mutex> lock(mux_);
+	gyro_angle = gyro_angle_;
 }
+
+int stream_receiver::get_reconnect_count()
+{
+	std::unique_lock<std::mutex> lock(mux_);
+	return reconnect_count_;
+}
+
+void stream_receiver::stream_process()
+{
+	int ret;
+	while(1)
+	{
+		{
+			std::unique_lock<std::mutex> lock(mux_);
+			if (!going)
+				break;
+		}
+		
+		stream_receiver_impl stream(ip_, port_, stream_id_);
+		while(1)
+		{/*
+			ret = stream.query_frame(5);
+			if (ret < 0)
+			{
+				reconnect_count_++;
+				break;
+			}
+
+			{
+				std::unique_lock<std::mutex> lock(mux_);		
+				stream.get_frame(frame_buffer_);
+				stream.get_detect_boxes(detect_boxes_);
+				stream.get_gyro_angle(gyro_angle_);
+				cond_.notify_all();	
+			}*/
+			std::this_thread::sleep_for(std::chrono::seconds(10));
+		
+		}	
+		
+	}
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

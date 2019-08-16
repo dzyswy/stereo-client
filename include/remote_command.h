@@ -21,7 +21,7 @@ namespace rpc {
 class remote_command
 {
 public:
-	set_connect(const char *ip, int port);
+	void set_connect(const char *ip, int port);
 	
 	int set_value(const char *cmd, int value, int timeout = 5000);
 	int set_value(const char *cmd, float value, int timeout = 5000);

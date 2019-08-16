@@ -7,56 +7,51 @@
 #include <stdio.h>
 #include <vector>
 #include <list>
+#include <mutex>
+#include <thread>
+#include <condition_variable>
+#include <ctime>
+#include <sys/time.h>
 
+#include "stream_struct.h"
 
 
 class stream_receiver_impl;
-
-
-struct http_output_detect_box {
-	int id;
-	int box_x;
-	int box_y;
-	int box_w;
-	int box_h;
-	int x;
-	int y;
-	int d;
-	int xcm;
-	int ycm;
-	int zcm;
-	int xtcm;
-	int ytcm;
-	int ztcm;
-	float xa;
-	float ya;
-	float r;
-	
-};
-
-struct gyro_status {
-	float roll;
-	float pitch;
-};
 
 
 
 class stream_receiver
 {
 public:
-	stream_receiver(std::string ip, int port, int stream_number);
+	stream_receiver();
 	~stream_receiver();
-	int query_frame(int timeout = 5);
-	int query_frame(std::vector<unsigned char> &image, int timeout = 5);
+	int connect_stream(const char *ip, int port, int stream_id);
+	int disconnect_stream();
 	
+	int query_frame(int timeout = 5);
 	void get_frame(std::vector<unsigned char> &image);
-	void get_detect_boxes(vector<struct http_output_detect_box> &detect_boxes);
-	void get_gyro_angle(struct gyro_status &gyro_angle);
+	void get_detect_boxes(std::vector<struct stereo_detect_box> &detect_boxes);
+	void get_gyro_angle(struct stereo_gyro_angle &gyro_angle);
+	int get_reconnect_count();
+	
+protected:
+	void stream_process();
 	
 private:
-	stream_receiver_impl *impl_;
+	std::string ip_;
+	int port_;
+	int stream_id_;
 	
+	int reconnect_count_;
 	
+	std::vector<unsigned char> frame_buffer_;
+	std::vector<struct stereo_detect_box> detect_boxes_;
+	struct stereo_gyro_angle gyro_angle_;
+
+	int going;
+	std::mutex mux_;
+	std::condition_variable cond_;
+	std::thread *run_thread_;
 };
 
 

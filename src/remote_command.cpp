@@ -4,7 +4,7 @@
 #include "rpc/rpc_error.h"
 
 
-remote_command::set_connect(const char *ip, int port)
+void remote_command::set_connect(const char *ip, int port)
 {
 	ip_ = ip;
 	port_ = port;
