@@ -1,7 +1,15 @@
+#include <iostream>
 #include "json/json.h"
 #include "json_gyro_angle.h"
 
-json_gyro_angle::json_gyro_angle(struct stereo_gyro_angle &value)
+using namespace std;
+
+void json_gyro_angle::to_struct(struct stereo_gyro_angle &value)
+{
+	value = gyro_angle;
+}
+
+void json_gyro_angle::from_struct(struct stereo_gyro_angle &value)
 {
 	gyro_angle = value;
 }
@@ -17,7 +25,11 @@ int json_gyro_angle::to_string(std::string &value)
 		
 		jroot["gyro_angle"] = jgyro_angle;
 		
-		value = jroot.toStyledString();
+	//	value = jroot.toStyledString();
+
+		Json::StreamWriterBuilder builder;
+		builder["indentation"] = "";
+		value = Json::writeString(builder, jroot);
 	}
 	catch(std::exception &ex)
     {

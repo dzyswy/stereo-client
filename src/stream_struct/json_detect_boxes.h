@@ -16,8 +16,10 @@
 struct json_detect_boxes
 {
 	std::vector<struct stereo_detect_box> detect_boxes;
- 
-	json_detect_boxes(std::vector<struct stereo_detect_box> &value);
+	
+	void to_struct(std::vector<struct stereo_detect_box> &value);
+	void from_struct(std::vector<struct stereo_detect_box> &value);
+	
 	int to_string(std::string &value);
 	int from_string(std::string &value);
 };

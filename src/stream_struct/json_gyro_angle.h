@@ -14,10 +14,13 @@ struct json_gyro_angle
 {
 	struct stereo_gyro_angle gyro_angle;
 	
-	json_gyro_angle(struct stereo_gyro_angle &value);
+	void to_struct(struct stereo_gyro_angle &value);
+	void from_struct(struct stereo_gyro_angle &value);
 	
 	int to_string(std::string &value);
 	int from_string(std::string &value);
+	
+	
 };
 
 

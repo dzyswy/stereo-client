@@ -23,6 +23,26 @@ if (UNIX)
 endif()
 
 
+find_package(OpenCV REQUIRED)
+if(NOT OpenCV_FOUND)
+	message("fail to find OpenCV")
+else()
+	include_directories(${OpenCV_INCLUDE_DIRS})
+	SET(LIBS ${LIBS} ${OpenCV_LIBS})
+	message(STATUS "OpenCV library status:")
+	message(STATUS "    version: ${OpenCV_VERSION}")
+	message(STATUS "    include: ${OpenCV_INCLUDE_DIRS}")
+	message(STATUS "    library: ${OpenCV_INSTALL_PATH}")
+	message(STATUS "    libs: ${OpenCV_LIBS}")
+endif()
+
+
+set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/libs)
+
+link_directories(${PROJECT_BINARY_DIR}/libs)
+
+
+
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 

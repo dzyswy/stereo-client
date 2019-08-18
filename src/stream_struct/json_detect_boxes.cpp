@@ -3,7 +3,12 @@
 
 using namespace std;
 
-json_detect_boxes::json_detect_boxes(vector<struct stereo_detect_box> &value)
+void json_detect_boxes::to_struct(vector<struct stereo_detect_box> &value)
+{
+	value = detect_boxes;
+}
+
+void json_detect_boxes::from_struct(vector<struct stereo_detect_box> &value)
 {
 	detect_boxes = value;
 }
@@ -38,7 +43,10 @@ int json_detect_boxes::to_string(std::string &value)
 		}	
 		jroot["detect_boxes"] = jdetect_boxes;
 		
-		value = jroot.toStyledString();
+	//	value = jroot.toStyledString();
+		Json::StreamWriterBuilder builder;
+		builder["indentation"] = "";
+		value = Json::writeString(builder, jroot);
 	}
 	catch(std::exception &ex)
     {
