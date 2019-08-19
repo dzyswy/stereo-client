@@ -1,51 +1,10 @@
-#include "camera_command.h"
-#include "discovery_receiver.h"
-#include "stereo_stream.h"
-
-
-
-
+﻿#include "zscam_client.h"
+#include <QtWidgets/QApplication>
 
 int main(int argc, char *argv[])
 {
-	discovery_receiver msearch("zynq_stereo_camera", 45789, 5000);
-	
-	
-	camera_command ccmd
-	system_command scmd;
-	stereo_stream mstream;
-	
-	
-	
-	
-	
-	return 0;
-	
+	QApplication a(argc, argv);
+	zscam_client w;
+	w.show();
+	return a.exec();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

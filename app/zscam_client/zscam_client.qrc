@@ -1,0 +1,16 @@
+<RCC>
+  <qresource prefix="zscam_client">
+    <file>icons/btm_zoom_dec.png</file>
+    <file>icons/btm_zoom_inc.png</file>
+    <file>icons/D.png</file>
+    <file>icons/DL.png</file>
+    <file>icons/DR.png</file>
+    <file>icons/L.png</file>
+    <file>icons/R.png</file>
+    <file>icons/S.png</file>
+    <file>icons/U.png</file>
+    <file>icons/UL.png</file>
+    <file>icons/UR.png</file>
+    <file>icons/icon.jpg</file>
+  </qresource>
+</RCC>

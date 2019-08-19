@@ -11,7 +11,6 @@
 #include <thread>
 #include <condition_variable>
 #include <ctime>
-#include <sys/time.h>
 
 class discovery_receiver_impl;
 

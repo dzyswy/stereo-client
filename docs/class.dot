@@ -17,7 +17,6 @@ digraph class {
 	
 	stream_receiver_impl [label = "{stream_receiver_impl}"] 
 	stream_receiver [label = "{stream_receiver}"] 
-	stereo_stream [label = "{stereo_stream}"] 
 	 
 	ptz_ctl_visca [label = "{ptz_ctl_visca}"] 
 	
@@ -39,9 +38,8 @@ digraph class {
 	
 	stream_receiver_impl -> asio [arrowhead="normal", style="normal"]
 	stream_receiver -> stream_receiver_impl [arrowhead="normal", style="normal"]
-	stereo_stream -> stream_receiver [arrowhead="normal", style="normal"]
-	
-	stereo_filter -> stereo_stream [arrowhead="normal", style="dashed"]
+
+	stereo_filter -> stream_receiver [arrowhead="normal", style="dashed"]
 	
 	ptz_ctl_visca -> visca [arrowhead="normal", style="normal"]
 	
@@ -55,7 +53,7 @@ digraph class {
 	qt_gui -> ptz_ctl_visca [arrowhead="normal", style="dashed"]
 	qt_gui -> camera_command [arrowhead="normal", style="dashed"]
 	qt_gui -> system_command [arrowhead="normal", style="dashed"]
-	qt_gui -> stereo_stream [arrowhead="normal", style="dashed"]
+	qt_gui -> stream_receiver [arrowhead="normal", style="dashed"]
 	qt_gui -> stereo_filter [arrowhead="normal", style="dashed"]
 	qt_gui -> fit_calib [arrowhead="normal", style="dashed"]
 	qt_gui -> ptz_track [arrowhead="normal", style="dashed"]
