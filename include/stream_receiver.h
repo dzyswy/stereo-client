@@ -29,7 +29,7 @@ public:
 	
 	int query_frame(int timeout = 5);
 	void get_frame(std::vector<unsigned char> &image);
-	void get_detect_boxes(std::vector<struct stereo_detect_box> &detect_boxes);
+	void get_detect_boxes(struct stereo_detect_boxes &detect_boxes);
 	void get_gyro_angle(struct stereo_gyro_angle &gyro_angle);
 	int get_reconnect_count();
 	
@@ -44,7 +44,7 @@ private:
 	int reconnect_count_;
 	
 	std::vector<unsigned char> frame_buffer_;
-	std::vector<struct stereo_detect_box> detect_boxes_;
+	struct stereo_detect_boxes detect_boxes_;
 	struct stereo_gyro_angle gyro_angle_;
 
 	int going;

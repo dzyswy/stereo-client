@@ -1,27 +1,19 @@
 #include <iostream>
 #include "json/json.h"
-#include "json_gyro_angle.h"
+#include "stereo_gyro_angle.h"
 
 using namespace std;
 
-void json_gyro_angle::to_struct(struct stereo_gyro_angle &value)
-{
-	value = gyro_angle;
-}
 
-void json_gyro_angle::from_struct(struct stereo_gyro_angle &value)
-{
-	gyro_angle = value;
-}
 
-int json_gyro_angle::to_string(std::string &value)
+int stereo_gyro_angle::to_string(std::string &value)
 {
 	try {
 		Json::Value jroot;
 		Json::Value jgyro_angle;
 
-		jgyro_angle["roll"] = gyro_angle.roll;
-		jgyro_angle["pitch"] = gyro_angle.pitch;
+		jgyro_angle["roll"] = roll;
+		jgyro_angle["pitch"] = pitch;
 		
 		jroot["gyro_angle"] = jgyro_angle;
 		
@@ -40,9 +32,10 @@ int json_gyro_angle::to_string(std::string &value)
 }
 
 
-int json_gyro_angle::from_string(std::string &value)
+int stereo_gyro_angle::from_string(std::string &value)
 {
-	struct stereo_gyro_angle _gyro_angle;
+	float _roll;
+	float _pitch;
 	
 	try {
 		Json::Reader reader;
@@ -62,8 +55,8 @@ int json_gyro_angle::from_string(std::string &value)
 		if (jgyro_angle["pitch"].empty())
 			return -1;
 
-		_gyro_angle.roll = jgyro_angle["roll"].asFloat();
-		_gyro_angle.pitch = jgyro_angle["pitch"].asFloat();
+		_roll = jgyro_angle["roll"].asFloat();
+		_pitch = jgyro_angle["pitch"].asFloat();
 		
 	} catch(std::exception &ex)
     {
@@ -71,7 +64,8 @@ int json_gyro_angle::from_string(std::string &value)
         return -1;
 	}
 
-	gyro_angle = _gyro_angle;
+	roll = _roll;
+	pitch = _pitch;
 	return 0;
 }
 

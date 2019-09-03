@@ -1,19 +1,16 @@
+#include "stereo_detect_boxes.h"
 #include "json/json.h"
-#include "json_detect_boxes.h"
+
 
 using namespace std;
 
-void json_detect_boxes::to_struct(vector<struct stereo_detect_box> &value)
-{
-	value = detect_boxes;
-}
 
-void json_detect_boxes::from_struct(vector<struct stereo_detect_box> &value)
-{
-	detect_boxes = value;
-}
 
-int json_detect_boxes::to_string(std::string &value)
+
+
+
+
+int stereo_detect_boxes::to_string(std::string &value)
 {
 	try {
 		Json::Value jroot;
@@ -57,7 +54,7 @@ int json_detect_boxes::to_string(std::string &value)
 }
 
 
-int json_detect_boxes::from_string(std::string &value)
+int stereo_detect_boxes::from_string(std::string &value)
 {
 	vector<struct stereo_detect_box> _detect_boxes;
 	

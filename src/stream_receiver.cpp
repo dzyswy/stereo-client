@@ -11,8 +11,7 @@
 #include <ctime>
 #include <asio.hpp>
 
-#include "json_detect_boxes.h"
-#include "json_gyro_angle.h"
+
 
 
 
@@ -33,7 +32,7 @@ public:
 	
 	int query_frame(int timeout = 5);
 	void get_frame(std::vector<unsigned char> &image);
-	void get_detect_boxes(vector<struct stereo_detect_box> &detect_boxes);
+	void get_detect_boxes(struct stereo_detect_boxes &detect_boxes);
 	void get_gyro_angle(struct stereo_gyro_angle &gyro_angle);
 	
 protected:
@@ -55,7 +54,7 @@ protected:
 	std::condition_variable cond_;
 	int frame_size_;
 	vector<unsigned char> frame_buffer_;
-	vector<struct stereo_detect_box> detect_boxes_;
+	struct stereo_detect_boxes detect_boxes_;
 	struct stereo_gyro_angle gyro_angle_;
 	
 	std::thread *run_thread_;	
@@ -68,7 +67,6 @@ stream_receiver_impl::stream_receiver_impl(std::string ip, int port, int stream_
 	frame_size_(0)
 {
 	frame_buffer_.clear();
-	detect_boxes_.clear();
 	memset(&gyro_angle_, 0, sizeof(gyro_angle_));
 
 	std::ostream request_stream(&request_);
@@ -109,7 +107,7 @@ void stream_receiver_impl::get_frame(std::vector<unsigned char> &image)
 	image = frame_buffer_;
 }
 
-void stream_receiver_impl::get_detect_boxes(vector<struct stereo_detect_box> &detect_boxes)
+void stream_receiver_impl::get_detect_boxes(struct stereo_detect_boxes &detect_boxes)
 {
 	std::unique_lock<std::mutex> lock(mux_);
 	detect_boxes = detect_boxes_;
@@ -235,24 +233,24 @@ void stream_receiver_impl::do_headers()
 					if (header.substr(0, len) == "Content-detect-boxes:") 
 					{
 						string detect_boxes_s = header.substr(len + 1, header.length() - (len + 2));
-						json_detect_boxes detect_boxes_j;
-						ret = detect_boxes_j.from_string(detect_boxes_s);
+						struct stereo_detect_boxes detect_boxes;
+						ret = detect_boxes.from_string(detect_boxes_s);
 						if (ret == 0)
 						{
 							std::unique_lock<std::mutex> lock(mux_);
-							detect_boxes_j.to_struct(detect_boxes_);
+							detect_boxes_ = detect_boxes;
 						}	
 					}
 					
 					len = strlen("Content-gyro-angle:");
 					if (header.substr(0, len) == "Content-gyro-angle:") {
 						string gyro_angle_s = header.substr(len + 1, header.length() - (len + 2));
-						json_gyro_angle gyro_angle_j;
-						ret = gyro_angle_j.from_string(gyro_angle_s);
+						struct stereo_gyro_angle gyro_angle;
+						ret = gyro_angle.from_string(gyro_angle_s);
 						if (ret == 0)
 						{
 							std::unique_lock<std::mutex> lock(mux_);
-							gyro_angle_j.to_struct(gyro_angle_);
+							gyro_angle_ = gyro_angle;
 						}	
 					}
 					if (header == "\r")
@@ -360,7 +358,7 @@ void stream_receiver::get_frame(std::vector<unsigned char> &image)
 	image = frame_buffer_;
 }
 
-void stream_receiver::get_detect_boxes(vector<struct stereo_detect_box> &detect_boxes)
+void stream_receiver::get_detect_boxes(struct stereo_detect_boxes &detect_boxes)
 {
 	std::unique_lock<std::mutex> lock(mux_);
 	detect_boxes = detect_boxes_;
