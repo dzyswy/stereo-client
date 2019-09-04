@@ -27,12 +27,12 @@ using namespace asio::ip;
 class stream_receiver_impl
 {
 public:	
-	stream_receiver_impl(std::string ip, int port, int stream_id);
+	stream_receiver_impl(std::string ip, int port, int index);
 	~stream_receiver_impl();
 	
 	int query_frame(int timeout = 5);
 	void get_frame(std::vector<unsigned char> &image);
-	void get_detect_boxes(struct stereo_detect_boxes &detect_boxes);
+	void get_detect_boxes(std::vector<struct stereo_detect_box> &detect_boxes);
 	void get_gyro_angle(struct stereo_gyro_angle &gyro_angle);
 	
 protected:
@@ -62,7 +62,7 @@ protected:
 };
 
 
-stream_receiver_impl::stream_receiver_impl(std::string ip, int port, int stream_id) : 
+stream_receiver_impl::stream_receiver_impl(std::string ip, int port, int index) : 
 	socket_(io_context_), 
 	frame_size_(0)
 {
@@ -71,7 +71,7 @@ stream_receiver_impl::stream_receiver_impl(std::string ip, int port, int stream_
 
 	std::ostream request_stream(&request_);
 	request_stream << "GET ";
-	request_stream << "/" << stream_id << " ";
+	request_stream << "/" << index << " ";
     request_stream << "HTTP/1.1\r\n\r\n";
 	
 	
@@ -107,10 +107,10 @@ void stream_receiver_impl::get_frame(std::vector<unsigned char> &image)
 	image = frame_buffer_;
 }
 
-void stream_receiver_impl::get_detect_boxes(struct stereo_detect_boxes &detect_boxes)
+void stream_receiver_impl::get_detect_boxes(std::vector<struct stereo_detect_box> &detect_boxes)
 {
 	std::unique_lock<std::mutex> lock(mux_);
-	detect_boxes = detect_boxes_;
+	detect_boxes = detect_boxes_.detect_boxes;
 }
 
 void stream_receiver_impl::get_gyro_angle(struct stereo_gyro_angle &gyro_angle)
@@ -311,7 +311,7 @@ stream_receiver::~stream_receiver()
 }
 
 
-int stream_receiver::connect_stream(const char *ip, int port, int stream_id)
+int stream_receiver::connect_stream(const char *ip, int port, int index)
 {
 	std::unique_lock<std::mutex> lock(mux_);
 	
@@ -320,7 +320,7 @@ int stream_receiver::connect_stream(const char *ip, int port, int stream_id)
 	
 	ip_ = ip;
 	port_ = port;
-	stream_id_ = stream_id;
+	index_ = index;
 	
 	going = 1;
 	run_thread_ = new std::thread([this] () {stream_process();});
@@ -358,10 +358,10 @@ void stream_receiver::get_frame(std::vector<unsigned char> &image)
 	image = frame_buffer_;
 }
 
-void stream_receiver::get_detect_boxes(struct stereo_detect_boxes &detect_boxes)
+void stream_receiver::get_detect_boxes(std::vector<struct stereo_detect_box> &detect_boxes)
 {
 	std::unique_lock<std::mutex> lock(mux_);
-	detect_boxes = detect_boxes_;
+	detect_boxes = detect_boxes_.detect_boxes;
 }
 
 void stream_receiver::get_gyro_angle(struct stereo_gyro_angle &gyro_angle)
@@ -390,7 +390,7 @@ void stream_receiver::stream_process()
 		
 		while(1)
 		{
-			stream_receiver_impl stream(ip_, port_, stream_id_);
+			stream_receiver_impl stream(ip_, port_, index_);
 			while(1)
 			{
 				ret = stream.query_frame(5);
@@ -404,7 +404,7 @@ void stream_receiver::stream_process()
 				{
 					std::unique_lock<std::mutex> lock(mux_);		
 					stream.get_frame(frame_buffer_);
-					stream.get_detect_boxes(detect_boxes_);
+					stream.get_detect_boxes(detect_boxes_.detect_boxes);
 					stream.get_gyro_angle(gyro_angle_);
 					cond_.notify_all();	
 				}

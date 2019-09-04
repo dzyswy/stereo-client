@@ -1,5 +1,5 @@
-#ifndef __REMOTE_COMMAND_H
-#define __REMOTE_COMMAND_H
+#ifndef __COMMAND_CLIENT_H
+#define __COMMAND_CLIENT_H
 
 
 #include <iostream>
@@ -10,6 +10,7 @@
 #include <mutex>
 
 
+#include "stereo_pixel_point.h"
 
 
 namespace rpc {
@@ -18,7 +19,7 @@ namespace rpc {
 }
 
 
-class remote_command
+class command_client
 {
 public:
 	void set_connect(const char *ip, int port);
@@ -26,11 +27,14 @@ public:
 	int set_value(const char *cmd, int value, int timeout = 5000);
 	int set_value(const char *cmd, float value, int timeout = 5000);
 	int set_value(const char *cmd, std::string value, int timeout = 5000);
+	int set_poly_mask(std::vector<std::pair<float, float> > &value, int timeout = 5000);
 	
 	int get_value(const char *cmd, int &value, int timeout = 5000);
 	int get_value(const char *cmd, float &value, int timeout = 5000);
 	int get_value(const char *cmd, std::string &value, int timeout = 5000);
+	int get_poly_mask(std::vector<std::pair<float, float> > &value, int timeout = 5000);
 	
+	int get_pixel_point(int x, int y, struct stereo_pixel_point &value, int timeout = 5000);
 	
 
 protected:

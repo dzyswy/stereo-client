@@ -12,7 +12,8 @@
 #include <condition_variable>
 #include <ctime>
 
-#include "stream_struct.h"
+#include "stereo_detect_boxes.h"
+#include "stereo_gyro_angle.h"
 
 
 class stream_receiver_impl;
@@ -24,12 +25,12 @@ class stream_receiver
 public:
 	stream_receiver();
 	~stream_receiver();
-	int connect_stream(const char *ip, int port, int stream_id);
+	int connect_stream(const char *ip, int port, int index);
 	int disconnect_stream();
 	
 	int query_frame(int timeout = 5);
 	void get_frame(std::vector<unsigned char> &image);
-	void get_detect_boxes(struct stereo_detect_boxes &detect_boxes);
+	void get_detect_boxes(std::vector<struct stereo_detect_box> &detect_boxes);
 	void get_gyro_angle(struct stereo_gyro_angle &gyro_angle);
 	int get_reconnect_count();
 	
@@ -39,7 +40,7 @@ protected:
 private:
 	std::string ip_;
 	int port_;
-	int stream_id_;
+	int index_;
 	
 	int reconnect_count_;
 	

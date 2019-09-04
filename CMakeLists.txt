@@ -18,25 +18,12 @@ endif()
 set(CMAKE_MODULE_PATH APPEND "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 set(CMAKE_CXX_STANDARD 11)
 
-set(CMAKE_PREFIX_PATH $ENV{QTDIR} ${CMAKE_PREFIX_PATH})
+#set(CMAKE_PREFIX_PATH $ENV{QTDIR} ${CMAKE_PREFIX_PATH})
 
 if (UNIX)
 	ADD_DEFINITIONS(-fPIC)
 endif()
 
-
-find_package(OpenCV REQUIRED)
-if(NOT OpenCV_FOUND)
-	message("fail to find OpenCV")
-else()
-	include_directories(${OpenCV_INCLUDE_DIRS})
-	SET(LIBS ${LIBS} ${OpenCV_LIBS})
-	message(STATUS "OpenCV library status:")
-	message(STATUS "    version: ${OpenCV_VERSION}")
-	message(STATUS "    include: ${OpenCV_INCLUDE_DIRS}")
-	message(STATUS "    library: ${OpenCV_INSTALL_PATH}")
-	message(STATUS "    libs: ${OpenCV_LIBS}")
-endif()
 
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/libs)
@@ -45,13 +32,11 @@ link_directories(${PROJECT_BINARY_DIR}/libs)
 
 
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include)
-
 
 ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/rpclib)
 ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/jsoncpp)
-ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/include)
-ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/src)
+ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/stereo_camera)
+#ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/ptz_track)
 #ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/app/zscam_client)
 
 
