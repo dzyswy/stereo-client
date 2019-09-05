@@ -226,7 +226,7 @@ void zscam_client::post_frame()
 
 	if (show_cursor_mode_)
 	{
-		show_center_cursor(&pixmap_, (int)cx, (int)cy);
+		show_center_cursor(&pixmap_, (int)cx_, (int)cy_);
 	}	
 		
 	int w = ui.label_video->width();
@@ -234,7 +234,7 @@ void zscam_client::post_frame()
 	QPixmap scale_pixmap = pixmap_.scaled(w, h);
 	
 	if (mouse_mode_ == MOUSE_MODE_DEFAULT)
-		show_mouse_press_point(&scale_pixmap, mouse_prex, mouse_prey);
+		show_mouse_press_point(&scale_pixmap, mouse_prex_, mouse_prey_);
 	
 	ui.label_video->setPixmap(scale_pixmap);
 	
@@ -260,21 +260,6 @@ void zscam_client::do_video_label_mouse_pressed(int x, int y)
 	{
 		case MOUSE_MODE_DEFAULT:
 		{
-			struct stereo_detect_box detect_box;
-			memset(&detect_box, 0, sizeof(detect_box));
-			detect_box.x = point.x;
-			detect_box.y = point.y;
-			detect_box.d = point.d;
-			detect_box.xcm = point.xcm;
-			detect_box.ycm = point.ycm;
-			detect_box.zcm = point.zcm;
-			detect_box.xtcm = point.xtcm;
-			detect_box.ytcm = point.ytcm;
-			detect_box.ztcm = point.ztcm;
-			detect_box.xa = point.xa;
-			detect_box.ya = point.ya;
-			detect_box.r = point.r;
-			
 			struct stereo_pixel_point point;
 			ret = camera_->get_pixel_point(x, y, point);
 			if ((ret < 0) || (point.d <= 0))
@@ -491,8 +476,8 @@ void zscam_client::init_ui()
 	
 	ret = camera_->get_value("detect_mode", value);
 	if (ret == 0) {
-		detect_mode = value;
-		if (detect_mode == 0) {
+		detect_mode_ = value;
+		if (detect_mode_ == 0) {
 			ui.pushButton_detect_mode->setText(QString::fromLocal8Bit("开始检测"));
 		} else {
 			ui.pushButton_detect_mode->setText(QString::fromLocal8Bit("停止检测"));
@@ -523,8 +508,8 @@ void zscam_client::init_ui()
 
 	ret = camera_->get_value("track_mode", value);
 	if (ret == 0) {
-		track_mode = value;
-		if (track_mode == 0) {
+		track_mode_ = value;
+		if (track_mode_ == 0) {
 			ui.pushButton_track_mode->setText(QString::fromLocal8Bit("开始跟踪"));
 		} else {
 			ui.pushButton_track_mode->setText(QString::fromLocal8Bit("停止跟踪"));

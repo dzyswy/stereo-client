@@ -15,13 +15,14 @@
 #include <QPen>
 #include <QFileDialog>
 #include <QDir>
-#include <opencv2/opencv.hpp>
+//#include <opencv2/opencv.hpp>
 
 
 #include "ui_zscam_client.h"
 #include "stereo_camera.h"
 #include "stereo_detect_boxes.h"
 #include "stereo_gyro_angle.h"
+#include "stereo_pixel_point.h"
 #include "media_record.h"
 
 #define SHOW_GRAPH_COORD_INFO_EN		(1 << 0)
@@ -38,7 +39,7 @@
 
 
 using namespace std;
-using namespace cv;
+//using namespace cv;
 
 
 
@@ -96,8 +97,8 @@ public:
 	std::vector<struct stereo_detect_box> detect_boxes_;
 	struct stereo_gyro_angle gyro_angle_;
 	
-	int cx_;
-	int cy_;
+	float cx_;
+	float cy_;
 	int detect_mode_;
 	int track_mode_;
 	

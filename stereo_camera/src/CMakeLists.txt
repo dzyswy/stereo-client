@@ -25,26 +25,7 @@ SET(LIBS ${LIBS} rpc)
 ADD_LIBRARY(stereo_camera SHARED ${STEREO_CAMERA_SRCS})
 TARGET_LINK_LIBRARIES(stereo_camera ${LIBS})
 ADD_LIBRARY(stereo_camera_static STATIC ${STEREO_CAMERA_SRCS})
-set_target_properties(stereo_camera_static PROPERTIES OUTPUT_NAME "stereo_camera")
-set_target_properties(stereo_camera PROPERTIES CLEAN_DIRECT_OUTPUT 1)
-set_target_properties(stereo_camera_static PROPERTIES CLEAN_DIRECT_OUTPUT 1)
-set_target_properties(stereo_camera PROPERTIES 
-    ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
-set_target_properties(stereo_camera_static PROPERTIES 
-    ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 
-#IF(UNIX)
-#    SET_PROPERTY(TARGET stereo_camera PROPERTY VERSION ${stereo_camera_VERSION})
-#    SET_PROPERTY(TARGET stereo_camera PROPERTY SOVERSION ${stereo_camera_VERSION_MAJOR})
-#ENDIF(UNIX)
+
 INSTALL(TARGETS stereo_camera DESTINATION lib)
 INSTALL(TARGETS stereo_camera_static DESTINATION lib)
-#INSTALL(DIRECTORY . DESTINATION include FILES_MATCHING PATTERN "*.h")
-#INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/stereo_camera.h DESTINATION include)
-#INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/stream_func.h DESTINATION include)
-#INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/record_media.h DESTINATION include)
-#INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/discovery/broadcast_client.h DESTINATION include)

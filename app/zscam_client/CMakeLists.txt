@@ -1,4 +1,9 @@
 
+if (POLICY CMP0071)
+  cmake_policy(SET CMP0071 NEW)
+endif()
+
+
 PROJECT(zscam_client CXX)
 
 
@@ -26,7 +31,10 @@ SET(CMAKE_AUTOMOC ON)
 #endif()
 
 
-SET(LIBS ${LIBS} stereo_camera)
+
+if (UNIX)
+	set(LIBS pthread)
+endif ()
 
  
 FIND_PACKAGE(Qt5Widgets)
@@ -39,6 +47,7 @@ qt5_add_resources(QRC_FILES ${QRC_SOURCE_FILES})
 qt5_wrap_ui(UI_HEADERS zscam_client.ui) # ftp_dialog.ui update_dialog.ui
 ADD_EXECUTABLE(zscam_client ${ZSCAM_CLIENT_SRCS} ${UI_HEADERS} ${QRC_FILES})
 TARGET_LINK_LIBRARIES(zscam_client 
+	stereo_camera
 	${LIBS}
 	${Qt5Core_QTMAIN_LIBRARIES})
 qt5_use_modules(zscam_client Widgets Gui)
