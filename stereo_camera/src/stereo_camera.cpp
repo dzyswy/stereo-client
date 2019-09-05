@@ -1,12 +1,15 @@
 #include "stereo_camera.h"
 
+#include "discovery_receiver.h"
 #include "command_client.h"
 #include "stream_receiver.h"
 
 
 
-stereo_camera::stereo_camera()
+stereo_camera::stereo_camera(const char *device_name, int port, int poll_time)
 {
+	open_ = 0;
+	xfind = new discovery_receiver(device_name, port, poll_time);
 	xcmd_ = new command_client;
 	xstream_ = new stream_receiver;
 }
@@ -16,6 +19,12 @@ stereo_camera::~stereo_camera()
 {
 	delete xcmd_;
 	delete xstream_;
+	delete xfind;
+}
+
+void stereo_camera::get_device_nodes(std::vector<std::string> &device_nodes)
+{
+	xfind->get_device_nodes(device_nodes);
 }
 
 
@@ -26,13 +35,19 @@ int stereo_camera::open_device(const char *ip, int cmd_port, int stream_port, in
 	ret = xstream_->connect_stream(ip, stream_port, stream_index);
 	if (ret < 0)
 		return -1;
-	
+	open_ = 1;
 	return 0;
 }	
 	
 int stereo_camera::close_device()
 {
+	open_ = 0;
 	return xstream_->disconnect_stream();
+}
+
+int stereo_camera::is_opened()
+{
+	return open_;
 }
 
 int stereo_camera::set_value(const char *cmd, int value, int timeout)
@@ -74,6 +89,11 @@ int stereo_camera::get_value(const char *cmd, std::string &value, int timeout)
 int stereo_camera::get_poly_mask(std::vector<std::pair<float, float> > &value, int timeout)
 {
 	return xcmd_->get_poly_mask(value, timeout);
+}
+
+int stereo_camera::do_action(const char *para, int timeout)
+{
+	return xcmd_->do_action(para, timeout);
 }
  
 int stereo_camera::get_pixel_point(int x, int y, struct stereo_pixel_point &value, int timeout)

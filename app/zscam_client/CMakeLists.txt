@@ -1,24 +1,32 @@
 
+PROJECT(zscam_client CXX)
+
+
+set(CMAKE_PREFIX_PATH $ENV{QTDIR} ${CMAKE_PREFIX_PATH})
+
+
+
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../../stereo_camera/include)
 
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} ZSCAM_CLIENT_SRCS)
 
 SET(CMAKE_AUTOMOC ON)
 
 
-find_package(OpenCV REQUIRED)
-if(NOT OpenCV_FOUND)
-	message("fail to find OpenCV")
-else()
-	include_directories(${OpenCV_INCLUDE_DIRS})
-	SET(LIBS ${LIBS} ${OpenCV_LIBS})
-	message(STATUS "OpenCV library status:")
-	message(STATUS "    version: ${OpenCV_VERSION}")
-endif()
+#find_package(OpenCV REQUIRED)
+#if(NOT OpenCV_FOUND)
+#	message("fail to find OpenCV")
+#else()
+#	include_directories(${OpenCV_INCLUDE_DIRS})
+#	SET(LIBS ${LIBS} ${OpenCV_LIBS})
+#	message(STATUS "OpenCV library status:")
+#	message(STATUS "    version: ${OpenCV_VERSION}")
+#endif()
 
 
-SET(LIBS ${LIBS} remote_stereo)
+SET(LIBS ${LIBS} stereo_camera)
 
  
 FIND_PACKAGE(Qt5Widgets)

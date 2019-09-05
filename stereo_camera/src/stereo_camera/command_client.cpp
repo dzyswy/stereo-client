@@ -14,13 +14,15 @@ void command_client::set_connect(const char *ip, int port)
 }
 
 
-int command_client::set_value(const char *cmd, int value, int timeout)
+int command_client::set_value(const char *para, int value, int timeout)
 {
 	try {
 		try {
 			rpc::client client(ip_, port_);
 			client.set_timeout(timeout);
-			return client.call(cmd, value).as<int>();
+			stringstream os;
+			os << "set_" << string(para);
+			return client.call(os.str().c_str(), value).as<int>();
 		} catch (rpc::rpc_error &e) {
 			std::cout << std::endl << e.what() << std::endl;
 			std::cout << "in function " << e.get_function_name() << ": ";
@@ -31,20 +33,22 @@ int command_client::set_value(const char *cmd, int value, int timeout)
 			throw;
 		}
 	} catch (...) {
-		std::string cmd_str = cmd;
+		std::string cmd_str = para;
 		std::cout << "Error: server is offline, or no support command, or error command format: " << cmd_str << " " << value << " \n";
 		return -1;
 	}
 }
 
 
-int command_client::set_value(const char *cmd, float value, int timeout)
+int command_client::set_value(const char *para, float value, int timeout)
 {
 	try {
 		try {
 			rpc::client client(ip_, port_);
 			client.set_timeout(timeout);
-			return client.call(cmd, value).as<int>();
+			stringstream os;
+			os << "set_" << string(para);
+			return client.call(os.str().c_str(), value).as<int>();
 		} catch (rpc::rpc_error &e) {
 			std::cout << std::endl << e.what() << std::endl;
 			std::cout << "in function " << e.get_function_name() << ": ";
@@ -55,19 +59,21 @@ int command_client::set_value(const char *cmd, float value, int timeout)
 			throw;
 		}
 	} catch (...) {
-		std::string cmd_str = cmd;
+		std::string cmd_str = para;
 		std::cout << "Error: server is offline, or no support command, or error command format: " << cmd_str << " " << value << " \n";
 		return -1;
 	}
 }
 
-int command_client::set_value(const char *cmd, std::string value, int timeout)
+int command_client::set_value(const char *para, std::string value, int timeout)
 {
 	try {
 		try {
 			rpc::client client(ip_, port_);	
 			client.set_timeout(timeout);
-			return client.call(cmd, value).as<int>();
+			stringstream os;
+			os << "set_" << string(para);
+			return client.call(os.str().c_str(), value).as<int>();
 		} catch (rpc::rpc_error &e) {
 			std::cout << std::endl << e.what() << std::endl;
 			std::cout << "in function " << e.get_function_name() << ": ";
@@ -78,7 +84,7 @@ int command_client::set_value(const char *cmd, std::string value, int timeout)
 			throw;
 		}
 	} catch (...) {
-		std::string cmd_str = cmd;
+		std::string cmd_str = para;
 		std::cout << "Error: server is offline, or no support command, or error command format: " << cmd_str << " " << value << " \n";
 		return -1;
 	}
@@ -93,17 +99,19 @@ int command_client::set_poly_mask(std::vector<std::pair<float, float> > &value, 
 	int ret = pointes.to_string(svalue);
 	if (ret < 0)
 		return -1;
-	return set_value("set_poly_mask", svalue, timeout);
+	return set_value("poly_mask", svalue, timeout);
 }
 
 
-int command_client::get_value(const char *cmd, int &value, int timeout)
+int command_client::get_value(const char *para, int &value, int timeout)
 {
 	try {
 		try {
 			rpc::client client(ip_, port_);
 			client.set_timeout(timeout);
-			value = client.call(cmd).as<int>();
+			stringstream os;
+			os << "get_" << string(para);
+			value = client.call(os.str().c_str()).as<int>();
 			return 0;
 		} catch (rpc::rpc_error &e) {
 			std::cout << std::endl << e.what() << std::endl;
@@ -115,19 +123,21 @@ int command_client::get_value(const char *cmd, int &value, int timeout)
 			throw;
 		}
 	} catch (...) {
-		std::string cmd_str = cmd;
+		std::string cmd_str = para;
 		std::cout << "Error: server is offline, or no support command, or error command format: " << cmd_str << " \n";
 		return -1;
 	}
 }
 
-int command_client::get_value(const char *cmd, float &value, int timeout)
+int command_client::get_value(const char *para, float &value, int timeout)
 {
 	try {
 		try {
 			rpc::client client(ip_, port_);
 			client.set_timeout(timeout);
-			value = client.call(cmd).as<float>();
+			stringstream os;
+			os << "get_" << string(para);
+			value = client.call(os.str().c_str()).as<float>();
 			return 0;
 		} catch (rpc::rpc_error &e) {
 			std::cout << std::endl << e.what() << std::endl;
@@ -139,20 +149,22 @@ int command_client::get_value(const char *cmd, float &value, int timeout)
 			throw;
 		}
 	} catch (...) {
-		std::string cmd_str = cmd;
+		std::string cmd_str = para;
 		std::cout << "Error: server is offline, or no support command, or error command format: " << cmd_str << " \n";
 		return -1;
 	}
 }
 
 
-int command_client::get_value(const char *cmd, std::string &value, int timeout)
+int command_client::get_value(const char *para, std::string &value, int timeout)
 {
 	try {
 		try {
 			rpc::client client(ip_, port_);
 			client.set_timeout(timeout);
-			value = client.call(cmd).as<std::string>();
+			stringstream os;
+			os << "get_" << string(para);
+			value = client.call(os.str().c_str()).as<std::string>();
 			return 0;
 		} catch (rpc::rpc_error &e) {
 			std::cout << std::endl << e.what() << std::endl;
@@ -164,7 +176,7 @@ int command_client::get_value(const char *cmd, std::string &value, int timeout)
 			throw;
 		}
 	} catch (...) {
-		std::string cmd_str = cmd;
+		std::string cmd_str = para;
 		std::cout << "Error: server is offline, or no support command, or error command format: " << cmd_str << " \n";
 		return -1;
 	}
@@ -175,7 +187,7 @@ int command_client::get_poly_mask(std::vector<std::pair<float, float> > &value, 
 {
 	int ret;
 	string str; 
-	ret = get_value("get_poly_mask", str, timeout);
+	ret = get_value("poly_mask", str, timeout);
 	if (ret < 0)
 		return -1;
 	
@@ -187,6 +199,7 @@ int command_client::get_poly_mask(std::vector<std::pair<float, float> > &value, 
 	value = pointes.data;
 	return 0;
 }
+
 
 
 int command_client::get_pixel_point(int x, int y, struct stereo_pixel_point &value, int timeout)
@@ -219,6 +232,34 @@ int command_client::get_pixel_point(int x, int y, struct stereo_pixel_point &val
 	
 	value = pixel_point;
 	
+	return 0;
+}
+
+int command_client::do_action(const char *para, int timeout)
+{
+	int value;
+	try {
+		try {
+			rpc::client client(ip_, port_);
+			client.set_timeout(timeout);;
+			value = client.call(para).as<int>();
+			if (value < 0)
+				return -1;
+			return 0;
+		} catch (rpc::rpc_error &e) {
+			std::cout << std::endl << e.what() << std::endl;
+			std::cout << "in function " << e.get_function_name() << ": ";
+
+			using err_t = std::tuple<int, std::string>;
+			auto err = e.get_error().as<err_t>();
+			std::cout << "[error " << std::get<0>(err) << "]: " << std::get<1>(err) << std::endl;
+			throw;
+		}
+	} catch (...) {
+		std::string cmd_str = para;
+		std::cout << "Error: server is offline, or no support command, or error command format: " << cmd_str << " \n";
+		return -1;
+	}
 	return 0;
 }
 

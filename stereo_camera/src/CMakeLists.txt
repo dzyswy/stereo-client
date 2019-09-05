@@ -2,7 +2,6 @@ if (POLICY CMP0074)
   cmake_policy(SET CMP0074 NEW)
 endif()
 
-project(stereo_camera)
 
 
 ADD_DEFINITIONS(-DASIO_STANDALONE)
@@ -12,18 +11,20 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/rpclib/include)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/jsoncpp/include)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/asio/include)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/stereo_camera)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/media_record)
 
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} REMOTE_STEREO_SRCS)
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/stereo_camera REMOTE_STEREO_SRCS)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} STEREO_CAMERA_SRCS)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/stereo_camera STEREO_CAMERA_SRCS)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/media_record STEREO_CAMERA_SRCS)
 
 
 SET(LIBS ${LIBS} jsoncpp)
 SET(LIBS ${LIBS} rpc)
 
 
-ADD_LIBRARY(stereo_camera SHARED ${REMOTE_STEREO_SRCS})
+ADD_LIBRARY(stereo_camera SHARED ${STEREO_CAMERA_SRCS})
 TARGET_LINK_LIBRARIES(stereo_camera ${LIBS})
-ADD_LIBRARY(stereo_camera_static STATIC ${REMOTE_STEREO_SRCS})
+ADD_LIBRARY(stereo_camera_static STATIC ${STEREO_CAMERA_SRCS})
 set_target_properties(stereo_camera_static PROPERTIES OUTPUT_NAME "stereo_camera")
 set_target_properties(stereo_camera PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 set_target_properties(stereo_camera_static PROPERTIES CLEAN_DIRECT_OUTPUT 1)

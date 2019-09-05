@@ -286,7 +286,7 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>-911</y>
+           <y>0</y>
            <width>334</width>
            <height>1901</height>
           </rect>
@@ -1836,7 +1836,7 @@
            <x>0</x>
            <y>0</y>
            <width>334</width>
-           <height>548</height>
+           <height>576</height>
           </rect>
          </property>
          <property name="autoFillBackground">
@@ -1952,7 +1952,7 @@
                <item>
                 <widget class="QLineEdit" name="lineEdit_ip">
                  <property name="enabled">
-                  <bool>false</bool>
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -1970,7 +1970,7 @@
                <item>
                 <widget class="QLineEdit" name="lineEdit_netmask">
                  <property name="enabled">
-                  <bool>false</bool>
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -1988,7 +1988,25 @@
                <item>
                 <widget class="QLineEdit" name="lineEdit_gateway">
                  <property name="enabled">
-                  <bool>false</bool>
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_31">
+               <item>
+                <widget class="QLabel" name="label_90">
+                 <property name="text">
+                  <string>Mac    :</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="lineEdit_mac">
+                 <property name="enabled">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>

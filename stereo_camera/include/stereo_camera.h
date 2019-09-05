@@ -8,7 +8,7 @@
 #include "stereo_gyro_angle.h"
 
 
-
+class discovery_receiver;
 class command_client;
 class stream_receiver;
 
@@ -17,10 +17,16 @@ class stream_receiver;
 class stereo_camera
 {
 public:
-	stereo_camera();
+	stereo_camera(const char *device_name = "zynq_stereo_camera", int port = 45789, int poll_time = 5000);
 	~stereo_camera();
+	
+	void get_device_nodes(std::vector<std::string> &device_nodes);
+	
+	
 	int open_device(const char *ip, int cmd_port, int stream_port, int stream_index);
 	int close_device();
+	
+	int is_opened();
 	
 	int set_value(const char *cmd, int value, int timeout = 5000);
 	int set_value(const char *cmd, float value, int timeout = 5000);
@@ -34,7 +40,7 @@ public:
 	
 	
 	int get_pixel_point(int x, int y, struct stereo_pixel_point &value, int timeout = 5000);
-	
+	int do_action(const char *para, int timeout = 5000);
 	
 	int query_frame(int timeout = 5);
 	void get_frame(std::vector<unsigned char> &image);
@@ -47,7 +53,9 @@ protected:
 	int stream_port_;
 	int stream_mode_;
 	int cmd_port_;
+	int open_;
 	
+	discovery_receiver *xfind;
 	command_client *xcmd_;
 	stream_receiver *xstream_;
 	
