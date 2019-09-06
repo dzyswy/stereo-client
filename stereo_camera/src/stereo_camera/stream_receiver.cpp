@@ -27,7 +27,7 @@ using namespace asio::ip;
 class stream_receiver_impl
 {
 public:	
-	stream_receiver_impl(std::string ip, int port, int index);
+	stream_receiver_impl(std::string ip, int port, int index, int debug = 0);
 	~stream_receiver_impl();
 	
 	int query_frame(int timeout = 5);
@@ -49,6 +49,7 @@ protected:
 	asio::streambuf request_;
 	asio::streambuf response_;
 	
+	int debug_;
 
 	std::mutex mux_;
 	std::condition_variable cond_;
@@ -56,18 +57,24 @@ protected:
 	vector<unsigned char> frame_buffer_;
 	struct stereo_detect_boxes detect_boxes_;
 	struct stereo_gyro_angle gyro_angle_;
+	int frame_count_;
+	int first_frame_;
 	
 	std::thread *run_thread_;	
 	
 };
 
 
-stream_receiver_impl::stream_receiver_impl(std::string ip, int port, int index) : 
+stream_receiver_impl::stream_receiver_impl(std::string ip, int port, int index, int debug) : 
 	socket_(io_context_), 
-	frame_size_(0)
+	frame_size_(0), 
+	debug_(debug)
 {
 	frame_buffer_.clear();
+	detect_boxes_.detect_boxes.clear();
 	memset(&gyro_angle_, 0, sizeof(gyro_angle_));
+	frame_count_ = 0;
+	first_frame_ = 1;
 
 	std::ostream request_stream(&request_);
 	request_stream << "GET ";
@@ -143,7 +150,6 @@ void stream_receiver_impl::do_write()
 		{
 			if (!ec)
 			{
-			//	cout << "do_write\n";
 				do_read();
 			}
 			else
@@ -168,8 +174,8 @@ void stream_receiver_impl::do_read()
 					if (header == "\r")
 						break;
 				}	
-					
-			//	cout << "do_read\n";
+				
+				first_frame_ = 1;				
 				do_boundary();
 			}
 			else
@@ -186,6 +192,10 @@ void stream_receiver_impl::do_boundary()
 		{
 			if (!ec)
 			{
+				if (debug_) {
+					cout << "do_boundary new read:" << n << ", total: " << response_.size() << endl;
+				}
+					 
 				std::istream rs(&response_);
 				std::string header;
 				while(std::getline(rs, header))
@@ -194,7 +204,18 @@ void stream_receiver_impl::do_boundary()
 					if (header == "--BOUNDARYSTRING\r")
 						break;
 				}	
-			//	cout << "do_boundary\n";
+				
+				if (first_frame_) {
+					first_frame_ = 0;
+				} else {
+					std::unique_lock<std::mutex> lock(mux_);
+					cond_.notify_all(); 
+				}	
+				
+				if (response_.size() > 2048)
+				{
+					response_.consume(response_.size());
+				}	
 				do_headers();
 			}
 			else
@@ -206,12 +227,28 @@ void stream_receiver_impl::do_boundary()
 
 void stream_receiver_impl::do_headers()
 {
+	
+	
 	asio::async_read_until(socket_, response_, "\r\n\r\n",
 		[this] (asio::error_code ec, std::size_t n) 
 		{
 			int ret;
+			string frame_size_s;
+			string frame_count_s;
+			string detect_boxes_s;
+			string gyro_angle_s;
+			
+			frame_size_s.clear();
+			frame_count_s.clear();
+			detect_boxes_s.clear();
+			gyro_angle_s.clear();
+			
 			if (!ec)
 			{
+				if (debug_) {
+					cout << "do_headers new read:" << n << ", total: " << response_.size() << endl;
+				}
+				 
 				std::istream rs(&response_);
 				std::string header;
 				while (std::getline(rs, header))
@@ -220,44 +257,85 @@ void stream_receiver_impl::do_headers()
 					int len;
 					if (header.substr(0, 15) == "Content-Length:") 
 					{
-						string frame_size_s = header.substr(16, header.length() - 17);
-						int frame_size = atoi(frame_size_s.c_str());
-						{
-							std::unique_lock<std::mutex> lock(mux_);
-							frame_size_ = (frame_size <= 0) ? 1:frame_size;
-						}
-					//	cout << frame_size << endl;
+						frame_size_s = header.substr(16, header.length() - 17);
+						if (debug_) {
+							cout << "get Content-Length: " << frame_size_s << endl;
+						} 
+					}
+					
+					len = strlen("Content-frame-count:");
+					if (header.substr(0, len) == "Content-frame-count:") 
+					{
+						frame_count_s = header.substr(len + 1, header.length() - (len + 2));
+						if (debug_) {
+							cout << "get Content-frame-count: " << frame_count_s << endl;
+						} 	
 					}
 					
 					len = strlen("Content-detect-boxes:");
 					if (header.substr(0, len) == "Content-detect-boxes:") 
 					{
-						string detect_boxes_s = header.substr(len + 1, header.length() - (len + 2));
-						struct stereo_detect_boxes detect_boxes;
-						ret = detect_boxes.from_string(detect_boxes_s);
-						if (ret == 0)
-						{
-							std::unique_lock<std::mutex> lock(mux_);
-							detect_boxes_ = detect_boxes;
-						}	
+						detect_boxes_s = header.substr(len + 1, header.length() - (len + 2));
+						if (debug_) {
+							cout << "get Content-detect-boxes: " << detect_boxes_s << endl;
+						} 	
 					}
 					
 					len = strlen("Content-gyro-angle:");
 					if (header.substr(0, len) == "Content-gyro-angle:") {
-						string gyro_angle_s = header.substr(len + 1, header.length() - (len + 2));
-						struct stereo_gyro_angle gyro_angle;
-						ret = gyro_angle.from_string(gyro_angle_s);
-						if (ret == 0)
-						{
-							std::unique_lock<std::mutex> lock(mux_);
-							gyro_angle_ = gyro_angle;
-						}	
+						gyro_angle_s = header.substr(len + 1, header.length() - (len + 2));
+						if (debug_) {
+							cout << "get Content-gyro-angle: " << gyro_angle_s << endl;
+						} 	
 					}
 					if (header == "\r")
 						break;
 				}	
-			//	cout << "do_headers\n";
-				do_content();
+				
+				{
+					std::unique_lock<std::mutex> lock(mux_);
+					
+					if (frame_size_s.empty()) {
+						frame_size_ = 0;
+					} else {
+						frame_size_ =  atoi(frame_size_s.c_str());
+					}
+					
+					if (frame_count_s.empty()) {
+						frame_count_ = 0;
+					} else {
+						frame_count_ = atoi(frame_count_s.c_str()); 
+					}
+					
+					if (detect_boxes_s.empty()) {
+						detect_boxes_.detect_boxes.clear();
+					} else {
+						struct stereo_detect_boxes detect_boxes;
+						ret = detect_boxes.from_string(detect_boxes_s);
+						if (ret < 0) {
+							detect_boxes_.detect_boxes.clear();
+						} else {
+							detect_boxes_ = detect_boxes;
+						} 
+					}
+					
+					if (gyro_angle_s.empty()) {
+						memset(&gyro_angle_, 0, sizeof(gyro_angle_));
+					} else {
+						struct stereo_gyro_angle gyro_angle;
+						ret = gyro_angle.from_string(gyro_angle_s);
+						if (ret < 0) {
+							memset(&gyro_angle_, 0, sizeof(gyro_angle_));
+						} else {
+							gyro_angle_ = gyro_angle;
+						}
+					}  
+				}
+				
+				if (frame_size_)
+					do_content();
+				else
+					do_boundary();
 			}
 			else
 			{
@@ -268,25 +346,21 @@ void stream_receiver_impl::do_headers()
 
 void stream_receiver_impl::do_content()
 {
-	asio::async_read(socket_, response_, asio::transfer_at_least(frame_size_ + 2),
+	asio::async_read(socket_, response_, asio::transfer_at_least(frame_size_),
 		[this] (asio::error_code ec, std::size_t n) 
 		{
 			if (!ec)
 			{
-				if (response_.size() >= (frame_size_ + 2))
+				if (debug_) {
+					cout << "do_content new read:" << n << ", total: " << response_.size() << ", frame_size: " << frame_size_ << endl;
+				}
+				
+				if (response_.size() >= frame_size_)
 				{
 					std::unique_lock<std::mutex> lock(mux_);
 					frame_buffer_.resize(frame_size_);
 					response_.sgetn((char *)&frame_buffer_[0], frame_size_);
-				//	char c = response_.sgetc();
-				//	cout << c << endl;
-				//	if (c != '\r')
-				//	{
-				//		frame_buffer_.resize(0);
-				//	}	
-					cond_.notify_all();
 				}	
-			//	cout << "do_content\n";
 				do_boundary();
 			}	
 		});
@@ -298,10 +372,15 @@ void stream_receiver_impl::do_content()
 
 
 
-stream_receiver::stream_receiver()
+stream_receiver::stream_receiver(int debug)
 {
+	debug_ = debug;
 	going = 0;
 	reconnect_count_ = 0;
+	frame_buffer_.clear();
+	detect_boxes_.detect_boxes.clear();
+	memset(&gyro_angle_, 0, sizeof(gyro_angle_));
+	
 }
 
 
@@ -323,7 +402,9 @@ int stream_receiver::connect_stream(const char *ip, int port, int index)
 	index_ = index;
 	
 	going = 1;
+	reconnect_count_ = 0;
 	run_thread_ = new std::thread([this] () {stream_process();});
+	return 0;
 }
 
 
@@ -379,6 +460,7 @@ int stream_receiver::get_reconnect_count()
 void stream_receiver::stream_process()
 {
 	int ret;
+	cout << "create stream receiver thread\n";
 	while(1)
 	{
 		{
@@ -387,36 +469,27 @@ void stream_receiver::stream_process()
 				break;
 		}
 		
+		stream_receiver_impl *stream = new stream_receiver_impl(ip_, port_, index_, debug_);
 		
 		while(1)
 		{
-			stream_receiver_impl stream(ip_, port_, index_);
-			while(1)
-			{
-				ret = stream.query_frame(5);
-				if (ret < 0)
-				{
-					reconnect_count_++;
-					std::this_thread::sleep_for(std::chrono::seconds(5));	
-					break;
-				}
-
-				{
-					std::unique_lock<std::mutex> lock(mux_);		
-					stream.get_frame(frame_buffer_);
-					stream.get_detect_boxes(detect_boxes_.detect_boxes);
-					stream.get_gyro_angle(gyro_angle_);
-					cond_.notify_all();	
-				}
-			}	
-			
+			ret = stream->query_frame(5);
 			if (ret < 0)
 				break;
-		}
-
-		
-		
+			
+			{
+				std::unique_lock<std::mutex> lock(mux_);		
+				stream->get_frame(frame_buffer_);
+				stream->get_detect_boxes(detect_boxes_.detect_boxes);
+				stream->get_gyro_angle(gyro_angle_);
+				cond_.notify_all();	
+			}
+		}	
+		cout << "stream receiver try reconnect...\n";
+		reconnect_count_++;
+		delete stream;
 	}
+	cout << "leave stream receiver thread\n";
 	
 }
 

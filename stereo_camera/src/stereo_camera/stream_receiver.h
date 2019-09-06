@@ -23,7 +23,7 @@ class stream_receiver_impl;
 class stream_receiver
 {
 public:
-	stream_receiver();
+	stream_receiver(int debug = 0);
 	~stream_receiver();
 	int connect_stream(const char *ip, int port, int index);
 	int disconnect_stream();
@@ -52,6 +52,9 @@ private:
 	std::mutex mux_;
 	std::condition_variable cond_;
 	std::thread *run_thread_;
+	
+	int debug_;
+	
 };
 
 

@@ -119,7 +119,7 @@ void zscam_client::on_pushButton_open_camera_clicked()
 			QMessageBox::warning(this, QString::fromLocal8Bit("错误"), QString::fromLocal8Bit("打开失败，请检查设备是否上电或IP填写是否正确"));			
 			return;
 		}
-		init_ui();
+	//	init_ui();
 		ui.pushButton_open_camera->setText(QString::fromLocal8Bit("关闭"));
 		
 	}	

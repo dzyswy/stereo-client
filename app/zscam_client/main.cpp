@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
 	
 	auto func_frame = [&] () {
 			int ret;
+			static int frame_count = 0;
 			
 			while(going)
 			{
@@ -44,6 +45,9 @@ int main(int argc, char *argv[])
 				w.set_detect_boxes(detect_boxes);
 				w.set_gyro_angle(gyro_angle);
 				w.post_frame();
+			
+				cout << "func_frame frame_count: " << frame_count << endl;
+				frame_count++;
 			}	
 			 
 		};

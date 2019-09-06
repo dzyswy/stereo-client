@@ -11,7 +11,7 @@ stereo_camera::stereo_camera(const char *device_name, int port, int poll_time)
 	open_ = 0;
 	xfind = new discovery_receiver(device_name, port, poll_time);
 	xcmd_ = new command_client;
-	xstream_ = new stream_receiver;
+	xstream_ = new stream_receiver(1);
 }
 
 
