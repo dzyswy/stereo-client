@@ -90,6 +90,7 @@ stream_receiver_impl::stream_receiver_impl(std::string ip, int port, int index, 
 
 stream_receiver_impl::~stream_receiver_impl()
 {
+	socket_.close();
 	io_context_.stop();
 	if (run_thread_)
 	{
@@ -103,7 +104,7 @@ int stream_receiver_impl::query_frame(int timeout)
 	std::unique_lock<std::mutex> lock(mux_);
 	if (cond_.wait_for(lock, std::chrono::seconds(timeout)) == std::cv_status::timeout)
 		return -1;
-	
+ 
 	return 0;
 }
 
@@ -212,7 +213,7 @@ void stream_receiver_impl::do_boundary()
 					cond_.notify_all(); 
 				}	
 				
-				if (response_.size() > 2048)
+				if ((frame_size_ > 1024) && (response_.size() > (frame_size_ * 2)))
 				{
 					response_.consume(response_.size());
 				}	
@@ -380,7 +381,7 @@ stream_receiver::stream_receiver(int debug)
 	frame_buffer_.clear();
 	detect_boxes_.detect_boxes.clear();
 	memset(&gyro_angle_, 0, sizeof(gyro_angle_));
-	
+	run_thread_ = NULL;
 }
 
 
@@ -391,18 +392,21 @@ stream_receiver::~stream_receiver()
 
 
 int stream_receiver::connect_stream(const char *ip, int port, int index)
-{
-	std::unique_lock<std::mutex> lock(mux_);
+{ 
+	{
+		std::unique_lock<std::mutex> lock(mux_);
 	
-	if (going)
-		return -1;
+		if (going)
+			return -1;
+		
+		ip_ = ip;
+		port_ = port;
+		index_ = index;
+		
+		going = 1;
+		reconnect_count_ = 0;
+	}
 	
-	ip_ = ip;
-	port_ = port;
-	index_ = index;
-	
-	going = 1;
-	reconnect_count_ = 0;
 	run_thread_ = new std::thread([this] () {stream_process();});
 	return 0;
 }
@@ -410,9 +414,11 @@ int stream_receiver::connect_stream(const char *ip, int port, int index)
 
 int stream_receiver::disconnect_stream()
 {
-	std::unique_lock<std::mutex> lock(mux_);
+	{
+		std::unique_lock<std::mutex> lock(mux_);
+		going = 0;
+	}
 	
-	going = 0;
 	if (run_thread_)
 	{
 		run_thread_->join();
@@ -429,7 +435,7 @@ int stream_receiver::query_frame(int timeout)
 	std::unique_lock<std::mutex> lock(mux_);
 	if (cond_.wait_for(lock, std::chrono::seconds(timeout)) == std::cv_status::timeout)
 		return -1;
-	
+ 
 	return 0;
 }
 
@@ -463,31 +469,35 @@ void stream_receiver::stream_process()
 	cout << "create stream receiver thread\n";
 	while(1)
 	{
+		stream_receiver_impl *impl = new stream_receiver_impl(ip_, port_, index_, debug_);
+		
+		while(1)
+		{
+			ret = impl->query_frame(5);
+			if (ret < 0) {
+				break;
+			}
+
+			{
+				std::unique_lock<std::mutex> lock(mux_);		
+				impl->get_frame(frame_buffer_);
+				impl->get_detect_boxes(detect_boxes_.detect_boxes);
+				impl->get_gyro_angle(gyro_angle_);
+				cond_.notify_all();
+				if (!going)
+					break;	
+			}
+		
+		}	
+		reconnect_count_++;
+		delete impl;
+		
 		{
 			std::unique_lock<std::mutex> lock(mux_);
 			if (!going)
 				break;
 		}
 		
-		stream_receiver_impl *stream = new stream_receiver_impl(ip_, port_, index_, debug_);
-		
-		while(1)
-		{
-			ret = stream->query_frame(5);
-			if (ret < 0)
-				break;
-			
-			{
-				std::unique_lock<std::mutex> lock(mux_);		
-				stream->get_frame(frame_buffer_);
-				stream->get_detect_boxes(detect_boxes_.detect_boxes);
-				stream->get_gyro_angle(gyro_angle_);
-				cond_.notify_all();	
-			}
-		}	
-		cout << "stream receiver try reconnect...\n";
-		reconnect_count_++;
-		delete stream;
 	}
 	cout << "leave stream receiver thread\n";
 	

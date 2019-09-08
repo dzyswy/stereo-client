@@ -21,7 +21,7 @@ int media_record::open_media(const char *file_name, int width, int height, doubl
 {
 	std::unique_lock<std::mutex> lock(mux_);
 	
-	if (file_name) {
+	if (avifile) {
 		cout << "record is busy, please close first!\n";
 		return -1;
 	}
@@ -51,9 +51,9 @@ int media_record::close_media()
 	
 	t_[1] = steady_clock::now();
 	double sec = duration_cast<duration<double>>(t_[1] - t_[0]).count();
-	avi_fps_ = sec / (double)frame_count_;
+	avi_fps_ = (double)frame_count_ / sec;
 	AVI_set_video((avi_t *)avifile, avi_width_, avi_height_, avi_fps_, "MJPG");
-	
+	cout << "record avi fps: " << avi_fps_ << endl;
 	AVI_close((avi_t *)avifile);
 	avifile = NULL;
 	return 0;

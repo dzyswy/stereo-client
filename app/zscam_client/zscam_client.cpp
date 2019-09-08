@@ -3,70 +3,216 @@
 
 
 
-zscam_client::zscam_client(stereo_camera *camera, QWidget *parent)
+zscam_client::zscam_client(QWidget *parent)
 	: QWidget(parent)
 {
 	ui.setupUi(this);
+	ui.plainTextEdit_all_boxes->setMaximumBlockCount(50);
+	ui.plainTextEdit_min_boxes->setMaximumBlockCount(50);
+	
+	
 	width = 960;
 	height = 540;
+	going = 0;
+	cx_ = width / 2;
+	cy_ = height / 2;
 	mouse_prex_ = width / 2;
 	mouse_prey_ = height / 2;
+	
+	mouse_mode_ = 0;
+	show_cursor_mode_ = 0;
+	show_detect_box_mask_ = SHOW_GRAPH_COORD_INFO_EN;
+	show_poly_mask_mode_ = 0;
 	
 	poly_mask_points_[0].clear();
 	poly_mask_points_[1].clear();
 	
-	camera_ = camera;
-	timer_ = new QTimer(this);
-	connect(timer_, SIGNAL(timeout()), this, SLOT(on_timer_timeout()));
-	timer_->start(2500);
+	default_pixmap_ = QPixmap(width, height);
+	
+	save_avi_ = 0;
+	save_pic_ = 0;
+	record_count_ = 0;
+	screenshot_count_ = 0;
+	record_frame_count_ = 0;
+	
+	open_ = 0;
+	run_thread_ = NULL;
 	
 	
+	camera_ = new stereo_camera("zynq_stereo_camera", 45789, 5, 0);
+	timer_slow_ = new QTimer(this);
+	connect(timer_slow_, SIGNAL(timeout()), this, SLOT(do_timer_slow_timeout()));
+	timer_slow_->start(2500);
+	
+	
+	connect(this, SIGNAL(fresh_frame_signal()), this, SLOT(do_fresh_frame()), Qt::QueuedConnection);
 	connect(ui.label_video, SIGNAL(Mouse_Pressed(int, int)), this, SLOT(do_video_label_mouse_pressed(int, int)));
  
-	
-	
-	/*
-	ui.plainTextEdit_all_boxes->setMaximumBlockCount(50);
-	ui.plainTextEdit_min_boxes->setMaximumBlockCount(50);
-	
-	width = 960;
-	height = 540;
-	
-	going = 0;
-	mstream = NULL;
-	camera_ = NULL;
-	camera_ = NULL;
-	run_thread_ = NULL;
- 
-	save_avi_ = 0;
-	save_picture_ = 0;
-	record_count = 0;
-	screenshot_count = 0;
-	
-	device_nodes_.clear();
-	
-	mouse_mode_ = 0;
-	cx = 0;
-	cy = 0;
-	mouse_prex = -1;
-	mouse_prey = -1;
-	show_cursor_mode_ = 0;
-	show_detect_box_mask_ = SHOW_GRAPH_COORD_INFO_EN;
-	show_poly_mask_mode_ = 0;
-	poly_mask_points_.clear();
-	poly_mask_points_[0].clear();
-
-	boost::thread tA(handle_discovery, this);
-	tA.detach();
-	connect_signals();*/
 }
 
 zscam_client::~zscam_client()
 {
-
+	timer_slow_->stop();
+	delete timer_slow_;
+	delete camera_;
 }
 
-void zscam_client::on_timer_timeout()
+
+ 
+void zscam_client::on_pushButton_open_camera_clicked() 
+{
+	int ret;
+	string ip = ui.comboBox_ip->currentText().toStdString();
+	int index = ui.comboBox_stream_number->currentIndex();
+
+	if (!open_)
+	{
+		ret = camera_->open_device(ip.c_str(), 7070, 9090, index);
+		if (ret < 0) {
+			QMessageBox::warning(this, QString::fromLocal8Bit("错误"), QString::fromLocal8Bit("打开失败，请检查设备是否上电或IP填写是否正确"));			
+			return;
+		}
+		
+		open_ = 1;
+		run_thread_ = new std::thread([this] () {stream_process();});
+		init_ui();
+		ui.pushButton_open_camera->setText(QString::fromLocal8Bit("关闭"));
+		
+	}	
+	else
+	{
+		open_ = 0;
+		if (run_thread_)
+		{
+			run_thread_->join();
+			delete run_thread_;
+			run_thread_ = NULL;
+		}
+		camera_->close_device();
+		ui.pushButton_open_camera->setText(QString::fromLocal8Bit("连接"));
+	}	
+	
+}
+
+void zscam_client::stream_process()
+{
+	std::vector<unsigned char> frame_buffer;
+	std::vector<struct stereo_detect_box> detect_boxes;
+	struct stereo_gyro_angle gyro_angle;
+	
+	cout << "create client stream thread!\n";
+	while(open_)
+	{
+		int ret = camera_->query_frame(5);
+		if (ret < 0) {
+			std::this_thread::sleep_for (std::chrono::seconds(1));
+			continue;
+		}
+		camera_->get_frame(frame_buffer);
+		camera_->get_detect_boxes(detect_boxes);
+		camera_->get_gyro_angle(gyro_angle);
+		
+
+		if (save_avi_ == 1)
+		{
+			QPixmap pixmap;
+			bool ok = pixmap.loadFromData((const unsigned char *)&frame_buffer[0], frame_buffer.size());
+			if (ok) {
+				ret = mrecord.open_media(avi_name_.c_str(), pixmap.width(), pixmap.height(), 15);
+				if (ret < 0) {
+					save_avi_ = 2;
+				} else {
+					save_avi_ = 3;
+				}
+			} else {
+				ok = 2;
+			}
+			 
+		}	
+		else if (save_avi_ == 3) {
+			ret = mrecord.write_frame((char *)&frame_buffer[0], frame_buffer.size(), 1);
+			record_frame_count_++;
+			if ((ret < 0) || (record_frame_count_ > 10000)) {
+				mrecord.close_media();
+				save_avi_ = 2;
+				
+			}
+		}
+		
+		if (save_pic_)
+		{
+			mrecord.save_picture(pic_name_.c_str(), (unsigned char *)&frame_buffer[0], frame_buffer.size());
+			save_pic_ = 0;
+		}
+		 
+		{
+			std::unique_lock<std::mutex> lock(mux_);
+			frame_buffer_ = frame_buffer;
+			detect_boxes_ = detect_boxes;
+			gyro_angle_ = gyro_angle; 
+		}
+		 
+		emit fresh_frame_signal();
+	}	
+	cout << "leave client stream thread!\n";
+}
+
+void zscam_client::do_fresh_frame()
+{
+	int ret;
+	QPixmap pixmap;
+	std::vector<struct stereo_detect_box> detect_boxes;
+	struct stereo_gyro_angle gyro_angle;
+	{
+		std::unique_lock<std::mutex> lock(mux_);
+		bool ok = pixmap.loadFromData((const unsigned char *)&frame_buffer_[0], frame_buffer_.size());
+		if (!ok)
+			pixmap = default_pixmap_;
+		detect_boxes = detect_boxes_;
+		gyro_angle = gyro_angle_;
+	}
+	
+	for (int i = 0; i < detect_boxes.size(); i++)
+	{
+		struct stereo_detect_box &detect_box = detect_boxes[i];
+		string str = gen_detect_box_str(detect_box, show_detect_box_mask_);
+		ui.plainTextEdit_all_boxes->appendPlainText(QString::fromStdString(str));
+	}	
+	
+	ui.doubleSpinBox_gyro_roll->setValue(gyro_angle.roll);
+	ui.doubleSpinBox_gyro_pitch->setValue(gyro_angle.pitch);
+	
+	
+	
+	show_detect_boxes(&pixmap, detect_boxes);
+
+	if (show_poly_mask_mode_)
+	{
+		show_poly_mask(&pixmap, poly_mask_points_[0], Qt::green);
+	}
+	
+	if (mouse_mode_ == MOUSE_MODE_POLY_MASK)
+	{
+		show_poly_mask_points(&pixmap, poly_mask_points_[1], Qt::red);
+	}
+
+	if (show_cursor_mode_)
+	{
+		show_center_cursor(&pixmap, (int)cx_, (int)cy_);
+	}	
+		
+	int w = ui.label_video->width();
+	int h = ui.label_video->height();
+	QPixmap scale_pixmap = pixmap.scaled(w, h);
+	
+	if (mouse_mode_ == MOUSE_MODE_DEFAULT)
+		show_mouse_press_point(&scale_pixmap, mouse_prex_, mouse_prey_);
+	
+	ui.label_video->setPixmap(scale_pixmap);
+}
+
+
+void zscam_client::do_timer_slow_timeout()
 {
 	vector<string> device_nodes;
 	camera_->get_device_nodes(device_nodes);
@@ -104,141 +250,16 @@ void zscam_client::on_timer_timeout()
 			ui.comboBox_ip->removeItem(i);
 		}
 	}
-}
-
-void zscam_client::on_pushButton_open_camera_clicked() 
-{
-	int ret;
-	string ip = ui.comboBox_ip->currentText().toStdString();
-	int index = ui.comboBox_stream_number->currentIndex();
 	
-	if (!camera_->is_opened())
+	if (save_avi_ == 2)
 	{
-		ret = camera_->open_device(ip.c_str(), 7070, 9090, index);
-		if (ret < 0) {
-			QMessageBox::warning(this, QString::fromLocal8Bit("错误"), QString::fromLocal8Bit("打开失败，请检查设备是否上电或IP填写是否正确"));			
-			return;
-		}
-	//	init_ui();
-		ui.pushButton_open_camera->setText(QString::fromLocal8Bit("关闭"));
-		
-	}	
-	else
-	{
-		camera_->close_device();
-		ui.pushButton_open_camera->setText(QString::fromLocal8Bit("连接"));
+		save_avi_ = 0;
+		ui.pushButton_record->setText(QString::fromLocal8Bit("录制"));
 	}	
 	
 }
 
-void zscam_client::set_frame(std::vector<unsigned char> &image)
-{
-	frame_buffer_ = image;
-}
 
-void zscam_client::set_detect_boxes(std::vector<struct stereo_detect_box> &detect_boxes)
-{
-	detect_boxes_ = detect_boxes;
-}
-
-void zscam_client::set_gyro_angle(struct stereo_gyro_angle &gyro_angle)
-{
-	gyro_angle_ = gyro_angle;
-}
-
-void zscam_client::post_frame()
-{
-	int ret;
-	
-	
-	int min_id = -1;
-	int min_n = -1;
-	for (int i = 0; i < detect_boxes_.size(); i++)
-	{
-		struct stereo_detect_box &detect_box = detect_boxes_[i];
-		string str = gen_detect_box_str(detect_box, show_detect_box_mask_);
-		ui.plainTextEdit_all_boxes->appendPlainText(QString::fromStdString(str));
-		
-		int id = detect_box.id;
-		if ((min_id < 0) || (id < min_id))
-		{
-			min_id = id;
-			min_n = i;
-		}	
-	}	
-	
-	if (min_n >= 0) {
-		struct stereo_detect_box &detect_box = detect_boxes_[min_n];
-
-		string str = gen_detect_box_str(detect_box, show_detect_box_mask_);
-		ui.plainTextEdit_min_boxes->appendPlainText(QString::fromStdString(str));
-		
-	//	detect_control_ptz_auto(detect_box, ptz_track_mask, ptz_install_mode, 5);
-	}
-	
-	ui.doubleSpinBox_gyro_roll->setValue(gyro_angle_.roll);
-	ui.doubleSpinBox_gyro_pitch->setValue(gyro_angle_.pitch);
-	
-	if (!pixmap_.loadFromData((const unsigned char *)&frame_buffer_[0], frame_buffer_.size())) {
-		return;
-	}	
-
-	if (save_avi_ == 1)
-	{
-		ret = mrecord.open_media(avi_name_.c_str(), pixmap_.width(), pixmap_.height(), 15);
-		if (ret < 0) {
-			save_avi_ = 0;
-			ui.pushButton_record->setText(QString::fromLocal8Bit("录制"));
-		} else {
-			save_avi_ = 2;
-		}
-			
-	}	
-	else if (save_avi_ == 2) {
-		ret = mrecord.write_frame((char *)&frame_buffer_[0], frame_buffer_.size(), 1);
-		record_frame_count_++;
-		if ((ret < 0) || (record_frame_count_ > 10000)) {
-			mrecord.close_media();
-			save_avi_ = 0;
-			ui.pushButton_record->setText(QString::fromLocal8Bit("录制"));
-		}
-	}
-	
-	if (save_pic_)
-	{
-		mrecord.save_picture(pic_name_.c_str(), (unsigned char *)&frame_buffer_[0], frame_buffer_.size());
-		save_pic_ = 0;
-	}	
-		
-	
-	
-	show_detect_boxes(&pixmap_, detect_boxes_);
-	
-	if (show_poly_mask_mode_)
-	{
-		show_poly_mask(&pixmap_, poly_mask_points_[0], Qt::green);
-	}
-	
-	if (mouse_mode_ == MOUSE_MODE_POLY_MASK)
-	{
-		show_poly_mask_points(&pixmap_, poly_mask_points_[1], Qt::red);
-	}
-
-	if (show_cursor_mode_)
-	{
-		show_center_cursor(&pixmap_, (int)cx_, (int)cy_);
-	}	
-		
-	int w = ui.label_video->width();
-	int h = ui.label_video->height();
-	QPixmap scale_pixmap = pixmap_.scaled(w, h);
-	
-	if (mouse_mode_ == MOUSE_MODE_DEFAULT)
-		show_mouse_press_point(&scale_pixmap, mouse_prex_, mouse_prey_);
-	
-	ui.label_video->setPixmap(scale_pixmap);
-	
-}
  
 void zscam_client::do_video_label_mouse_pressed(int x, int y)
 {
@@ -247,7 +268,7 @@ void zscam_client::do_video_label_mouse_pressed(int x, int y)
 	mouse_prex_ = x;
 	mouse_prey_ = y;
 	
-	if (!camera_->is_opened())
+	if (open_)
 		return;
 	
 	float w = ui.label_video->width();
@@ -294,8 +315,6 @@ void zscam_client::do_video_label_mouse_pressed(int x, int y)
 		
 	}
 	
-	
-	
 //	detect_control_ptz(detect_box, ptz_track_mode, ptz_track_mask, ptz_install_mode, 5);
 	
 }
@@ -309,7 +328,7 @@ void zscam_client::init_ui()
 	float fvalue;
 	string svalue;
 	
-	if (!camera_->is_opened())
+	if (!open_)
 		return;
 	 
 	ret = camera_->get_value("cx", fvalue);
@@ -509,11 +528,11 @@ void zscam_client::init_ui()
 	ret = camera_->get_value("track_mode", value);
 	if (ret == 0) {
 		track_mode_ = value;
-		if (track_mode_ == 0) {
-			ui.pushButton_track_mode->setText(QString::fromLocal8Bit("开始跟踪"));
+		if (value) {
+			ui.checkBox_track_mode->setCheckState(Qt::Checked); 
 		} else {
-			ui.pushButton_track_mode->setText(QString::fromLocal8Bit("停止跟踪"));
-		}
+			ui.checkBox_track_mode->setCheckState(Qt::Unchecked);  
+		}	
 	}
 	
 	ret = camera_->get_value("http_out_mode", value);
@@ -530,8 +549,7 @@ void zscam_client::init_ui()
 	if (ret == 0) {
 		ui.lineEdit_version->setText(QString::fromStdString(svalue));
 	}	
-	
-	
+	 
 	ret = camera_->get_value("serial_number", svalue);
 	if (ret == 0) {
 		ui.lineEdit_serial_number->setText(QString::fromStdString(svalue));

@@ -91,6 +91,8 @@ void discovery_receiver_impl::do_receive()
 				string dev_msg, age_msg;
 				getline(rs, dev_msg);
 				getline(rs, age_msg);
+			//	cout << dev_msg << endl;
+			//	cout << age_msg << endl;
 				if (dev_msg.size() && (dev_msg.substr(0, 7) == "device:") && (dev_msg.substr(8, dev_msg.length()-9) == device_name_))
 				{
 					if (age_msg.size() && (age_msg.substr(0, 8) == "max-age:"))
@@ -138,7 +140,7 @@ void discovery_receiver_impl::add_node(string dev_ip, int max_age)
 
 void discovery_receiver_impl::do_timer()
 {
-	timer_.expires_from_now(std::chrono::milliseconds(poll_time_));
+	timer_.expires_from_now(std::chrono::seconds(poll_time_));
 	timer_.async_wait([this](std::error_code ec) {
 			if (!ec) 
 			{

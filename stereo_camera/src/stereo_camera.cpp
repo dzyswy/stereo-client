@@ -4,19 +4,19 @@
 #include "command_client.h"
 #include "stream_receiver.h"
 
+using namespace std;
 
-
-stereo_camera::stereo_camera(const char *device_name, int port, int poll_time)
+stereo_camera::stereo_camera(const char *device_name, int port, int poll_time, int debug)
 {
-	open_ = 0;
 	xfind = new discovery_receiver(device_name, port, poll_time);
 	xcmd_ = new command_client;
-	xstream_ = new stream_receiver(1);
+	xstream_ = new stream_receiver(debug);
 }
 
 
 stereo_camera::~stereo_camera()
 {
+	close_device();
 	delete xcmd_;
 	delete xstream_;
 	delete xfind;
@@ -31,24 +31,20 @@ void stereo_camera::get_device_nodes(std::vector<std::string> &device_nodes)
 int stereo_camera::open_device(const char *ip, int cmd_port, int stream_port, int stream_index)
 {
 	int ret;
+ 
 	xcmd_->set_connect(ip, cmd_port);
 	ret = xstream_->connect_stream(ip, stream_port, stream_index);
 	if (ret < 0)
 		return -1;
-	open_ = 1;
+
 	return 0;
 }	
 	
 int stereo_camera::close_device()
 {
-	open_ = 0;
 	return xstream_->disconnect_stream();
 }
 
-int stereo_camera::is_opened()
-{
-	return open_;
-}
 
 int stereo_camera::set_value(const char *cmd, int value, int timeout)
 {
