@@ -124,10 +124,10 @@ public:
 	int screenshot_count_;
 	int record_frame_count_;
 
- 
-	int mouse_mode_;
 	int show_cursor_mode_;
 	int show_detect_box_mask_;
+	
+	int draw_poly_mask_mode_;
 	int show_poly_mask_mode_;
 	vector<pair<float, float> > poly_mask_points_[2];
 	
@@ -353,12 +353,29 @@ private slots:
 	}
 		
 	
-	
-	void on_comboBox_poly_mask_mode_currentIndexChanged(int index)
+	void on_comboBox_poly_mode_currentIndexChanged(int index)
 	{
-		
 		if (open_) 
-			camera_->set_value("poly_mask_mode", index);
+			camera_->set_value("poly_mode", index);
+	}
+	
+	void on_checkBox_draw_poly_mask_stateChanged(int state)
+	{
+		switch (state)
+		{
+			case Qt::Unchecked:
+			{
+				draw_poly_mask_mode_ = 0;
+				poly_mask_points_[1].clear();
+			}break;
+			case Qt::Checked:
+			{
+				draw_poly_mask_mode_ = 1;
+				poly_mask_points_[1].clear();
+			}break;
+			default:
+				break;
+		}
 	}
 	
 	void on_pushButton_set_poly_mask_clicked()
@@ -370,9 +387,21 @@ private slots:
 			camera_->get_poly_mask(poly_mask_points_[0]);
 	}
 	
-	void on_pushButton_clear_poly_mask_clicked()
+	void on_checkBox_show_poly_mask_stateChanged(int state)
 	{
-		poly_mask_points_[1].clear();
+		switch (state)
+		{
+			case Qt::Unchecked:
+				show_poly_mask_mode_ = 0;
+				break;
+			case Qt::Checked:
+				show_poly_mask_mode_ = 1;
+				break;
+		}
+		
+		
+		if (open_) 
+			camera_->get_poly_mask(poly_mask_points_[0]);
 	}
 
 	void on_pushButton_detect_mode_clicked()
@@ -417,27 +446,7 @@ private slots:
 			camera_->set_value("detect_min_nms_dist", arg1.toInt());
 	}
 
-	/*	
-	void on_pushButton_track_mode_clicked()
-	{
-		if (open_)
-		{
-			if (track_mode_ == 0)
-			{
-				track_mode_ = 1;
-				camera_->set_value("track_mode", track_mode_);
-				ui.pushButton_track_mode->setText(QString::fromLocal8Bit("停止跟踪"));
-			}
-			else
-			{
-				track_mode_ = 0;
-				camera_->set_value("track_mode", track_mode_);
-				ui.pushButton_track_mode->setText(QString::fromLocal8Bit("开始跟踪"));
-			}
-		}	
-			
-	}*/
-	
+
 	void on_checkBox_track_mode_stateChanged(int state)
 	{
 		switch (state)
@@ -449,9 +458,6 @@ private slots:
 				track_mode_ = 1;
 				break;
 		}
-		 
-	//	if (open_) 
-	//		camera_->set_value("track_mode", track_mode_);
 	}
 
 	void on_spinBox_track_max_cost_valueChanged(const QString &arg1)
@@ -500,6 +506,22 @@ private slots:
 			camera_->do_action("reboot", 1);
 	}
 	
+	void on_checkBox_dhcp_stateChanged(int state)
+	{
+		if (state == Qt::Checked)
+		{
+			ui.lineEdit_ip->setEnabled(false);
+			ui.lineEdit_netmask->setEnabled(false);
+			ui.lineEdit_gateway->setEnabled(false);	
+		}	
+		else if (state == Qt::Unchecked)
+		{
+			ui.lineEdit_ip->setEnabled(true);
+			ui.lineEdit_netmask->setEnabled(true);
+			ui.lineEdit_gateway->setEnabled(true);	
+		}	
+	}
+	
 	void on_pushButton_network_clicked()
 	{
 		int ret = 0, value = -1;
@@ -507,7 +529,7 @@ private slots:
 		string ip = ui.lineEdit_ip->text().toStdString();
 		string netmask = ui.lineEdit_netmask->text().toStdString();
 		string gateway = ui.lineEdit_gateway->text().toStdString();
-		string mac = "";
+		string mac = ui.lineEdit_mac->text().toStdString();
 	
 		if (!open_) 
 			return;
@@ -518,17 +540,20 @@ private slots:
 			if (ret < 0)
 				break;
 			
-			ret = camera_->set_value("ip", ip);
-			if (ret < 0)
-				break;
-			
-			ret = camera_->set_value("netmask", netmask);
-			if (ret < 0)
-				break;
-			
-			ret = camera_->set_value("gateway", gateway);
-			if (ret < 0)
-				break;
+			if (!dhcp)
+			{
+				ret = camera_->set_value("ip", ip);
+				if (ret < 0)
+					break;
+				
+				ret = camera_->set_value("netmask", netmask);
+				if (ret < 0)
+					break;
+				
+				ret = camera_->set_value("gateway", gateway);
+				if (ret < 0)
+					break;
+			}	
 			
 			ret = camera_->set_value("mac", mac);
 			if (ret < 0)
@@ -647,11 +672,6 @@ private slots:
 		}
 	}
 	
-	void on_comboBox_mouse_mode_currentIndexChanged(int index)
-	{
-		mouse_mode_ = index;
-	}
-	
 	void on_checkBox_show_cursor_stateChanged(int state)
 	{
 		switch (state)
@@ -665,22 +685,8 @@ private slots:
 		}
 	}
 	
-	void on_checkBox_show_poly_mask_stateChanged(int state)
-	{
-		switch (state)
-		{
-			case Qt::Unchecked:
-				show_poly_mask_mode_ = 0;
-				break;
-			case Qt::Checked:
-				show_poly_mask_mode_ = 1;
-				break;
-		}
-		
-		
-		if (open_) 
-			camera_->get_poly_mask(poly_mask_points_[0]);
-	}
+	
+	
 
 };
 

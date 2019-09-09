@@ -19,11 +19,12 @@ zscam_client::zscam_client(QWidget *parent)
 	mouse_prex_ = width / 2;
 	mouse_prey_ = height / 2;
 	
-	mouse_mode_ = 0;
+	draw_poly_mask_mode_ = 0;
 	show_cursor_mode_ = 0;
 	show_detect_box_mask_ = SHOW_GRAPH_COORD_INFO_EN;
-	show_poly_mask_mode_ = 0;
 	
+	
+	show_poly_mask_mode_ = 0; 
 	poly_mask_points_[0].clear();
 	poly_mask_points_[1].clear();
 	
@@ -191,7 +192,7 @@ void zscam_client::do_fresh_frame()
 		show_poly_mask(&pixmap, poly_mask_points_[0], Qt::green);
 	}
 	
-	if (mouse_mode_ == MOUSE_MODE_POLY_MASK)
+	if (draw_poly_mask_mode_)
 	{
 		show_poly_mask_points(&pixmap, poly_mask_points_[1], Qt::red);
 	}
@@ -205,8 +206,8 @@ void zscam_client::do_fresh_frame()
 	int h = ui.label_video->height();
 	QPixmap scale_pixmap = pixmap.scaled(w, h);
 	
-	if (mouse_mode_ == MOUSE_MODE_DEFAULT)
-		show_mouse_press_point(&scale_pixmap, mouse_prex_, mouse_prey_);
+	
+	show_mouse_press_point(&scale_pixmap, mouse_prex_, mouse_prey_);
 	
 	ui.label_video->setPixmap(scale_pixmap);
 }
@@ -258,17 +259,15 @@ void zscam_client::do_timer_slow_timeout()
 	}	
 	
 }
-
-
  
 void zscam_client::do_video_label_mouse_pressed(int x, int y)
 {
 	int ret;
-	cout << "x: " << x << " y: " << y << endl;
+	cout << "video label: x= " << x << " y= " << y << endl;
 	mouse_prex_ = x;
 	mouse_prey_ = y;
 	
-	if (open_)
+	if (!open_)
 		return;
 	
 	float w = ui.label_video->width();
@@ -276,44 +275,37 @@ void zscam_client::do_video_label_mouse_pressed(int x, int y)
 	
 	int sx = (float)x / w * (float)width;
 	int sy = (float)y / h * (float)height;
-	 
-	switch(mouse_mode_)
+	cout << "stereo camera: x= " << sx << " y= " << sy << endl;
+	
+	if (draw_poly_mask_mode_)
 	{
-		case MOUSE_MODE_DEFAULT:
-		{
-			struct stereo_pixel_point point;
-			ret = camera_->get_pixel_point(x, y, point);
-			if ((ret < 0) || (point.d <= 0))
-				return;
-			
-			struct stereo_detect_box detect_box;
-			memset(&detect_box, 0, sizeof(detect_box));
-			detect_box.x = point.x;
-			detect_box.y = point.y;
-			detect_box.d = point.d;
-			detect_box.xcm = point.xcm;
-			detect_box.ycm = point.ycm;
-			detect_box.zcm = point.zcm;
-			detect_box.xtcm = point.xtcm;
-			detect_box.ytcm = point.ytcm;
-			detect_box.ztcm = point.ztcm;
-			detect_box.xa = point.xa;
-			detect_box.ya = point.ya;
-			detect_box.r = point.r;
-			
-			string str = gen_detect_box_str(detect_box, show_detect_box_mask_);
-			ui.plainTextEdit_all_boxes->appendPlainText(QString::fromStdString(str));
-		}break;
+		poly_mask_points_[1].push_back(std::make_pair(sx, sy));
+	}	
+	else
+	{
+		struct stereo_pixel_point point;
+		ret = camera_->get_pixel_point(x, y, point);
+		if ((ret < 0) || (point.d <= 0))
+			return;
 		
-		case MOUSE_MODE_POLY_MASK:
-		{
-			poly_mask_points_[1].push_back(std::make_pair(sx, sy));
-		}break;
+		struct stereo_detect_box detect_box;
+		memset(&detect_box, 0, sizeof(detect_box));
+		detect_box.x = point.x;
+		detect_box.y = point.y;
+		detect_box.d = point.d;
+		detect_box.xcm = point.xcm;
+		detect_box.ycm = point.ycm;
+		detect_box.zcm = point.zcm;
+		detect_box.xtcm = point.xtcm;
+		detect_box.ytcm = point.ytcm;
+		detect_box.ztcm = point.ztcm;
+		detect_box.xa = point.xa;
+		detect_box.ya = point.ya;
+		detect_box.r = point.r;
 		
-		default:
-			break;
-		
-	}
+		string str = gen_detect_box_str(detect_box, show_detect_box_mask_);
+		ui.plainTextEdit_all_boxes->appendPlainText(QString::fromStdString(str));
+	}	
 	
 //	detect_control_ptz(detect_box, ptz_track_mode, ptz_track_mask, ptz_install_mode, 5);
 	
@@ -483,7 +475,7 @@ void zscam_client::init_ui()
 	
 	ret = camera_->get_value("poly_mode", value);
 	if (ret == 0) {
-		ui.comboBox_poly_mask_mode->setCurrentIndex(value);
+		ui.comboBox_poly_mode->setCurrentIndex(value);
 	}
 	
 	vector<pair<float, float> > poly_mask_points;
@@ -512,9 +504,7 @@ void zscam_client::init_ui()
 	if (ret == 0) {
 		ui.spinBox_detect_min_space_size->setValue(value);
 	}
-
-	
-
+ 
 	ret = camera_->get_value("track_max_cost", value);
 	if (ret == 0) {
 		ui.spinBox_track_max_cost->setValue(value);
@@ -559,8 +549,14 @@ void zscam_client::init_ui()
 	if (ret == 0) {
 		if (value) {
 			ui.checkBox_dhcp->setCheckState(Qt::Checked); 
+			ui.lineEdit_ip->setEnabled(false);
+			ui.lineEdit_netmask->setEnabled(false);
+			ui.lineEdit_gateway->setEnabled(false);	
 		} else {
-			ui.checkBox_dhcp->setCheckState(Qt::Unchecked);  
+			ui.checkBox_dhcp->setCheckState(Qt::Unchecked); 
+			ui.lineEdit_ip->setEnabled(true);
+			ui.lineEdit_netmask->setEnabled(true);
+			ui.lineEdit_gateway->setEnabled(true);
 		}	
 	}
 	 
@@ -604,11 +600,12 @@ void zscam_client::show_center_cursor(QPixmap *dst, int x, int y)
 
 void zscam_client::show_mouse_press_point(QPixmap *dst, int x, int y)
 {
+	int len = 5;
 	if ((x >= 0) && (y >= 0))
 	{
 		QPainter painter(dst);
 		painter.setPen(QPen(Qt::darkBlue, 2, Qt::SolidLine));
-		painter.drawRoundRect(x, y, 4, 4);
+		painter.drawRoundRect(x - len / 2, y - len / 2, len, len);
 	}
 }
 
@@ -682,12 +679,15 @@ void zscam_client::show_poly_mask(QPixmap *dst, vector<pair<float, float> > &poi
 
 void zscam_client::show_poly_mask_points(QPixmap *dst, vector<pair<float, float> > &points, QColor color)
 {
+	int len = 11;
 	QPainter painter(dst);
 	for (int i = 0; i < points.size(); i++)
 	{
 		painter.setPen(QPen(color, 1.5, Qt::SolidLine));
-		painter.drawLine(points[i].first - 5, points[i].second, points[i].first + 5, points[i].second);
-		painter.drawLine(points[i].first, points[i].second - 5, points[i].first, points[i].second + 5);
+		int x = points[i].first;
+		int y = points[i].second;
+		painter.drawLine(x - len / 2, y, x + len / 2, y);
+		painter.drawLine(x, y - len / 2, x, y + len / 2);
 	}
 
 }
