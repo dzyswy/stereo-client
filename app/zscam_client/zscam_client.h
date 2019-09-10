@@ -107,6 +107,13 @@ public:
 	
 	float cx_;
 	float cy_;
+	int match_mode_;
+	int bg_mode_;
+	int median_mode_;
+	int tex_mode_;
+	int space_mode_;
+	int morph_mode_;
+	int poly_mode_;
 	int detect_mode_;
 	int track_mode_;
 	
@@ -144,11 +151,23 @@ private slots:
 	void do_video_label_mouse_pressed(int x, int y);
 	
 	
-	void on_comboBox_match_mode_currentIndexChanged(int index)
+	void on_checkBox_match_mode_stateChanged(int state)
 	{
+		switch (state)
+		{
+			case Qt::Unchecked:
+				match_mode_ = STEREO_CAMERA_MATCH_CLOSE_MODE;
+				break;
+			case Qt::Checked:
+				match_mode_ = STEREO_CAMERA_MATCH_OPEN_MODE;
+				break;
+		}
+		
+		
 		if (open_) 
-			camera_->set_value("match_mode", index);
+			camera_->set_value("match_mode", match_mode_);
 	}
+
 	 
 	void on_spinBox_match_edge_th_valueChanged(const QString &arg1)
 	{
@@ -178,12 +197,22 @@ private slots:
 		if (open_) 
 			camera_->set_value("match_check_th", arg1.toInt());
 	}
-		
-	void on_comboBox_bg_mode_currentIndexChanged(int index)
+	
+	void on_checkBox_bg_mode_stateChanged(int state)
 	{
+		switch (state)
+		{
+			case Qt::Unchecked:
+				bg_mode_ = STEREO_CAMERA_BG_CLOSE_MODE;
+				break;
+			case Qt::Checked:
+				bg_mode_ = STEREO_CAMERA_BG_OPEN_MODE;
+				break;
+		}
+		
 		
 		if (open_) 
-			camera_->set_value("bg_mode", index);
+			camera_->set_value("bg_mode", bg_mode_);
 	}
 		 
 	void on_spinBox_bg_color_dist_valueChanged(const QString &arg1)
@@ -244,36 +273,74 @@ private slots:
 			camera_->do_action("set_bg_init");
 	}
 		
-
-		
-	void on_comboBox_median_mode_currentIndexChanged(int index)
+	void on_checkBox_median_mode_stateChanged(int state)
 	{
+		switch (state)
+		{
+			case Qt::Unchecked:
+				median_mode_ = STEREO_CAMERA_MEDIAN_CLOSE_MODE;
+				break;
+			case Qt::Checked:
+				median_mode_ = STEREO_CAMERA_MEDIAN_OPEN_MODE;
+				break;
+		}
+		
 		
 		if (open_) 
-			camera_->set_value("median_mode", index);
-	}
-		
-	void on_comboBox_tex_mode_currentIndexChanged(int index)
-	{
-		
-		if (open_) 
-			camera_->set_value("tex_mode", index);
-	}
-	
-	void on_comboBox_space_mode_currentIndexChanged(int index)
-	{
-		
-		if (open_) 
-			camera_->set_value("space_mode", index);
+			camera_->set_value("median_mode", median_mode_);
 	}
 	
-	void on_comboBox_morph_mode_currentIndexChanged(int index)
+	void on_checkBox_tex_mode_stateChanged(int state)
 	{
+		switch (state)
+		{
+			case Qt::Unchecked:
+				tex_mode_ = STEREO_CAMERA_TEX_CLOSE_MODE;
+				break;
+			case Qt::Checked:
+				tex_mode_ = STEREO_CAMERA_TEX_OPEN_MODE;
+				break;
+		}
+		
 		
 		if (open_) 
-			camera_->set_value("morph_mode", index);
+			camera_->set_value("tex_mode", tex_mode_);
 	}
 	
+	void on_checkBox_space_mode_stateChanged(int state)
+	{
+		switch (state)
+		{
+			case Qt::Unchecked:
+				space_mode_ = STEREO_CAMERA_SPACE_CLOSE_MODE;
+				break;
+			case Qt::Checked:
+				space_mode_ = STEREO_CAMERA_SPACE_OPEN_MODE;
+				break;
+		}
+		
+		
+		if (open_) 
+			camera_->set_value("space_mode", space_mode_);
+	}
+	
+	void on_checkBox_morph_mode_stateChanged(int state)
+	{
+		switch (state)
+		{
+			case Qt::Unchecked:
+				morph_mode_ = STEREO_CAMERA_MORPH_CLOSE_MODE;
+				break;
+			case Qt::Checked:
+				morph_mode_ = STEREO_CAMERA_MORPH_OPEN_MODE;
+				break;
+		}
+		
+		
+		if (open_) 
+			camera_->set_value("morph_mode", morph_mode_);
+	}
+ 
 	void on_spinBox_post_tex_th_valueChanged(const QString &arg1)
 	{
 		
@@ -352,13 +419,23 @@ private slots:
 			camera_->set_value("detect_maxz", arg1.toInt());
 	}
 		
-	
-	void on_comboBox_poly_mode_currentIndexChanged(int index)
+	void on_checkBox_poly_mode_stateChanged(int state)
 	{
+		switch (state)
+		{
+			case Qt::Unchecked:
+				poly_mode_ = STEREO_CAMERA_POLY_CLOSE_MODE;
+				break;
+			case Qt::Checked:
+				poly_mode_ = STEREO_CAMERA_POLY_OPEN_MODE;
+				break;
+		}
+		
+		
 		if (open_) 
-			camera_->set_value("poly_mode", index);
+			camera_->set_value("poly_mode", poly_mode_);
 	}
-	
+   	
 	void on_checkBox_draw_poly_mask_stateChanged(int state)
 	{
 		switch (state)

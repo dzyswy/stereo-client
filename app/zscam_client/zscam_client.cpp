@@ -333,9 +333,16 @@ void zscam_client::init_ui()
 		cy_ = fvalue;
 	}
 	 
-	ret = camera_->get_value("match_mode", value);
+	ret = camera_->get_value("match_mode", value); 
 	if (ret == 0) {
-		ui.comboBox_match_mode->setCurrentIndex(value);
+
+		if (value == STEREO_CAMERA_MATCH_OPEN_MODE) {
+			match_mode_ = STEREO_CAMERA_MATCH_OPEN_MODE;
+			ui.checkBox_match_mode->setCheckState(Qt::Checked);
+		} else {
+			match_mode_ = STEREO_CAMERA_MATCH_CLOSE_MODE;
+			ui.checkBox_match_mode->setCheckState(Qt::Unchecked); 
+		}	 
 	}
 	
 	ret = camera_->get_value("match_edge_th", value);
@@ -360,8 +367,15 @@ void zscam_client::init_ui()
 	 
 	ret = camera_->get_value("bg_mode", value);
 	if (ret == 0) {
-		ui.comboBox_bg_mode->setCurrentIndex(value);
-	}	
+
+		if (value == STEREO_CAMERA_BG_OPEN_MODE) {
+			bg_mode_ = STEREO_CAMERA_BG_OPEN_MODE;
+			ui.checkBox_bg_mode->setCheckState(Qt::Checked);
+		} else {
+			bg_mode_ = STEREO_CAMERA_BG_CLOSE_MODE;
+			ui.checkBox_bg_mode->setCheckState(Qt::Unchecked); 
+		}	 
+	}
 	 
 	ret = camera_->get_value("bg_color_dist", value);
 	if (ret == 0) {
@@ -399,23 +413,47 @@ void zscam_client::init_ui()
 	}	
 		
 	ret = camera_->get_value("median_mode", value);
-	if (ret == 0) {
-		ui.comboBox_median_mode->setCurrentIndex(value);
+	if (ret == 0) { 
+		if (value == STEREO_CAMERA_MEDIAN_OPEN_MODE) {
+			median_mode_ = STEREO_CAMERA_MEDIAN_OPEN_MODE;
+			ui.checkBox_median_mode->setCheckState(Qt::Checked);
+		} else {
+			median_mode_ = STEREO_CAMERA_MEDIAN_CLOSE_MODE;
+			ui.checkBox_median_mode->setCheckState(Qt::Unchecked); 
+		}	 
 	}
 	
 	ret = camera_->get_value("tex_mode", value);
-	if (ret == 0) {
-		ui.comboBox_tex_mode->setCurrentIndex(value);
+	if (ret == 0) { 
+		if (value == STEREO_CAMERA_TEX_OPEN_MODE) {
+			tex_mode_ = STEREO_CAMERA_TEX_OPEN_MODE;
+			ui.checkBox_tex_mode->setCheckState(Qt::Checked);
+		} else {
+			tex_mode_ = STEREO_CAMERA_TEX_CLOSE_MODE;
+			ui.checkBox_tex_mode->setCheckState(Qt::Unchecked); 
+		}	 
 	}
 	
 	ret = camera_->get_value("space_mode", value);
-	if (ret == 0) {
-		ui.comboBox_space_mode->setCurrentIndex(value);
+	if (ret == 0) { 
+		if (value == STEREO_CAMERA_SPACE_OPEN_MODE) {
+			space_mode_ = STEREO_CAMERA_SPACE_OPEN_MODE;
+			ui.checkBox_space_mode->setCheckState(Qt::Checked);
+		} else {
+			space_mode_ = STEREO_CAMERA_SPACE_CLOSE_MODE;
+			ui.checkBox_space_mode->setCheckState(Qt::Unchecked); 
+		}	 
 	}
 	
 	ret = camera_->get_value("morph_mode", value);
-	if (ret == 0) {
-		ui.comboBox_morph_mode->setCurrentIndex(value);
+	if (ret == 0) { 
+		if (value == STEREO_CAMERA_MORPH_OPEN_MODE) {
+			morph_mode_ = STEREO_CAMERA_MORPH_OPEN_MODE;
+			ui.checkBox_morph_mode->setCheckState(Qt::Checked);
+		} else {
+			morph_mode_ = STEREO_CAMERA_MORPH_CLOSE_MODE;
+			ui.checkBox_morph_mode->setCheckState(Qt::Unchecked); 
+		}	 
 	}
 	
 	ret = camera_->get_value("install_height", value);
@@ -474,8 +512,14 @@ void zscam_client::init_ui()
 	}
 	
 	ret = camera_->get_value("poly_mode", value);
-	if (ret == 0) {
-		ui.comboBox_poly_mode->setCurrentIndex(value);
+	if (ret == 0) { 
+		if (value == STEREO_CAMERA_POLY_OPEN_MODE) {
+			poly_mode_ = STEREO_CAMERA_POLY_OPEN_MODE;
+			ui.checkBox_poly_mode->setCheckState(Qt::Checked);
+		} else {
+			poly_mode_ = STEREO_CAMERA_POLY_CLOSE_MODE;
+			ui.checkBox_poly_mode->setCheckState(Qt::Unchecked); 
+		}	 
 	}
 	
 	vector<pair<float, float> > poly_mask_points;

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1173</width>
-    <height>622</height>
+    <height>823</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -237,7 +237,7 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="gridLayout_23">
-      <item row="0" column="0">
+      <item row="0" column="1">
        <widget class="QToolBox" name="toolBox">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
@@ -247,20 +247,20 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>350</width>
+          <width>401</width>
           <height>0</height>
          </size>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="page">
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>-700</y>
-           <width>334</width>
-           <height>1745</height>
+           <y>-25</y>
+           <width>385</width>
+           <height>824</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -529,343 +529,64 @@
            </widget>
           </item>
           <item>
-           <widget class="QGroupBox" name="groupBox_6">
+           <widget class="QGroupBox" name="groupBox_31">
             <property name="title">
-             <string>立体匹配</string>
+             <string>算法模式</string>
             </property>
-            <layout class="QGridLayout" name="gridLayout">
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_6">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>边沿阈值：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QSpinBox" name="spinBox_match_P1">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="label_9">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>左右检查系数：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_7">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>P1：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="label_8">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>P2：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QSpinBox" name="spinBox_match_edge_th">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <property name="maximum">
-                <number>255</number>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1">
-              <widget class="QSpinBox" name="spinBox_match_P2">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="0">
-              <widget class="QLabel" name="label_10">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>匹配模式：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="1">
-              <widget class="QComboBox" name="comboBox_match_mode">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>60</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <item>
-                <property name="text">
-                 <string>模式0</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>模式1</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>关闭</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="4" column="1">
-              <widget class="QSpinBox" name="spinBox_match_check_th">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="groupBox_4">
-            <property name="title">
-             <string>背景建模</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_2">
-             <item row="0" column="2">
-              <widget class="QSpinBox" name="spinBox_bg_color_match">
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-              </widget>
-             </item>
+            <layout class="QGridLayout" name="gridLayout_28">
              <item row="0" column="0">
-              <widget class="QLabel" name="label">
-               <property name="text">
-                <string>颜色距离和匹配：</string>
-               </property>
-              </widget>
+              <layout class="QGridLayout" name="gridLayout_24">
+               <item row="0" column="0">
+                <widget class="QCheckBox" name="checkBox_match_mode">
+                 <property name="text">
+                  <string>立体匹配</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QCheckBox" name="checkBox_median_mode">
+                 <property name="text">
+                  <string>中值滤波</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="2">
+                <widget class="QCheckBox" name="checkBox_tex_mode">
+                 <property name="text">
+                  <string>纹理滤波</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QCheckBox" name="checkBox_space_mode">
+                 <property name="text">
+                  <string>空间滤波</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QCheckBox" name="checkBox_morph_mode">
+                 <property name="text">
+                  <string>形态学滤波</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2">
+                <widget class="QCheckBox" name="checkBox_poly_mode">
+                 <property name="text">
+                  <string>屏蔽滤波</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
              <item row="1" column="0">
-              <widget class="QLabel" name="label_2">
-               <property name="text">
-                <string>空间距离和匹配：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QSpinBox" name="spinBox_bg_disp_dist">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QSpinBox" name="spinBox_bg_color_dist">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QSpinBox" name="spinBox_bg_space_dist">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="label_11">
-               <property name="text">
-                <string>背景模式：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_3">
-               <property name="text">
-                <string>视差距离和匹配：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1">
-              <widget class="QSpinBox" name="spinBox_bg_update_radio">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="2">
-              <widget class="QSpinBox" name="spinBox_bg_disp_match">
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="label_4">
-               <property name="text">
-                <string>背景更新率：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="2">
-              <widget class="QSpinBox" name="spinBox_bg_space_match">
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="1" colspan="2">
-              <layout class="QHBoxLayout" name="horizontalLayout_27">
+              <layout class="QHBoxLayout" name="horizontalLayout_16">
                <item>
-                <widget class="QComboBox" name="comboBox_bg_mode">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
+                <widget class="QCheckBox" name="checkBox_bg_mode">
+                 <property name="text">
+                  <string>背景建模</string>
                  </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>60</width>
-                   <height>22</height>
-                  </size>
-                 </property>
-                 <item>
-                  <property name="text">
-                   <string>模式0</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>模式1</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>关闭</string>
-                  </property>
-                 </item>
                 </widget>
                </item>
                <item>
@@ -887,557 +608,8 @@
                  </property>
                 </widget>
                </item>
-              </layout>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="groupBox_29">
-            <property name="title">
-             <string>中值滤波</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_24">
-             <item row="0" column="2">
-              <widget class="QComboBox" name="comboBox_median_mode">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>60</width>
-                 <height>22</height>
-                </size>
-               </property>
                <item>
-                <property name="text">
-                 <string>关闭</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>打开</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="0" column="0" colspan="2">
-              <widget class="QLabel" name="label_87">
-               <property name="text">
-                <string>中值滤波模式：</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="groupBox_28">
-            <property name="title">
-             <string>纹理滤波</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_13">
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_12">
-               <property name="text">
-                <string>纹理阈值：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1" rowspan="2" colspan="2">
-              <widget class="QSpinBox" name="spinBox_post_tex_th">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <property name="maximum">
-                <number>255</number>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0" rowspan="2">
-              <widget class="QLabel" name="label_13">
-               <property name="text">
-                <string>纹理总数：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1" colspan="2">
-              <widget class="QSpinBox" name="spinBox_post_tex_sum_th">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <property name="maximum">
-                <number>9</number>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0" colspan="2">
-              <widget class="QLabel" name="label_34">
-               <property name="text">
-                <string>纹理滤波模式：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="2">
-              <widget class="QComboBox" name="comboBox_tex_mode">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>60</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <item>
-                <property name="text">
-                 <string>关闭</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>打开</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="groupBox_8">
-            <property name="title">
-             <string>空间滤波</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_3">
-             <item row="3" column="2">
-              <widget class="QSpinBox" name="spinBox_detect_maxx">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <property name="minimum">
-                <number>-100000</number>
-               </property>
-               <property name="maximum">
-                <number>1000000</number>
-               </property>
-              </widget>
-             </item>
-             <item row="10" column="1">
-              <widget class="QComboBox" name="comboBox_space_mode">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>60</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <item>
-                <property name="text">
-                 <string>关闭</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>深度</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>灰度</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>双通道</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_16">
-               <property name="text">
-                <string>安装高度：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="2">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_install_z_angle">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <property name="decimals">
-                <number>1</number>
-               </property>
-               <property name="minimum">
-                <double>-360.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>360.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.100000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="label_18">
-               <property name="text">
-                <string>水平范围：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="2">
-              <widget class="QSpinBox" name="spinBox_detect_maxy">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <property name="minimum">
-                <number>-100000</number>
-               </property>
-               <property name="maximum">
-                <number>1000000</number>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1">
-              <widget class="QSpinBox" name="spinBox_detect_minx">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <property name="minimum">
-                <number>-10000</number>
-               </property>
-               <property name="maximum">
-                <number>100000</number>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_15">
-               <property name="text">
-                <string>俯仰水平角：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="2">
-              <widget class="QSpinBox" name="spinBox_detect_maxz">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <property name="maximum">
-                <number>100000</number>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_17">
-               <property name="text">
-                <string>高度范围：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="label_19">
-               <property name="text">
-                <string>距离范围：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="10" column="0">
-              <widget class="QLabel" name="label_14">
-               <property name="text">
-                <string>空间滤波模式：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QSpinBox" name="spinBox_install_height">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <property name="maximum">
-                <number>100000</number>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QSpinBox" name="spinBox_detect_miny">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <property name="minimum">
-                <number>-100000</number>
-               </property>
-               <property name="maximum">
-                <number>100000</number>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_install_x_angle">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <property name="decimals">
-                <number>1</number>
-               </property>
-               <property name="minimum">
-                <double>-360.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>360.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.100000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="1">
-              <widget class="QSpinBox" name="spinBox_detect_minz">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <property name="minimum">
-                <number>-100000</number>
-               </property>
-               <property name="maximum">
-                <number>100000</number>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="groupBox_32">
-            <property name="title">
-             <string>形态学滤波</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_29">
-             <item row="0" column="2">
-              <widget class="QComboBox" name="comboBox_morph_mode">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>60</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <item>
-                <property name="text">
-                 <string>关闭</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>打开</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="0" column="0" colspan="2">
-              <widget class="QLabel" name="label_91">
-               <property name="text">
-                <string>形态学滤波模式： </string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="groupBox_33">
-            <property name="title">
-             <string>屏蔽区域滤波</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_30">
-             <item row="0" column="2">
-              <widget class="QComboBox" name="comboBox_poly_mode">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>60</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <item>
-                <property name="text">
-                 <string>关闭</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>打开</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="0" column="0" colspan="2">
-              <widget class="QLabel" name="label_92">
-               <property name="text">
-                <string>屏蔽区域滤波模式：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="3">
-              <widget class="QCheckBox" name="checkBox_show_poly_mask">
-               <property name="text">
-                <string>显示屏蔽区域</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0" colspan="4">
-              <layout class="QHBoxLayout" name="horizontalLayout_17">
-               <item>
-                <spacer name="horizontalSpacer_14">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="checkBox_draw_poly_mask">
-                 <property name="text">
-                  <string>显示屏蔽点</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButton_set_poly_mask">
-                 <property name="text">
-                  <string>设置</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_15">
+                <spacer name="horizontalSpacer_12">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -1451,36 +623,14 @@
                </item>
               </layout>
              </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="groupBox_9">
-            <property name="title">
-             <string>检测和跟踪</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_5">
              <item row="2" column="0">
-              <widget class="QLabel" name="label_20">
-               <property name="text">
-                <string>detect_min_wsize：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="0" colspan="2">
-              <layout class="QHBoxLayout" name="horizontalLayout_28">
+              <layout class="QHBoxLayout" name="horizontalLayout_27">
                <item>
-                <spacer name="horizontalSpacer_35">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
+                <widget class="QCheckBox" name="checkBox_track_mode">
+                 <property name="text">
+                  <string>跟踪    </string>
                  </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
+                </widget>
                </item>
                <item>
                 <widget class="QPushButton" name="pushButton_detect_mode">
@@ -1502,14 +652,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="checkBox_track_mode">
-                 <property name="text">
-                  <string>跟踪</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_36">
+                <spacer name="horizontalSpacer_32">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -1523,110 +666,13 @@
                </item>
               </layout>
              </item>
-             <item row="4" column="1">
-              <widget class="QSpinBox" name="spinBox_detect_min_nms_dist">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <property name="maximum">
-                <number>100000</number>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="label_21">
-               <property name="text">
-                <string>detect_min_space_size：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="0">
-              <widget class="QLabel" name="label_23">
-               <property name="text">
-                <string>track_max_cost：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1">
-              <widget class="QSpinBox" name="spinBox_detect_min_space_size">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <property name="maximum">
-                <number>100000</number>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="label_22">
-               <property name="text">
-                <string>detect_min_nms_dist</string>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="1">
-              <widget class="QSpinBox" name="spinBox_track_max_cost">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <property name="maximum">
-                <number>100000</number>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QSpinBox" name="spinBox_detect_min_wsize">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <property name="maximum">
-                <number>100000</number>
-               </property>
-              </widget>
-             </item>
             </layout>
            </widget>
           </item>
           <item>
            <widget class="QGroupBox" name="groupBox_15">
             <property name="title">
-             <string>跟踪结果</string>
+             <string>目标信息</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_12">
              <item row="3" column="1">
@@ -1688,25 +734,766 @@
           </item>
          </layout>
          <zorder>groupBox_3</zorder>
-         <zorder>groupBox_4</zorder>
          <zorder>groupBox_5</zorder>
-         <zorder>groupBox_6</zorder>
-         <zorder>groupBox_8</zorder>
-         <zorder>groupBox_9</zorder>
          <zorder>groupBox_15</zorder>
-         <zorder>groupBox_28</zorder>
-         <zorder>groupBox_29</zorder>
          <zorder>groupBox_30</zorder>
-         <zorder>groupBox_32</zorder>
-         <zorder>groupBox_33</zorder>
+         <zorder>groupBox_31</zorder>
+        </widget>
+        <widget class="QWidget" name="page_5">
+         <attribute name="label">
+          <string>双目参数</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <widget class="QGroupBox" name="groupBox_6">
+            <property name="title">
+             <string>立体匹配</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout">
+             <item row="3" column="1">
+              <widget class="QSpinBox" name="spinBox_match_P2">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_6">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>边沿阈值：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QSpinBox" name="spinBox_match_check_th">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="spinBox_match_edge_th">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+               <property name="maximum">
+                <number>255</number>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_7">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>P1：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="label_9">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>左右检查系数：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_8">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>P2：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QSpinBox" name="spinBox_match_P1">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_4">
+            <property name="title">
+             <string>背景建模</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_2">
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="spinBox_bg_space_dist">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>空间距离和匹配：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_3">
+               <property name="text">
+                <string>视差距离和匹配：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>颜色距离和匹配：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_4">
+               <property name="text">
+                <string>背景更新率：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QSpinBox" name="spinBox_bg_color_dist">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QSpinBox" name="spinBox_bg_color_match">
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2">
+              <widget class="QSpinBox" name="spinBox_bg_disp_match">
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QSpinBox" name="spinBox_bg_disp_dist">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QSpinBox" name="spinBox_bg_update_radio">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QSpinBox" name="spinBox_bg_space_match">
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_28">
+            <property name="title">
+             <string>纹理滤波</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_13">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_12">
+               <property name="text">
+                <string>纹理阈值：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QSpinBox" name="spinBox_post_tex_th">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+               <property name="maximum">
+                <number>255</number>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_13">
+               <property name="text">
+                <string>纹理总数：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="spinBox_post_tex_sum_th">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+               <property name="maximum">
+                <number>9</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_8">
+            <property name="title">
+             <string>空间滤波</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_3">
+             <item row="4" column="0">
+              <widget class="QLabel" name="label_19">
+               <property name="text">
+                <string>距离范围：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QSpinBox" name="spinBox_detect_miny">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+               <property name="minimum">
+                <number>-100000</number>
+               </property>
+               <property name="maximum">
+                <number>100000</number>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_18">
+               <property name="text">
+                <string>水平范围：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_17">
+               <property name="text">
+                <string>高度范围：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_install_z_angle">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+               <property name="decimals">
+                <number>1</number>
+               </property>
+               <property name="minimum">
+                <double>-360.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>360.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="2">
+              <widget class="QSpinBox" name="spinBox_detect_maxz">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+               <property name="maximum">
+                <number>100000</number>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QSpinBox" name="spinBox_detect_minz">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+               <property name="minimum">
+                <number>-100000</number>
+               </property>
+               <property name="maximum">
+                <number>100000</number>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QSpinBox" name="spinBox_detect_minx">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+               <property name="minimum">
+                <number>-10000</number>
+               </property>
+               <property name="maximum">
+                <number>100000</number>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QSpinBox" name="spinBox_install_height">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+               <property name="maximum">
+                <number>100000</number>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_16">
+               <property name="text">
+                <string>安装高度：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_15">
+               <property name="text">
+                <string>俯仰水平角：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_install_x_angle">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+               <property name="decimals">
+                <number>1</number>
+               </property>
+               <property name="minimum">
+                <double>-360.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>360.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2">
+              <widget class="QSpinBox" name="spinBox_detect_maxy">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+               <property name="minimum">
+                <number>-100000</number>
+               </property>
+               <property name="maximum">
+                <number>1000000</number>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="2">
+              <widget class="QSpinBox" name="spinBox_detect_maxx">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+               <property name="minimum">
+                <number>-100000</number>
+               </property>
+               <property name="maximum">
+                <number>1000000</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_33">
+            <property name="title">
+             <string>屏蔽区域滤波</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_30">
+             <item row="2" column="0" colspan="2">
+              <layout class="QHBoxLayout" name="horizontalLayout_17">
+               <item>
+                <spacer name="horizontalSpacer_14">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBox_draw_poly_mask">
+                 <property name="text">
+                  <string>显示屏蔽点</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBox_show_poly_mask">
+                 <property name="text">
+                  <string>显示屏蔽区域</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="pushButton_set_poly_mask">
+                 <property name="text">
+                  <string>设置</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_15">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_9">
+            <property name="title">
+             <string>检测和跟踪</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_5">
+             <item row="3" column="1">
+              <widget class="QSpinBox" name="spinBox_detect_min_space_size">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+               <property name="maximum">
+                <number>100000</number>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QSpinBox" name="spinBox_detect_min_wsize">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+               <property name="maximum">
+                <number>100000</number>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QLabel" name="label_23">
+               <property name="text">
+                <string>track_max_cost：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_20">
+               <property name="text">
+                <string>detect_min_wsize：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QSpinBox" name="spinBox_track_max_cost">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+               <property name="maximum">
+                <number>100000</number>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_21">
+               <property name="text">
+                <string>detect_min_space_size：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QSpinBox" name="spinBox_detect_min_nms_dist">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+               <property name="maximum">
+                <number>100000</number>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="label_22">
+               <property name="text">
+                <string>detect_min_nms_dist</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
         </widget>
         <widget class="QWidget" name="page_2">
          <property name="geometry">
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>334</width>
-           <height>669</height>
+           <width>401</width>
+           <height>653</height>
           </rect>
          </property>
          <property name="autoFillBackground">
@@ -1715,8 +1502,8 @@
          <attribute name="label">
           <string>系统设置</string>
          </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
+         <layout class="QGridLayout" name="gridLayout_31">
+          <item row="0" column="0">
            <widget class="QGroupBox" name="groupBox_10">
             <property name="title">
              <string>配置</string>
@@ -1744,7 +1531,7 @@
             </layout>
            </widget>
           </item>
-          <item>
+          <item row="1" column="0">
            <widget class="QGroupBox" name="groupBox_13">
             <property name="title">
              <string>重启</string>
@@ -1786,7 +1573,7 @@
             </layout>
            </widget>
           </item>
-          <item>
+          <item row="2" column="0">
            <widget class="QGroupBox" name="groupBox_11">
             <property name="title">
              <string>多媒体</string>
@@ -1853,165 +1640,159 @@
             </layout>
            </widget>
           </item>
-          <item>
+          <item row="3" column="0">
            <widget class="QGroupBox" name="groupBox_12">
             <property name="title">
              <string>网络配置</string>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_3">
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_8">
-               <item>
-                <spacer name="horizontalSpacer_4">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="checkBox_dhcp">
-                 <property name="text">
-                  <string>自动分配</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_5">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_9">
-               <item>
-                <widget class="QLabel" name="label_30">
-                 <property name="text">
-                  <string>IP     :</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="lineEdit_ip">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_10">
-               <item>
-                <widget class="QLabel" name="label_28">
-                 <property name="text">
-                  <string>Netmask:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="lineEdit_netmask">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_11">
-               <item>
-                <widget class="QLabel" name="label_29">
-                 <property name="text">
-                  <string>Gateway:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="lineEdit_gateway">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_31">
-               <item>
-                <widget class="QLabel" name="label_90">
-                 <property name="text">
-                  <string>Mac    :</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="lineEdit_mac">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_12">
-               <item>
-                <spacer name="horizontalSpacer_6">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButton_network">
-                 <property name="text">
-                  <string>设置</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_7">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
-             </item>
-            </layout>
+            <widget class="QWidget" name="">
+             <layout class="QHBoxLayout" name="horizontalLayout_8">
+              <item>
+               <spacer name="horizontalSpacer_4">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBox_dhcp">
+                <property name="text">
+                 <string>自动分配</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="">
+             <layout class="QHBoxLayout" name="horizontalLayout_12">
+              <item>
+               <spacer name="horizontalSpacer_6">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_network">
+                <property name="text">
+                 <string>设置</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_7">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="">
+             <property name="geometry">
+              <rect>
+               <x>12</x>
+               <y>52</y>
+               <width>166</width>
+               <height>100</height>
+              </rect>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_29">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_30">
+                <property name="text">
+                 <string>IP     :</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="lineEdit_ip">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_28">
+                <property name="text">
+                 <string>Netmask:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="lineEdit_netmask">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_29">
+                <property name="text">
+                 <string>Gateway:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLineEdit" name="lineEdit_gateway">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_90">
+                <property name="text">
+                 <string>Mac    :</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="lineEdit_mac">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
            </widget>
           </item>
-          <item>
+          <item row="4" column="0">
            <widget class="QGroupBox" name="groupBox_14">
             <property name="title">
              <string>升级</string>
@@ -2203,7 +1984,7 @@
             </layout>
            </widget>
           </item>
-          <item>
+          <item row="5" column="0">
            <spacer name="verticalSpacer">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -2223,7 +2004,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>334</width>
+           <width>385</width>
            <height>1622</height>
           </rect>
          </property>
@@ -3751,8 +3532,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>334</width>
-           <height>546</height>
+           <width>401</width>
+           <height>653</height>
           </rect>
          </property>
          <attribute name="label">
