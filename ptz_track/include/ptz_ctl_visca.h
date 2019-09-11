@@ -37,10 +37,10 @@ public:
 	}
 	
 	
-	int set_pantilt_left(int pan_speed = -1);
-	int set_pantilt_right(int pan_speed = -1);
-	int set_pantilt_up(int tilt_speed = -1);
-	int set_pantilt_down(int tilt_speed = -1);
+	int set_pantilt_left(int pan_speed = -1, int tilt_speed = -1);
+	int set_pantilt_right(int pan_speed = -1, int tilt_speed = -1);
+	int set_pantilt_up(int pan_speed = -1, int tilt_speed = -1);
+	int set_pantilt_down(int pan_speed = -1, int tilt_speed = -1);
 	int set_pantilt_upleft(int pan_speed = -1, int tilt_speed = -1);
 	int set_pantilt_upright(int pan_speed = -1, int tilt_speed = -1);
 	int set_pantilt_downleft(int pan_speed = -1, int tilt_speed = -1);
@@ -125,8 +125,8 @@ protected:
 	
 	
 protected:
-	VISCAInterface_t *interface_;
-    VISCACamera_t *camera;
+	struct _VISCA_interface *interface_;
+    struct _VISCA_camera *camera_;
 
 	int pan_speed_;
 	int tilt_speed_;

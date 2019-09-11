@@ -14,6 +14,7 @@
 
 #include "stereo_detect_boxes.h"
 #include "stereo_gyro_angle.h"
+#include "stereo_pixel_point.h"
 
 
 class discovery_receiver;

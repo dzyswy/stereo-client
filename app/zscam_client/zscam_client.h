@@ -32,22 +32,25 @@
 #include "stereo_gyro_angle.h"
 #include "stereo_pixel_point.h"
 #include "media_record.h"
+#include "stereo_filter.h"
+#include "ptz_ctl_visca.h"
+#include "fit_calib.h"
+#include "ptz_track.h"
+
+
+
+
 
 #define SHOW_GRAPH_COORD_INFO_EN		(1 << 0)
 #define SHOW_CAMERA_COORD_INFO_EN		(1 << 1)
 #define SHOW_ROOM_COORD_INFO_EN			(1 << 2)
 #define SHOW_BALL_COORD_INFO_EN			(1 << 3)
 
-#define PTZ_TRACK_PAN_EN				(1 << 0)
-#define PTZ_TRACK_TILT_EN				(1 << 1)
-#define PTZ_TRACK_ZOOM_EN				(1 << 2)
-#define PTZ_TRACK_PTZ_ALL_MASK			(PTZ_TRACK_PAN_EN | PTZ_TRACK_TILT_EN | PTZ_TRACK_ZOOM_EN)
 
 
 
 
-using namespace std;
-//using namespace cv;
+using namespace std; 
 
 
 
@@ -86,7 +89,12 @@ private:
 	void show_mouse_press_point(QPixmap *dst, int x, int y);
 	void show_poly_mask(QPixmap *dst, vector<pair<float, float> > &points, QColor color);
 	void show_poly_mask_points(QPixmap *dst, vector<pair<float, float> > &points, QColor color);
-		
+	void show_pid_para();
+	void show_fit_calib_sample();
+	void show_fit_calib_all_samples(QPixmap *dst, QColor color);
+	void load_config(const char *config_name);
+	void save_config(const char *config_name);
+	
 public:
 	Ui::zscam_clientClass ui;
 	int width;
@@ -96,7 +104,17 @@ public:
 	QTimer *timer_slow_;
 	media_record xrecord;
 	
+	stereo_filter *xfilter_;
+	ptz_ctl_visca *xptz_;
+	fit_calib *xfit_;
+	ptz_track *xtrack_;
+	
+	
 	int open_;
+	int open_ptz_;
+	int run_track_;
+	
+	
 	QPixmap default_pixmap_;
 	std::vector<unsigned char> frame_buffer_;
 	std::vector<struct stereo_detect_box> detect_boxes_;
@@ -139,6 +157,12 @@ public:
 	vector<pair<float, float> > poly_mask_points_[2];
 	
 
+
+	int show_fit_calib_sample_mode_;
+	int test_track_mode_;
+	struct fit_calib_pose_sample pose_sample_;
+	struct fit_calib_pixel_sample pixel_sample_;
+	
 	
 
 signals:
@@ -762,6 +786,248 @@ private slots:
 		}
 	}
 	
+	
+	//ptz
+	void on_pushButton_open_ptz_clicked();
+	void on_pushButton_ptz_track_run_clicked();
+	void on_spinBox_sample_count_valueChanged(int value); 
+	void on_comboBox_sample_coord_currentIndexChanged(int index);
+	void on_comboBox_sample_index_currentIndexChanged(int index);
+	void on_pushButton_get_sample_clicked();
+	void on_pushButton_set_sample_clicked();
+	void on_pushButton_run_sample_clicked();
+	void on_pushButton_fit_calib_clicked();
+	void on_checkBox_fit_calib_en_stateChanged(int arg1)
+	{
+		if (!open_ptz_)
+			return;
+		
+		switch (arg1)
+		{
+		case Qt::Unchecked:
+			show_fit_calib_sample_mode_ = 0;
+			break;
+		case Qt::Checked:
+			show_fit_calib_sample_mode_ = 1;
+			break;
+		}
+	}
+	void on_checkBox_checkBox_test_track_stateChanged(int arg1)
+	{
+		if (!open_ptz_)
+			return;
+		
+		switch (arg1)
+		{
+		case Qt::Unchecked:
+			test_track_mode_ = 0;
+			break;
+		case Qt::Checked:
+			test_track_mode_ = 1;
+			break;
+		}
+	}
+	
+	
+	/*
+	void on_checkBox_datascreen_stateChanged(int arg1)
+	{
+		if (!open_ptz_)
+			return;
+		
+		switch (arg1)
+		{
+		case Qt::Unchecked:
+			xptz_->set_datascreen_off();
+			break;
+		case Qt::Checked:
+			xptz_->set_datascreen_on();
+			break;
+		}
+	}*/
+	
+	void on_toolButton_UL_pressed()
+	{
+		int pan_speed = ui.spinBox_pan_speed->value();
+		int tilt_speed = ui.spinBox_tilt_speed->value();
+		if (open_ptz_)
+			xptz_->set_pantilt_upleft(pan_speed, tilt_speed);
+	}
+	
+	void on_toolButton_U_pressed()
+	{
+		int pan_speed = ui.spinBox_pan_speed->value();
+		int tilt_speed = ui.spinBox_tilt_speed->value();
+		if (open_ptz_)
+			xptz_->set_pantilt_up(pan_speed, tilt_speed);
+	}
+	
+	void on_toolButton_UR_pressed()
+	{
+		int pan_speed = ui.spinBox_pan_speed->value();
+		int tilt_speed = ui.spinBox_tilt_speed->value();
+		if (open_ptz_)
+			xptz_->set_pantilt_upright(pan_speed, tilt_speed);
+	}
+	
+	void on_toolButton_L_pressed()
+	{
+		int pan_speed = ui.spinBox_pan_speed->value();
+		int tilt_speed = ui.spinBox_tilt_speed->value();
+		if (open_ptz_)
+			xptz_->set_pantilt_left(pan_speed, tilt_speed);
+	}
+	
+	void on_toolButton_R_pressed()
+	{
+		int pan_speed = ui.spinBox_pan_speed->value();
+		int tilt_speed = ui.spinBox_tilt_speed->value();
+		if (open_ptz_)
+			xptz_->set_pantilt_right(pan_speed, tilt_speed);
+	}
+	
+	void on_toolButton_DL_pressed()
+	{
+		int pan_speed = ui.spinBox_pan_speed->value();
+		int tilt_speed = ui.spinBox_tilt_speed->value();
+		if (open_ptz_)
+			xptz_->set_pantilt_downleft(pan_speed, tilt_speed);
+	}
+	
+	void on_toolButton_D_pressed()
+	{
+		int pan_speed = ui.spinBox_pan_speed->value();
+		int tilt_speed = ui.spinBox_tilt_speed->value();
+		if (open_ptz_)
+			xptz_->set_pantilt_down(pan_speed, tilt_speed);
+	}
+	
+	void on_toolButton_DR_pressed()
+	{
+		int pan_speed = ui.spinBox_pan_speed->value();
+		int tilt_speed = ui.spinBox_tilt_speed->value();
+		if (open_ptz_)
+			xptz_->set_pantilt_downright(pan_speed, tilt_speed);
+	}
+	
+	void toolButton_pantilt_stop()
+	{
+		if (open_ptz_)
+			xptz_->set_pantilt_stop();
+	}
+	
+	void on_toolButton_tele_pressed()
+	{
+		int zoom_speed = ui.spinBox_zoom_speed->value();
+		if (open_ptz_)
+			xptz_->set_zoom_tele(zoom_speed);
+	}
+	
+	void on_toolButton_wide_pressed()
+	{
+		int zoom_speed = ui.spinBox_zoom_speed->value();
+		if (open_ptz_)
+			xptz_->set_zoom_wide(zoom_speed);
+	}
+	
+	void toolButton_zoom_stop()
+	{
+		if (open_ptz_)
+			xptz_->set_zoom_stop();
+	}
+	
+	void on_spinBox_pan_speed_valueChanged(int value)
+	{
+		if (open_ptz_)
+			xptz_->set_pan_speed(value);
+	}
+	
+	void on_spinBox_tilt_speed_valueChanged(int value)
+	{
+		if (open_ptz_)
+			xptz_->set_tilt_speed(value);
+	}
+	
+	void on_spinBox_zoom_speed_valueChanged(int value)
+	{
+		if (open_ptz_)
+			xptz_->set_zoom_speed(value);
+	}
+	
+	
+	void on_spinBox_pan_abs_valueChanged(int value)
+	{
+		int pan_speed = ui.spinBox_pan_speed->value();
+		int tilt_speed = ui.spinBox_tilt_speed->value();
+		int pan_abs = ui.spinBox_pan_abs->value();
+		int tilt_abs = ui.spinBox_tilt_abs->value();
+		if (open_ptz_)
+			xptz_->set_pantilt_absolute_position(pan_abs, tilt_abs, pan_speed, tilt_speed);
+	}
+	
+	void on_spinBox_tilt_abs_valueChanged(int value)
+	{
+		int pan_speed = ui.spinBox_pan_speed->value();
+		int tilt_speed = ui.spinBox_tilt_speed->value();
+		int pan_abs = ui.spinBox_pan_abs->value();
+		int tilt_abs = ui.spinBox_tilt_abs->value();
+		if (open_ptz_)
+			xptz_->set_pantilt_absolute_position(pan_abs, tilt_abs, pan_speed, tilt_speed);
+	}
+	
+	void on_spinBox_zoom_abs_valueChanged(int value)
+	{
+		int zoom_speed = ui.spinBox_zoom_speed->value();
+		int zoom_abs = ui.spinBox_zoom_abs->value();
+		if (open_ptz_)
+			xptz_->set_zoom_absolute_position(zoom_abs, zoom_speed);
+	}
+	
+	
+	
+	
+	
+	void on_spinBox_min_number_count_valueChanged(int value)
+	{
+		xfit_->set_min_number_count(value);
+	}
+	
+	void on_spinBox_max_number_count_valueChanged(int value)
+	{
+		xfit_->set_max_number_count(value);
+	}
+	
+	void on_doubleSpinBox_stable_angle_valueChanged(double value)
+	{
+		xfit_->set_stable_angle((float)value);
+	}
+	
+	void on_spinBox_min_stable_count_valueChanged(int value)
+	{
+		xfit_->set_min_stable_count(value);
+	}
+	
+	void on_pushButton_set_pid_clicked()
+	{
+		int channel = ui.comboBox_pid_channel->currentIndex();
+		float kp = (float)ui.doubleSpinBox_pid_kp->value();
+		float ki = (float)ui.doubleSpinBox_pid_ki->value();
+		float kd = (float)ui.doubleSpinBox_pid_kd->value();
+		float dead_zone = (float)ui.doubleSpinBox_pid_dead_zone->value();
+		float max_limit = (float)ui.doubleSpinBox_pid_max_limit->value();
+		
+		xtrack_->set_kp(channel, kp);
+		xtrack_->set_ki(channel, ki);
+		xtrack_->set_kd(channel, kd);
+		xtrack_->set_dead_zone(channel, dead_zone);
+		xtrack_->set_max_limit(channel, max_limit); 
+	}
+	
+	 
+	void on_spinBox_track_lock_time_valueChanged(int value)
+	{
+		xtrack_->set_lock_time(value);
+	}
 	
 	
 

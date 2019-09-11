@@ -2,7 +2,8 @@
 #define __STEREO_FILTER_H
 
 
-
+#include <iostream>
+#include <cmath>
 
 
 #include "stereo_camera.h"

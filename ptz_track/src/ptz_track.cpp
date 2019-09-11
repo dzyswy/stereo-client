@@ -1,7 +1,7 @@
 #include "ptz_track.h"
 
 
-
+using namespace std;
 
 
 ptz_track::ptz_track(ptz_ctl_visca *ptz, fit_calib *calib, float period)
@@ -89,13 +89,13 @@ void ptz_track::track_process()
 		
 		
 		int ptz_pose[FIT_CALIB_PTZ_MAX_CHANNEL]; 
-		ret = ptz_->get_pantilt_position(&ptz_pose[PTZ_TRACK_PTZ_PAN], &ptz_pose[PTZ_TRACK_PTZ_TILT]);
+		ret = ptz_->get_pantilt_position(&ptz_pose[FIT_CALIB_PTZ_PAN], &ptz_pose[FIT_CALIB_PTZ_TILT]);
 		if (ret < 0) {
 			printf("Failed to get pan tilt position!\n");
 			std::this_thread::sleep_for(std::chrono::seconds(3));
 			continue;
 		}
-		ret = ptz_->get_zoom_position(&ptz_pose[PTZ_TRACK_PTZ_ZOOM]);
+		ret = ptz_->get_zoom_position(&ptz_pose[FIT_CALIB_PTZ_ZOOM]);
 		if (ret < 0) {
 			printf("Failed to get zoom position!\n");
 			std::this_thread::sleep_for(std::chrono::seconds(3));
@@ -111,9 +111,9 @@ void ptz_track::track_process()
 		bool pan_mask = (track_mask_ & PTZ_TRACK_PTZ_PAN_MASK) ? true : false;
 		bool tilt_mask = (track_mask_ & PTZ_TRACK_PTZ_TILT_MASK) ? true : false;
 		bool zoom_mask = (track_mask_ & PTZ_TRACK_PTZ_ZOOM_MASK) ? true : false;
-		bool pan_move = (fabs(ptz_diff[PTZ_TRACK_PTZ_PAN]) > get_dead_zone(PTZ_TRACK_PTZ_PAN)) ? true : false;
-		bool tilt_move = (fabs(ptz_diff[PTZ_TRACK_PTZ_TILT]) > get_dead_zone(PTZ_TRACK_PTZ_TILT)) ? true : false;
-		bool zoom_move = (fabs(ptz_diff[PTZ_TRACK_PTZ_ZOOM]) > get_dead_zone(PTZ_TRACK_PTZ_ZOOM)) ? true : false;
+		bool pan_move = (fabs(ptz_diff[FIT_CALIB_PTZ_PAN]) > get_dead_zone(FIT_CALIB_PTZ_PAN)) ? true : false;
+		bool tilt_move = (fabs(ptz_diff[FIT_CALIB_PTZ_TILT]) > get_dead_zone(FIT_CALIB_PTZ_TILT)) ? true : false;
+		bool zoom_move = (fabs(ptz_diff[FIT_CALIB_PTZ_ZOOM]) > get_dead_zone(FIT_CALIB_PTZ_ZOOM)) ? true : false;
 		bool move_pan = (pan_mask && pan_move) ? true : false;
 		bool move_tilt = (tilt_mask && tilt_move) ? true : false;
 		bool move_zoom = (zoom_mask && zoom_move) ? true : false;
@@ -142,7 +142,7 @@ void ptz_track::track_process()
 			
 			if ((panSpeed == 0) && (tiltSpeed == 0)) 
 			{
-				ptz_->set_pantilt_stop(pan_speed, tilt_speed);
+				ptz_->set_pantilt_stop();
 			}	
 			else 
 			{
@@ -193,11 +193,11 @@ void ptz_track::track_process()
 			{
 				if (zoomSpeed > 0)
 				{
-					ptz_->set_zoom_tele_speed(zoom_speed - 1);
+					ptz_->set_zoom_tele(zoom_speed - 1);
 				}	
 				else
 				{
-					ptz_->set_zoom_wide_speed(zoom_speed - 1);
+					ptz_->set_zoom_wide(zoom_speed - 1);
 				}		
 			}	
 			
@@ -207,27 +207,22 @@ void ptz_track::track_process()
 			switch(lock_state_)
 			{
 				case PTZ_TRACK_TRACK_UNLOCKED:
-				{ 
-					if (position_statble_count) 
+				{  
+					if (move_pan || move_tilt)
 					{
-						if (move_pan || move_tilt)
-						{
-							int pan_position = move_pan ? focus_pose_.val[PTZ_TRACK_PTZ_PAN] : ptz_pose[PTZ_TRACK_PTZ_PAN];
-							int tilt_position = move_tilt ? focus_pose_.val[PTZ_TRACK_PTZ_TILT] : ptz_pose[PTZ_TRACK_PTZ_TILT];
-							ptz_->set_pantilt_absolute_position(&pan_position, &tilt_position, ptz_->get_max_pan_speed(), ptz_->get_max_tilt_speed());
-						}	
-						
-						if (move_zoom)
-						{
-							int zoom_position = focus_pose_.val[PTZ_TRACK_PTZ_ZOOM];
-							ptz_->set_zoom_absolute_position(&zoom_position, ptz_->get_max_zoom_speed());
-						}	
-						
-						lock_state_ = PTZ_TRACK_TRACK_LOCKED;
-						lock_timeout_ = time(0) + lock_time_;
-					}
+						int pan_position = move_pan ? focus_pose_.val[FIT_CALIB_PTZ_PAN] : ptz_pose[FIT_CALIB_PTZ_PAN];
+						int tilt_position = move_tilt ? focus_pose_.val[FIT_CALIB_PTZ_TILT] : ptz_pose[FIT_CALIB_PTZ_TILT];
+						ptz_->set_pantilt_absolute_position(pan_position, tilt_position, ptz_->get_max_pan_speed(), ptz_->get_max_tilt_speed());
+					}	
 					
+					if (move_zoom)
+					{
+						int zoom_position = focus_pose_.val[FIT_CALIB_PTZ_ZOOM];
+						ptz_->set_zoom_absolute_position(zoom_position, ptz_->get_max_zoom_speed());
+					}	
 					
+					lock_state_ = PTZ_TRACK_TRACK_LOCKED;
+					lock_timeout_ = time(0) + lock_time_; 
 						
 				}break;
 				case PTZ_TRACK_TRACK_LOCKED:
@@ -245,8 +240,8 @@ void ptz_track::track_process()
 			 
 		gettimeofday(&tv[1], NULL);
 		
-		float time_used = (tv[1].tv_sec - tv[0].tv_sec) * 1000 + (tv[1].tv_usec - tv[0].tv_usec) / 1000;
-		float time_leave = period_ - time_used;
+		int time_used = (tv[1].tv_sec - tv[0].tv_sec) * 1000 + (tv[1].tv_usec - tv[0].tv_usec) / 1000;
+		int time_leave = period_ - time_used;
 		if (time_leave > 1)
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(time_leave));
@@ -254,8 +249,79 @@ void ptz_track::track_process()
 	}	
 }
 
+int ptz_track::pid_paras_to_string(std::string &value)
+{
+	try {
+		Json::Value jroot;
+		Json::Value jpids;
+		
+		
+		for (int i = 0; i < FIT_CALIB_PTZ_MAX_CHANNEL; i++)
+		{ 
+			Json::Value jpid;
+			
+			jpid["kp"] = 
+			
+			jpid["kp"] = get_kp(i);
+			jpid["ki"] = get_ki(i);
+			jpid["kd"] = get_kd(i);
+			jpid["dead_zone"] = get_dead_zone(i);
+			jpid["max_limit"] = get_max_limit(i);
+			
+			jpids.append(jpid);
+		}	
+	
+		jroot["pids"] = jpids;
+		
+	//	value = jroot.toStyledString();
+		Json::StreamWriterBuilder builder;
+		builder["indentation"] = "";
+		value = Json::writeString(builder, jroot);
+	}
+	catch(std::exception &ex)
+    {
+        printf( "jsoncpp struct error: %s.\n", ex.what());
+        return -1;
+	}
+	return 0;
+}
 
-
+int ptz_track::pid_paras_from_string(std::string value)
+{
+	try {
+		Json::Reader reader;
+		Json::Value jroot;
+		Json::Value jpids;
+		
+		
+		
+		if (!reader.parse(value, jroot))
+			return -1;
+		
+		if (jroot["pids"].empty())
+			return -1; 
+		
+		jpids = jroot["pids"];
+		for (int i = 0; i < jpids.size(); i++)
+		{  
+			Json::Value jpid;
+			jpid = jpids[i];
+			
+			set_kp(i, jpid["kp"].asFloat());
+			set_ki(i, jpid["ki"].asFloat());
+			set_kd(i, jpid["kd"].asFloat());
+			set_dead_zone(i, jpid["dead_zone"].asFloat());
+			set_max_limit(i, jpid["max_limit"].asFloat());
+		} 
+		
+	} catch(std::exception &ex)
+    {
+        printf( "jsoncpp struct error: %s.\n", ex.what());
+        return -1;
+	}
+	samples = _samples;
+	return 0;
+}
 
 
 

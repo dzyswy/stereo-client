@@ -1,8 +1,12 @@
 #ifndef __PTZ_TRACK_H
 #define __PTZ_TRACK_H
 
+#include <iostream>
 #include <ctime>
 #include <sys/time.h>
+#include <cmath>
+#include <chrono>
+#include <ratio>
 
 #include "pid_inc.h"
 #include "fit_calib.h"
@@ -52,6 +56,9 @@ public:
 	int run();
 	int stop();
 	
+	int pid_paras_from_string(std::string value);
+	int pid_paras_to_string(std::string &value);
+	
 	
 	void track_process();
 	
@@ -64,6 +71,7 @@ protected:
 	int track_mask_;
 	int track_coord_;
 	int lock_time_;
+	
 	int lock_state_;
 	time_t lock_timeout_;
 	
@@ -75,13 +83,13 @@ protected:
 	struct ptz_track_focus_pose focus_pose_;
 
 	
-	pid_inc pid_[PTZ_TRACK_PTZ_MAX_CHANNEL];
+	pid_inc pid_[FIT_CALIB_PTZ_MAX_CHANNEL];
 	
 	
 	
 public:
 
-	void set_detect_box(struct stereo_detect_box &value);
+	int set_detect_box(struct stereo_detect_box &value);
 
 
 	void set_track_mode(int value)
@@ -122,7 +130,6 @@ public:
 	void set_dead_zone(int channel, float value)
 	{
 		pid_[channel].set_dead_zone(value);
-		dead_zone_[channel] = value;
 	}
 	
 	void set_max_limit(int channel, float value)

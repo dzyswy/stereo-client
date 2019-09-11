@@ -21,14 +21,13 @@ int fit_calib_samples::to_string(std::string &value)
 		
 		for (int i = 0; i < samples.size(); i++)
 		{
-			vector<std::pair<struct fit_calib_pose_sample, struct fit_calib_pixel_sample> > &_sample_pair = samples[i];
-			struct fit_calib_pose_sample &_pose_sample = _sample_pair.first;
-			struct fit_calib_pixel_sample &_pixel_sample = _sample_pair.second;
+			struct fit_calib_pose_sample &_pose_sample = samples[i].first;
+			struct fit_calib_pixel_sample &_pixel_sample = samples[i].second;
 			
 			Json::Value jpose_sample;
 			for (int j = 0; j = FIT_CALIB_PTZ_MAX_CHANNEL; j++)
 			{
-				jsample_pair[std::to_string(j).c_str()] = _pose_sample.val[j];
+				jpose_sample[std::to_string(j).c_str()] = _pose_sample.val[j];
 			}	
 			
 			Json::Value jpixel_sample;

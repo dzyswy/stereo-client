@@ -31,16 +31,15 @@ enum fit_calib_ptz_channel_type
 	FIT_CALIB_PTZ_MAX_CHANNEL = 3,
 };
 
-struct fit_calib_pixel_sample
-{
-	float val[FIT_CALIB_MAX_COORD][FIT_CALIB_PTZ_MAX_CHANNEL];
-};
-
 struct fit_calib_pose_sample
 {
 	float val[FIT_CALIB_PTZ_MAX_CHANNEL];
 };
 
+struct fit_calib_pixel_sample
+{
+	float val[FIT_CALIB_MAX_COORD][FIT_CALIB_PTZ_MAX_CHANNEL];
+};
 
 
 struct fit_calib_samples

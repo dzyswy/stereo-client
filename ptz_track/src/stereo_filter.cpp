@@ -1,6 +1,7 @@
 #include "stereo_filter.h"
 
 
+using namespace std;
 
 
 
