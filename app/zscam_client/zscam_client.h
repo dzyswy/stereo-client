@@ -92,8 +92,8 @@ private:
 	void show_pid_para();
 	void show_fit_calib_sample();
 	void show_fit_calib_all_samples(QPixmap *dst, QColor color);
-	void load_config(const char *config_name);
-	void save_config(const char *config_name);
+	int load_config(const char *config_name);
+	int save_config(const char *config_name);
 	
 public:
 	Ui::zscam_clientClass ui;
@@ -111,8 +111,8 @@ public:
 	
 	
 	int open_;
-	int open_ptz_;
-	int run_track_;
+	int ptz_open_;
+	int ptz_track_run_;
 	
 	
 	QPixmap default_pixmap_;
@@ -156,12 +156,14 @@ public:
 	int show_poly_mask_mode_;
 	vector<pair<float, float> > poly_mask_points_[2];
 	
-
+	int number_state_;
+	struct stereo_detect_box focus_box_; 
+	int statble_state_;
 
 	int show_fit_calib_sample_mode_;
 	int test_track_mode_;
-	struct fit_calib_pose_sample pose_sample_;
-	struct fit_calib_pixel_sample pixel_sample_;
+	struct fit_calib_ptz_pose pose_sample_;
+	struct fit_calib_stereo_pixel pixel_sample_;
 	
 	
 
@@ -186,40 +188,28 @@ private slots:
 				match_mode_ = STEREO_CAMERA_MATCH_OPEN_MODE;
 				break;
 		}
-		
-		
-		if (open_) 
-			camera_->set_value("match_mode", match_mode_);
+		camera_->set_value("match_mode", match_mode_);
 	}
 
 	 
 	void on_spinBox_match_edge_th_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("match_edge_th", arg1.toInt());
-		
+		camera_->set_value("match_edge_th", arg1.toInt());
 	}
 		
 	void on_spinBox_match_P1_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("match_P1", arg1.toInt());
+		camera_->set_value("match_P1", arg1.toInt());
 	}
 		
 	void on_spinBox_match_P2_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("match_P2", arg1.toInt());
+		camera_->set_value("match_P2", arg1.toInt());
 	}
 		
 	void on_spinBox_match_check_th_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("match_check_th", arg1.toInt());
+		camera_->set_value("match_check_th", arg1.toInt());
 	}
 	
 	void on_checkBox_bg_mode_stateChanged(int state)
@@ -233,68 +223,48 @@ private slots:
 				bg_mode_ = STEREO_CAMERA_BG_OPEN_MODE;
 				break;
 		}
-		
-		
-		if (open_) 
-			camera_->set_value("bg_mode", bg_mode_);
+		camera_->set_value("bg_mode", bg_mode_);
 	}
 		 
 	void on_spinBox_bg_color_dist_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("bg_color_dist", arg1.toInt());
+		camera_->set_value("bg_color_dist", arg1.toInt());
 	}
 		
 	void on_spinBox_bg_color_match_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("bg_color_match", arg1.toInt());
+		camera_->set_value("bg_color_match", arg1.toInt());
 	}
 		
 	void on_spinBox_bg_space_dist_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("bg_space_dist", arg1.toInt());
+		camera_->set_value("bg_space_dist", arg1.toInt());
 	}
 		
 	void on_spinBox_bg_space_match_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("bg_space_match", arg1.toInt());
+		camera_->set_value("bg_space_match", arg1.toInt());
 	}
 		
 	void on_spinBox_bg_disp_dist_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("bg_disp_dist", arg1.toInt());
+		camera_->set_value("bg_disp_dist", arg1.toInt());
 	}
 		
 	void on_spinBox_bg_disp_match_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("bg_disp_match", arg1.toInt());
+		camera_->set_value("bg_disp_match", arg1.toInt());
 	}
 		
 	void on_spinBox_bg_update_radio_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("bg_update_radio", arg1.toInt());
+		camera_->set_value("bg_update_radio", arg1.toInt());
 	}
 		
 		
 	void on_pushButton_bg_init_clicked()
 	{
-		int value;
-		
-		if (open_) 
-			camera_->do_action("set_bg_init");
+		camera_->do_action("set_bg_init");
 	}
 		
 	void on_checkBox_median_mode_stateChanged(int state)
@@ -308,10 +278,7 @@ private slots:
 				median_mode_ = STEREO_CAMERA_MEDIAN_OPEN_MODE;
 				break;
 		}
-		
-		
-		if (open_) 
-			camera_->set_value("median_mode", median_mode_);
+		camera_->set_value("median_mode", median_mode_);
 	}
 	
 	void on_checkBox_tex_mode_stateChanged(int state)
@@ -325,10 +292,7 @@ private slots:
 				tex_mode_ = STEREO_CAMERA_TEX_OPEN_MODE;
 				break;
 		}
-		
-		
-		if (open_) 
-			camera_->set_value("tex_mode", tex_mode_);
+		camera_->set_value("tex_mode", tex_mode_);
 	}
 	
 	void on_checkBox_space_mode_stateChanged(int state)
@@ -342,10 +306,7 @@ private slots:
 				space_mode_ = STEREO_CAMERA_SPACE_OPEN_MODE;
 				break;
 		}
-		
-		
-		if (open_) 
-			camera_->set_value("space_mode", space_mode_);
+		camera_->set_value("space_mode", space_mode_);
 	}
 	
 	void on_checkBox_morph_mode_stateChanged(int state)
@@ -359,88 +320,63 @@ private slots:
 				morph_mode_ = STEREO_CAMERA_MORPH_OPEN_MODE;
 				break;
 		}
-		
-		
-		if (open_) 
-			camera_->set_value("morph_mode", morph_mode_);
+		camera_->set_value("morph_mode", morph_mode_);
 	}
  
 	void on_spinBox_post_tex_th_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("post_tex_th", arg1.toInt());
+		camera_->set_value("post_tex_th", arg1.toInt());
 	}
 		
 	void on_spinBox_post_tex_sum_th_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("post_tex_sum_th", arg1.toInt());
+		camera_->set_value("post_tex_sum_th", arg1.toInt());
 	}
 	
 
 	void on_spinBox_install_height_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("install_height", arg1.toInt());
+		camera_->set_value("install_height", arg1.toInt());
 	}
 		
 	void on_doubleSpinBox_install_x_angle_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("install_x_angle", (float)arg1.toDouble());
+		camera_->set_value("install_x_angle", (float)arg1.toDouble());
 	}
 		
 	void on_doubleSpinBox_install_z_angle_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("install_z_angle", (float)arg1.toDouble());
+		camera_->set_value("install_z_angle", (float)arg1.toDouble());
 	}
 		
 	void on_spinBox_detect_minx_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("detect_minx", arg1.toInt());
+		camera_->set_value("detect_minx", arg1.toInt());
 	}
 		
 	void on_spinBox_detect_maxx_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("detect_maxx", arg1.toInt());
+		camera_->set_value("detect_maxx", arg1.toInt());
 	}
 		
 	void on_spinBox_detect_miny_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("detect_miny", arg1.toInt());
+		camera_->set_value("detect_miny", arg1.toInt());
 	}
 		
 	void on_spinBox_detect_maxy_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("detect_maxy", arg1.toInt());
+		camera_->set_value("detect_maxy", arg1.toInt());
 	}
 		
 	void on_spinBox_detect_minz_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("detect_minz", arg1.toInt());
+		camera_->set_value("detect_minz", arg1.toInt());
 	}
 		
 	void on_spinBox_detect_maxz_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("detect_maxz", arg1.toInt());
+		camera_->set_value("detect_maxz", arg1.toInt());
 	}
 		
 	void on_checkBox_poly_mode_stateChanged(int state)
@@ -454,10 +390,7 @@ private slots:
 				poly_mode_ = STEREO_CAMERA_POLY_OPEN_MODE;
 				break;
 		}
-		
-		
-		if (open_) 
-			camera_->set_value("poly_mode", poly_mode_);
+		camera_->set_value("poly_mode", poly_mode_);
 	}
    	
 	void on_checkBox_draw_poly_mask_stateChanged(int state)
@@ -481,11 +414,8 @@ private slots:
 	
 	void on_pushButton_set_poly_mask_clicked()
 	{ 
-		if (open_) 
-			camera_->set_poly_mask(poly_mask_points_[1]);
-		
-		if (open_) 
-			camera_->get_poly_mask(poly_mask_points_[0]);
+		camera_->set_poly_mask(poly_mask_points_[1]);
+		camera_->get_poly_mask(poly_mask_points_[0]);
 	}
 	
 	void on_checkBox_show_poly_mask_stateChanged(int state)
@@ -499,52 +429,38 @@ private slots:
 				show_poly_mask_mode_ = 1;
 				break;
 		}
-		
-		
-		if (open_) 
-			camera_->get_poly_mask(poly_mask_points_[0]);
+		camera_->get_poly_mask(poly_mask_points_[0]);
 	}
 
 	void on_pushButton_detect_mode_clicked()
-	{
-		if (open_)
+	{ 
+		if (detect_mode_ == 0)
 		{
-			if (detect_mode_ == 0)
-			{
-				detect_mode_ = 1;
-				ui.pushButton_detect_mode->setText(QString::fromLocal8Bit("停止检测"));
-			}
-			else
-			{
-				detect_mode_ = 0;
-				ui.pushButton_detect_mode->setText(QString::fromLocal8Bit("开始检测"));
-			}
-			camera_->set_value("detect_mode", detect_mode_);
-			camera_->set_value("track_mode", track_mode_);	
-		}	
-			
-		
+			detect_mode_ = 1;
+			ui.pushButton_detect_mode->setText(QString::fromLocal8Bit("停止检测"));
+		}
+		else
+		{
+			detect_mode_ = 0;
+			ui.pushButton_detect_mode->setText(QString::fromLocal8Bit("开始检测"));
+		}
+		camera_->set_value("detect_mode", detect_mode_);
+		camera_->set_value("track_mode", track_mode_);	  
 	}
 
 	void on_spinBox_detect_min_wsize_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("detect_min_wsize", arg1.toInt());
+		camera_->set_value("detect_min_wsize", arg1.toInt());
 	}
 
 	void on_spinBox_detect_min_space_size_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("detect_min_space_size", arg1.toInt());
+		camera_->set_value("detect_min_space_size", arg1.toInt());
 	}
 
 	void on_spinBox_detect_min_nms_dist_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("detect_min_nms_dist", arg1.toInt());
+		camera_->set_value("detect_min_nms_dist", arg1.toInt());
 	}
 
 
@@ -563,48 +479,37 @@ private slots:
 
 	void on_spinBox_track_max_cost_valueChanged(const QString &arg1)
 	{
-		if (open_) 
-			camera_->set_value("track_max_cost", arg1.toInt());
+		camera_->set_value("track_max_cost", arg1.toInt());
 	}
 	
 	void on_comboBox_http_out_mode_currentIndexChanged(int index)
 	{
-		
-		if (open_) 
-			camera_->set_value("http_out_mode", index);
+		camera_->set_value("http_out_mode", index);
 	}
 	
 	void on_radioButton_channel0_mode_clicked()
 	{
-		
-		if (open_) 
-			camera_->set_value("http_out_channel", 0);
+		camera_->set_value("http_out_channel", 0);
 	}
 
 	void on_radioButton_channel1_mode_clicked()
 	{
-		
-		if (open_) 
-			camera_->set_value("http_out_channel", 1);
+		camera_->set_value("http_out_channel", 1);
 	}
 	
 	void on_spinBox_stream_quality_valueChanged(const QString &arg1)
 	{
-		
-		if (open_) 
-			camera_->set_value("http_out_quality", arg1.toInt());
+		camera_->set_value("http_out_quality", arg1.toInt());
 	}
 	
 	void on_pushButton_save_config_clicked()
 	{
-		if (open_) 
-			camera_->do_action("save_config");
+		camera_->do_action("save_config");
 	}
 	
 	void on_pushButton_reboot_clicked()
 	{
-		if (open_) 
-			camera_->do_action("reboot", 1);
+		camera_->do_action("reboot", 1);
 	}
 	
 	void on_checkBox_dhcp_stateChanged(int state)
@@ -632,9 +537,6 @@ private slots:
 		string gateway = ui.lineEdit_gateway->text().toStdString();
 		string mac = ui.lineEdit_mac->text().toStdString();
 	
-		if (!open_) 
-			return;
-		
 		while(1)
 		{
 			ret = camera_->set_value("dhcp", dhcp);
@@ -799,7 +701,7 @@ private slots:
 	void on_pushButton_fit_calib_clicked();
 	void on_checkBox_fit_calib_en_stateChanged(int arg1)
 	{
-		if (!open_ptz_)
+		if (!ptz_open_)
 			return;
 		
 		switch (arg1)
@@ -814,7 +716,7 @@ private slots:
 	}
 	void on_checkBox_checkBox_test_track_stateChanged(int arg1)
 	{
-		if (!open_ptz_)
+		if (!ptz_open_)
 			return;
 		
 		switch (arg1)
@@ -832,7 +734,7 @@ private slots:
 	/*
 	void on_checkBox_datascreen_stateChanged(int arg1)
 	{
-		if (!open_ptz_)
+		if (!ptz_open_)
 			return;
 		
 		switch (arg1)
@@ -850,108 +752,93 @@ private slots:
 	{
 		int pan_speed = ui.spinBox_pan_speed->value();
 		int tilt_speed = ui.spinBox_tilt_speed->value();
-		if (open_ptz_)
-			xptz_->set_pantilt_upleft(pan_speed, tilt_speed);
+		xptz_->set_pantilt_upleft(pan_speed, tilt_speed);
 	}
 	
 	void on_toolButton_U_pressed()
 	{
 		int pan_speed = ui.spinBox_pan_speed->value();
 		int tilt_speed = ui.spinBox_tilt_speed->value();
-		if (open_ptz_)
-			xptz_->set_pantilt_up(pan_speed, tilt_speed);
+		xptz_->set_pantilt_up(pan_speed, tilt_speed);
 	}
 	
 	void on_toolButton_UR_pressed()
 	{
 		int pan_speed = ui.spinBox_pan_speed->value();
 		int tilt_speed = ui.spinBox_tilt_speed->value();
-		if (open_ptz_)
-			xptz_->set_pantilt_upright(pan_speed, tilt_speed);
+		xptz_->set_pantilt_upright(pan_speed, tilt_speed);
 	}
 	
 	void on_toolButton_L_pressed()
 	{
 		int pan_speed = ui.spinBox_pan_speed->value();
 		int tilt_speed = ui.spinBox_tilt_speed->value();
-		if (open_ptz_)
-			xptz_->set_pantilt_left(pan_speed, tilt_speed);
+		xptz_->set_pantilt_left(pan_speed, tilt_speed);
 	}
 	
 	void on_toolButton_R_pressed()
 	{
 		int pan_speed = ui.spinBox_pan_speed->value();
 		int tilt_speed = ui.spinBox_tilt_speed->value();
-		if (open_ptz_)
-			xptz_->set_pantilt_right(pan_speed, tilt_speed);
+		xptz_->set_pantilt_right(pan_speed, tilt_speed);
 	}
 	
 	void on_toolButton_DL_pressed()
 	{
 		int pan_speed = ui.spinBox_pan_speed->value();
 		int tilt_speed = ui.spinBox_tilt_speed->value();
-		if (open_ptz_)
-			xptz_->set_pantilt_downleft(pan_speed, tilt_speed);
+		xptz_->set_pantilt_downleft(pan_speed, tilt_speed);
 	}
 	
 	void on_toolButton_D_pressed()
 	{
 		int pan_speed = ui.spinBox_pan_speed->value();
 		int tilt_speed = ui.spinBox_tilt_speed->value();
-		if (open_ptz_)
-			xptz_->set_pantilt_down(pan_speed, tilt_speed);
+		xptz_->set_pantilt_down(pan_speed, tilt_speed);
 	}
 	
 	void on_toolButton_DR_pressed()
 	{
 		int pan_speed = ui.spinBox_pan_speed->value();
 		int tilt_speed = ui.spinBox_tilt_speed->value();
-		if (open_ptz_)
-			xptz_->set_pantilt_downright(pan_speed, tilt_speed);
+		xptz_->set_pantilt_downright(pan_speed, tilt_speed);
 	}
 	
 	void toolButton_pantilt_stop()
 	{
-		if (open_ptz_)
-			xptz_->set_pantilt_stop();
+		xptz_->set_pantilt_stop();
 	}
 	
 	void on_toolButton_tele_pressed()
 	{
 		int zoom_speed = ui.spinBox_zoom_speed->value();
-		if (open_ptz_)
-			xptz_->set_zoom_tele(zoom_speed);
+		xptz_->set_zoom_tele(zoom_speed);
 	}
 	
 	void on_toolButton_wide_pressed()
 	{
 		int zoom_speed = ui.spinBox_zoom_speed->value();
-		if (open_ptz_)
-			xptz_->set_zoom_wide(zoom_speed);
+		xptz_->set_zoom_wide(zoom_speed);
 	}
 	
 	void toolButton_zoom_stop()
 	{
-		if (open_ptz_)
-			xptz_->set_zoom_stop();
+		xptz_->set_zoom_stop();
 	}
 	
 	void on_spinBox_pan_speed_valueChanged(int value)
 	{
-		if (open_ptz_)
-			xptz_->set_pan_speed(value);
+		xptz_->set_pan_speed(value);
 	}
 	
 	void on_spinBox_tilt_speed_valueChanged(int value)
 	{
-		if (open_ptz_)
-			xptz_->set_tilt_speed(value);
+		xptz_->set_tilt_speed(value);
 	}
 	
 	void on_spinBox_zoom_speed_valueChanged(int value)
 	{
-		if (open_ptz_)
-			xptz_->set_zoom_speed(value);
+		xptz_->set_zoom_speed(value);
 	}
 	
 	
@@ -961,8 +848,7 @@ private slots:
 		int tilt_speed = ui.spinBox_tilt_speed->value();
 		int pan_abs = ui.spinBox_pan_abs->value();
 		int tilt_abs = ui.spinBox_tilt_abs->value();
-		if (open_ptz_)
-			xptz_->set_pantilt_absolute_position(pan_abs, tilt_abs, pan_speed, tilt_speed);
+		xptz_->set_pantilt_absolute_position(pan_abs, tilt_abs, pan_speed, tilt_speed);
 	}
 	
 	void on_spinBox_tilt_abs_valueChanged(int value)
@@ -971,16 +857,14 @@ private slots:
 		int tilt_speed = ui.spinBox_tilt_speed->value();
 		int pan_abs = ui.spinBox_pan_abs->value();
 		int tilt_abs = ui.spinBox_tilt_abs->value();
-		if (open_ptz_)
-			xptz_->set_pantilt_absolute_position(pan_abs, tilt_abs, pan_speed, tilt_speed);
+		xptz_->set_pantilt_absolute_position(pan_abs, tilt_abs, pan_speed, tilt_speed);
 	}
 	
 	void on_spinBox_zoom_abs_valueChanged(int value)
 	{
 		int zoom_speed = ui.spinBox_zoom_speed->value();
 		int zoom_abs = ui.spinBox_zoom_abs->value();
-		if (open_ptz_)
-			xptz_->set_zoom_absolute_position(zoom_abs, zoom_speed);
+		xptz_->set_zoom_absolute_position(zoom_abs, zoom_speed);
 	}
 	
 	
@@ -989,22 +873,22 @@ private slots:
 	
 	void on_spinBox_min_number_count_valueChanged(int value)
 	{
-		xfit_->set_min_number_count(value);
+		xfilter_->set_min_number_count(value);
 	}
 	
 	void on_spinBox_max_number_count_valueChanged(int value)
 	{
-		xfit_->set_max_number_count(value);
+		xfilter_->set_max_number_count(value);
 	}
 	
 	void on_doubleSpinBox_stable_angle_valueChanged(double value)
 	{
-		xfit_->set_stable_angle((float)value);
+		xfilter_->set_stable_angle((float)value);
 	}
 	
 	void on_spinBox_min_stable_count_valueChanged(int value)
 	{
-		xfit_->set_min_stable_count(value);
+		xfilter_->set_min_stable_count(value);
 	}
 	
 	void on_pushButton_set_pid_clicked()

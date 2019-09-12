@@ -21,8 +21,8 @@ int fit_calib_samples::to_string(std::string &value)
 		
 		for (int i = 0; i < samples.size(); i++)
 		{
-			struct fit_calib_pose_sample &_pose_sample = samples[i].first;
-			struct fit_calib_pixel_sample &_pixel_sample = samples[i].second;
+			struct fit_calib_ptz_pose &_pose_sample = samples[i].first;
+			struct fit_calib_stereo_pixel &_pixel_sample = samples[i].second;
 			
 			Json::Value jpose_sample;
 			for (int j = 0; j = FIT_CALIB_PTZ_MAX_CHANNEL; j++)
@@ -62,7 +62,7 @@ int fit_calib_samples::to_string(std::string &value)
 
 int fit_calib_samples::from_string(std::string &value)
 {
-	std::vector<std::pair<struct fit_calib_pose_sample, struct fit_calib_pixel_sample> > _samples;
+	std::vector<std::pair<struct fit_calib_ptz_pose, struct fit_calib_stereo_pixel> > _samples;
 	
 	try {
 		Json::Reader reader;
@@ -81,8 +81,8 @@ int fit_calib_samples::from_string(std::string &value)
 		jsamples = jroot["samples"];
 		for (int i = 0; i < jsamples.size(); i++)
 		{ 
-			struct fit_calib_pose_sample _pose_sample = {0};
-			struct fit_calib_pixel_sample _pixel_sample = {0};
+			struct fit_calib_ptz_pose _pose_sample = {0};
+			struct fit_calib_stereo_pixel _pixel_sample = {0};
 			
 			Json::Value jsample_pair;
 			jsample_pair = jsamples[i];

@@ -261,7 +261,7 @@
          </size>
         </property>
         <property name="currentIndex">
-         <number>3</number>
+         <number>4</number>
         </property>
         <widget class="QWidget" name="page">
          <property name="geometry">
@@ -2668,10 +2668,50 @@
              <string>PID参数</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_20">
+             <item row="3" column="1">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_pid_kd">
+               <property name="decimals">
+                <number>2</number>
+               </property>
+               <property name="maximum">
+                <double>100000.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.010000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_75">
+               <property name="text">
+                <string>Kp:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2">
+              <widget class="QLabel" name="label_76">
+               <property name="text">
+                <string>最小限制:</string>
+               </property>
+              </widget>
+             </item>
              <item row="0" column="0">
               <widget class="QLabel" name="label_74">
                <property name="text">
                 <string>通道:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_pid_ki">
+               <property name="decimals">
+                <number>2</number>
+               </property>
+               <property name="maximum">
+                <double>100000.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.010000000000000</double>
                </property>
               </widget>
              </item>
@@ -2694,10 +2734,17 @@
                </item>
               </widget>
              </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_75">
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_72">
                <property name="text">
-                <string>Kp:</string>
+                <string>Kd:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QLabel" name="label_73">
+               <property name="text">
+                <string>死区:</string>
                </property>
               </widget>
              </item>
@@ -2714,89 +2761,7 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="2">
-              <widget class="QLabel" name="label_73">
-               <property name="text">
-                <string>死区:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="3">
-              <widget class="QSpinBox" name="spinBox_pid_dead_zone">
-               <property name="maximum">
-                <number>100000</number>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_70">
-               <property name="text">
-                <string>Ki:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_pid_ki">
-               <property name="decimals">
-                <number>2</number>
-               </property>
-               <property name="maximum">
-                <double>100000.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.010000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="2">
-              <widget class="QLabel" name="label_76">
-               <property name="text">
-                <string>最小限制:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="3">
-              <widget class="QSpinBox" name="spinBox_pid_min_limit">
-               <property name="maximum">
-                <number>100000</number>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="label_72">
-               <property name="text">
-                <string>Kd:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_pid_kd">
-               <property name="decimals">
-                <number>2</number>
-               </property>
-               <property name="maximum">
-                <double>100000.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.010000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="2">
-              <widget class="QLabel" name="label_71">
-               <property name="text">
-                <string>最大限制:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="3">
-              <widget class="QSpinBox" name="spinBox_pid_max_limit">
-               <property name="maximum">
-                <number>100000</number>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0" colspan="4">
+             <item row="4" column="0" colspan="5">
               <layout class="QHBoxLayout" name="horizontalLayout_29">
                <item>
                 <spacer name="horizontalSpacer_44">
@@ -2832,6 +2797,59 @@
                 </spacer>
                </item>
               </layout>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_70">
+               <property name="text">
+                <string>Ki:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="2">
+              <widget class="QLabel" name="label_71">
+               <property name="text">
+                <string>最大限制:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="3">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_pid_dead_zone">
+               <property name="decimals">
+                <number>2</number>
+               </property>
+               <property name="maximum">
+                <double>1000000.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.010000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="3">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_pid_min_limit">
+               <property name="decimals">
+                <number>2</number>
+               </property>
+               <property name="maximum">
+                <double>1000000.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.010000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="3">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_pid_max_limit">
+               <property name="decimals">
+                <number>2</number>
+               </property>
+               <property name="maximum">
+                <double>1000000.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.010000000000000</double>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>

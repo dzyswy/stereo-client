@@ -13,6 +13,8 @@ using namespace std;
 
 ptz_ctl_visca::ptz_ctl_visca()
 {
+	open_ = 0;
+	
 	pan_speed_ = 8;
 	tilt_speed_ = 6;
 	zoom_speed_ = 1;
@@ -39,6 +41,10 @@ ptz_ctl_visca::~ptz_ctl_visca()
 
 int ptz_ctl_visca::open_device(const char *dev_name) 
 {
+	std::unique_lock<std::mutex> lock(mux_);
+	if (open_)
+		return -1;
+	
 	int camera_num;
     if (VISCA_open_serial(interface_, dev_name)!=VISCA_SUCCESS) {
         fprintf(stderr,"camera_ui: unable to open serial device %s\n",dev_name);
@@ -55,12 +61,16 @@ int ptz_ctl_visca::open_device(const char *dev_name)
 	const unsigned char VISCA_POWER_OFF = 3;
 	VISCA_set_power(interface_, camera_, VISCA_POWER_ON);
 	
+	open_ = 1;
+	
 	return 0;
 } 
 
 int ptz_ctl_visca::close_device() 
 {
+	std::unique_lock<std::mutex> lock(mux_);
 	VISCA_close_serial(interface_);
+	open_ = 0;
 	return 0;
 } 
 	
@@ -69,6 +79,10 @@ int ptz_ctl_visca::close_device()
 	
 int ptz_ctl_visca::set_pantilt_left(int pan_speed, int tilt_speed) 
 {
+	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
+	
 	int panSpeed = gen_valid_pan_speed(pan_speed);
 	int tiltSpeed = gen_valid_tilt_speed(tilt_speed);
 	
@@ -79,6 +93,10 @@ int ptz_ctl_visca::set_pantilt_left(int pan_speed, int tilt_speed)
 
 int ptz_ctl_visca::set_pantilt_right(int pan_speed, int tilt_speed) 
 {
+	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
+	
 	int panSpeed = gen_valid_pan_speed(pan_speed);
 	int tiltSpeed = gen_valid_tilt_speed(tilt_speed);
 	
@@ -89,6 +107,10 @@ int ptz_ctl_visca::set_pantilt_right(int pan_speed, int tilt_speed)
 
 int ptz_ctl_visca::set_pantilt_up(int pan_speed, int tilt_speed) 
 {
+	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
+	
 	int panSpeed = gen_valid_pan_speed(pan_speed);
 	int tiltSpeed = gen_valid_tilt_speed(tilt_speed);
 	
@@ -99,6 +121,10 @@ int ptz_ctl_visca::set_pantilt_up(int pan_speed, int tilt_speed)
 
 int ptz_ctl_visca::set_pantilt_down(int pan_speed, int tilt_speed) 
 {
+	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
+	
 	int panSpeed = gen_valid_pan_speed(pan_speed);
 	int tiltSpeed = gen_valid_tilt_speed(tilt_speed);
 	
@@ -109,6 +135,10 @@ int ptz_ctl_visca::set_pantilt_down(int pan_speed, int tilt_speed)
 
 int ptz_ctl_visca::set_pantilt_upleft(int pan_speed, int tilt_speed) 
 {
+	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
+	
 	int panSpeed = gen_valid_pan_speed(pan_speed);
 	int tiltSpeed = gen_valid_tilt_speed(tilt_speed);
 	
@@ -119,6 +149,10 @@ int ptz_ctl_visca::set_pantilt_upleft(int pan_speed, int tilt_speed)
 
 int ptz_ctl_visca::set_pantilt_upright(int pan_speed, int tilt_speed) 
 {
+	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
+	
 	int panSpeed = gen_valid_pan_speed(pan_speed);
 	int tiltSpeed = gen_valid_tilt_speed(tilt_speed);
 	
@@ -129,6 +163,10 @@ int ptz_ctl_visca::set_pantilt_upright(int pan_speed, int tilt_speed)
 
 int ptz_ctl_visca::set_pantilt_downleft(int pan_speed, int tilt_speed) 
 {
+	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
+	
 	int panSpeed = gen_valid_pan_speed(pan_speed);
 	int tiltSpeed = gen_valid_tilt_speed(tilt_speed);
 	
@@ -139,6 +177,10 @@ int ptz_ctl_visca::set_pantilt_downleft(int pan_speed, int tilt_speed)
  
 int ptz_ctl_visca::set_pantilt_downright(int pan_speed, int tilt_speed) 
 {
+	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
+	
 	int panSpeed = gen_valid_pan_speed(pan_speed);
 	int tiltSpeed = gen_valid_tilt_speed(tilt_speed);
 	
@@ -149,6 +191,10 @@ int ptz_ctl_visca::set_pantilt_downright(int pan_speed, int tilt_speed)
 
 int ptz_ctl_visca::set_pantilt_stop() 
 {
+	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
+	
 	int panSpeed = pan_speed_;
 	int tiltSpeed = tilt_speed_;
 	
@@ -159,6 +205,10 @@ int ptz_ctl_visca::set_pantilt_stop()
 	
 int ptz_ctl_visca::set_pantilt_absolute_position(int pan_position, int tilt_position, int pan_speed, int tilt_speed) 
 {
+	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
+	
 	int panSpeed = gen_valid_pan_speed(pan_speed);
 	int tiltSpeed = gen_valid_tilt_speed(tilt_speed);
 	if (VISCA_set_pantilt_absolute_position(interface_, camera_, panSpeed, tiltSpeed, pan_position, tilt_position) != VISCA_SUCCESS)
@@ -168,6 +218,10 @@ int ptz_ctl_visca::set_pantilt_absolute_position(int pan_position, int tilt_posi
 
 int ptz_ctl_visca::set_pantilt_relative_position(int pan_position, int tilt_position, int pan_speed, int tilt_speed) 
 {
+	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
+	
 	int panSpeed = gen_valid_pan_speed(pan_speed);
 	int tiltSpeed = gen_valid_tilt_speed(tilt_speed);
 	if (VISCA_set_pantilt_relative_position(interface_, camera_, panSpeed, tiltSpeed, pan_position, tilt_position) != VISCA_SUCCESS)
@@ -177,6 +231,10 @@ int ptz_ctl_visca::set_pantilt_relative_position(int pan_position, int tilt_posi
 
 int ptz_ctl_visca::set_pantilt_home() 
 {
+	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
+	
 	if (VISCA_set_pantilt_home(interface_, camera_) != VISCA_SUCCESS)
 		return -1;
 	return 0;
@@ -184,6 +242,10 @@ int ptz_ctl_visca::set_pantilt_home()
 	
 int ptz_ctl_visca::set_zoom_tele(int zoom_speed) 
 {
+	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
+	
 	int zoomSpeed = gen_valid_zoom_speed(zoom_speed);
 	if (VISCA_set_zoom_tele_speed(interface_, camera_, zoomSpeed) != VISCA_SUCCESS)
 		return -1;
@@ -192,6 +254,10 @@ int ptz_ctl_visca::set_zoom_tele(int zoom_speed)
 
 int ptz_ctl_visca::set_zoom_wide(int zoom_speed) 
 {
+	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
+	
 	int zoomSpeed = gen_valid_zoom_speed(zoom_speed);
 	if (VISCA_set_zoom_wide_speed(interface_, camera_, zoomSpeed) != VISCA_SUCCESS)
 		return -1;
@@ -200,6 +266,10 @@ int ptz_ctl_visca::set_zoom_wide(int zoom_speed)
 
 int ptz_ctl_visca::set_zoom_stop() 
 {
+	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
+	
 	if (VISCA_set_zoom_stop(interface_, camera_) != VISCA_SUCCESS)
 		return -1;
 	return 0;
@@ -208,6 +278,10 @@ int ptz_ctl_visca::set_zoom_stop()
 
 int ptz_ctl_visca::set_zoom_absolute_position(int zoom_position, int zoom_speed) 
 {
+	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
+	
 	if (VISCA_set_zoom_value(interface_, camera_, zoom_position) != VISCA_SUCCESS)
 		return -1;
 	return 0;
@@ -216,6 +290,10 @@ int ptz_ctl_visca::set_zoom_absolute_position(int zoom_position, int zoom_speed)
 	
 int ptz_ctl_visca::get_pantilt_position(int *pan_position, int *tilt_position) 
 {
+	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
+	
 	short panPosition = 0, tiltPosition = 0;
 	if (VISCA_get_pantilt_position(interface_, camera_, (int16_t *)&panPosition, (int16_t *)&tiltPosition) != VISCA_SUCCESS)
 		return -1;
@@ -226,6 +304,10 @@ int ptz_ctl_visca::get_pantilt_position(int *pan_position, int *tilt_position)
 
 int ptz_ctl_visca::get_zoom_position(int *zoom_position) 
 {
+	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
+	
 	uint16_t zoomPosition;
 	if (VISCA_get_zoom_value(interface_, camera_, (uint16_t *)zoomPosition) != VISCA_SUCCESS)
 		return -1;

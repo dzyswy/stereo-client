@@ -35,17 +35,7 @@ enum ptz_track_track_lock_type
 };
 
 
-
-struct ptz_track_focus_pose
-{
-	float val[FIT_CALIB_PTZ_MAX_CHANNEL];
-};
-
-struct ptz_track_focus_pixel
-{
-	float val[FIT_CALIB_MAX_COORD][FIT_CALIB_PTZ_MAX_CHANNEL];
-};
-
+ 
 
 class ptz_track
 {
@@ -80,7 +70,7 @@ protected:
 	std::mutex mux_;
 	std::thread *run_thread_;
 	
-	struct ptz_track_focus_pose focus_pose_;
+	struct fit_calib_ptz_pose focus_pose_;
 
 	
 	pid_inc pid_[FIT_CALIB_PTZ_MAX_CHANNEL];

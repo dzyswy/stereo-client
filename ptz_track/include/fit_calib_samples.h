@@ -31,12 +31,12 @@ enum fit_calib_ptz_channel_type
 	FIT_CALIB_PTZ_MAX_CHANNEL = 3,
 };
 
-struct fit_calib_pose_sample
+struct fit_calib_ptz_pose
 {
 	float val[FIT_CALIB_PTZ_MAX_CHANNEL];
 };
 
-struct fit_calib_pixel_sample
+struct fit_calib_stereo_pixel
 {
 	float val[FIT_CALIB_MAX_COORD][FIT_CALIB_PTZ_MAX_CHANNEL];
 };
@@ -44,7 +44,7 @@ struct fit_calib_pixel_sample
 
 struct fit_calib_samples
 {
-	std::vector<std::pair<struct fit_calib_pose_sample, struct fit_calib_pixel_sample> > samples;
+	std::vector<std::pair<struct fit_calib_ptz_pose, struct fit_calib_stereo_pixel> > samples;
 	
 	int to_string(std::string &value);
 	int from_string(std::string &value);

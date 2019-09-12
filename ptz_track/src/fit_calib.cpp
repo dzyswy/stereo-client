@@ -72,6 +72,18 @@ int fit_calib::pixel_to_pose(float pixel, float &pose, int coord, int channel)
 	return 0;
 }
 
+int fit_calib::pixel_to_pose(struct fit_calib_stereo_pixel &pixel, struct fit_calib_ptz_pose &pose, int coord)
+{
+	for (int i = 0; i < FIT_CALIB_PTZ_MAX_CHANNEL; i++)
+	{
+		int ret = pixel_to_pose(pixel.val[coord][i], pose.val[i], coord, i);
+		if (ret < 0)
+			return -1;
+	}
+	
+	return 0;
+}
+
 int fit_calib::gen_para()
 {
 	int ret = 0;
@@ -85,7 +97,7 @@ int fit_calib::gen_para()
 		{
 			for (int k = 0; k < sample_count; k++)
 			{
-				std::pair<struct fit_calib_pose_sample, struct fit_calib_pixel_sample> &sample = samples_.samples[k];
+				std::pair<struct fit_calib_ptz_pose, struct fit_calib_stereo_pixel> &sample = samples_.samples[k];
 				
 				first[k] = (double)sample.first.val[j];
 				second[k] = (double)sample.second.val[i][j];
@@ -156,11 +168,11 @@ int fit_calib::set_sample(int pan_pose, int tilt_pose, int zoom_pose, struct ste
 	if (index >= sample_count)
 		return -1;
 	
-	struct fit_calib_pose_sample pose_sample;
+	struct fit_calib_ptz_pose pose_sample;
 	to_pose_sample(pan_pose, tilt_pose, zoom_pose, pose_sample);
 	
 	
-	struct fit_calib_pixel_sample pixel_sample;
+	struct fit_calib_stereo_pixel pixel_sample;
 	to_pixel_sample(pixel, pixel_sample); 
 	
 	if (index < 0) {
@@ -171,7 +183,7 @@ int fit_calib::set_sample(int pan_pose, int tilt_pose, int zoom_pose, struct ste
 	return 0;
 }
 
-int fit_calib::set_sample(struct fit_calib_pose_sample &pose_sample, struct fit_calib_pixel_sample &pixel_sample, int index)
+int fit_calib::set_sample(struct fit_calib_ptz_pose &pose_sample, struct fit_calib_stereo_pixel &pixel_sample, int index)
 {
 	int sample_count = get_sample_count();
 	if (index >= sample_count)
@@ -191,25 +203,25 @@ int fit_calib::get_sample(int pan_pose, int tilt_pose, int zoom_pose, struct ste
 	if ((index < 0) || (index >= sample_count))
 		return -1;
 	
-	struct fit_calib_pose_sample &pose_sample = samples_.samples[index].first;
+	struct fit_calib_ptz_pose &pose_sample = samples_.samples[index].first;
 	from_pose_sample(pose_sample, pan_pose, tilt_pose, zoom_pose);
 	
 	
-	struct fit_calib_pixel_sample &pixel_sample = samples_.samples[index].second;
+	struct fit_calib_stereo_pixel &pixel_sample = samples_.samples[index].second;
 	from_pixel_sample(pixel_sample, pixel);
 	
 	return 0;
 }
 
-int fit_calib::get_sample(struct fit_calib_pose_sample &pose_sample, struct fit_calib_pixel_sample &pixel_sample, int index)
+int fit_calib::get_sample(struct fit_calib_ptz_pose &pose_sample, struct fit_calib_stereo_pixel &pixel_sample, int index)
 {
 	int sample_count = get_sample_count();
 	if ((index < 0) || (index >= sample_count))
 		return -1;
 	
 	
-	pose_sample = samples_[index].first;
-	pixel_sample = samples_[index].second;
+	pose_sample = samples_.samples[index].first;
+	pixel_sample = samples_.samples[index].second;
 	return 0;
 }
 
@@ -224,14 +236,14 @@ int fit_calib::get_sample_count()
 }
 
 
-void fit_calib::to_pose_sample(int pan_pose, int tilt_pose, int zoom_pose, struct fit_calib_pose_sample &pose_sample)
+void fit_calib::to_pose_sample(int pan_pose, int tilt_pose, int zoom_pose, struct fit_calib_ptz_pose &pose_sample)
 {
 	pose_sample.val[FIT_CALIB_PTZ_PAN] = (float)pan_pose;
 	pose_sample.val[FIT_CALIB_PTZ_TILT] = (float)tilt_pose;
 	pose_sample.val[FIT_CALIB_PTZ_ZOOM] = (float)zoom_pose;
 }
 
-void fit_calib::to_pixel_sample(struct stereo_pixel_point &pixel, struct fit_calib_pixel_sample &pixel_sample)
+void fit_calib::to_pixel_sample(struct stereo_pixel_point &pixel, struct fit_calib_stereo_pixel &pixel_sample)
 {
 	pixel_sample.val[FIT_CALIB_GRAPH_COORD][FIT_CALIB_PTZ_PAN] = pixel.x;
 	pixel_sample.val[FIT_CALIB_GRAPH_COORD][FIT_CALIB_PTZ_TILT] = pixel.y;
@@ -250,14 +262,14 @@ void fit_calib::to_pixel_sample(struct stereo_pixel_point &pixel, struct fit_cal
 	pixel_sample.val[FIT_CALIB_BALL_COORD][FIT_CALIB_PTZ_ZOOM] = pixel.r;
 }
 
-void fit_calib::from_pose_sample(struct fit_calib_pose_sample &pose_sample, int &pan_pose, int &tilt_pose, int &zoom_pose)
+void fit_calib::from_pose_sample(struct fit_calib_ptz_pose &pose_sample, int &pan_pose, int &tilt_pose, int &zoom_pose)
 {
 	pan_pose = (int)pose_sample.val[FIT_CALIB_PTZ_PAN];
 	tilt_pose = (int)pose_sample.val[FIT_CALIB_PTZ_TILT];
 	zoom_pose = (int)pose_sample.val[FIT_CALIB_PTZ_ZOOM];
 }
 
-void fit_calib::from_pixel_sample(struct fit_calib_pixel_sample &pixel_sample, struct stereo_pixel_point &pixel)
+void fit_calib::from_pixel_sample(struct fit_calib_stereo_pixel &pixel_sample, struct stereo_pixel_point &pixel)
 {
 	pixel.x = pixel_sample.val[FIT_CALIB_GRAPH_COORD][FIT_CALIB_PTZ_PAN];
 	pixel.y = pixel_sample.val[FIT_CALIB_GRAPH_COORD][FIT_CALIB_PTZ_TILT];

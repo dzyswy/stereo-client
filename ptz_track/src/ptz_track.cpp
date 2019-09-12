@@ -1,7 +1,15 @@
 #include "ptz_track.h"
+#include "json/json.h"
 
 
+  
+  
+  
 using namespace std;
+
+
+
+
 
 
 ptz_track::ptz_track(ptz_ctl_visca *ptz, fit_calib *calib, float period)
@@ -51,7 +59,9 @@ int ptz_track::set_detect_box(struct stereo_detect_box &value)
 {
 	int ret;
 	
-	struct ptz_track_focus_pixel focus_pixel;
+	std::unique_lock<std::mutex> lock(mux_);
+	
+	struct fit_calib_stereo_pixel focus_pixel;
 	focus_pixel.val[FIT_CALIB_GRAPH_COORD][FIT_CALIB_PTZ_PAN] = value.x;
 	focus_pixel.val[FIT_CALIB_GRAPH_COORD][FIT_CALIB_PTZ_TILT] = value.y;
 	focus_pixel.val[FIT_CALIB_GRAPH_COORD][FIT_CALIB_PTZ_ZOOM] = value.d;
@@ -67,13 +77,10 @@ int ptz_track::set_detect_box(struct stereo_detect_box &value)
 	focus_pixel.val[FIT_CALIB_BALL_COORD][FIT_CALIB_PTZ_PAN] = value.xa;
 	focus_pixel.val[FIT_CALIB_BALL_COORD][FIT_CALIB_PTZ_TILT] = value.ya;
 	focus_pixel.val[FIT_CALIB_BALL_COORD][FIT_CALIB_PTZ_ZOOM] = value.r;
-	
-	for (int i = 0; i < FIT_CALIB_PTZ_MAX_CHANNEL; i++)
-	{
-		ret = calib_->pixel_to_pose(focus_pixel.val[track_coord_][i], focus_pose_.val[i], track_coord_, i);
-		if (ret < 0)
-			return -1;
-	}
+ 
+	ret = calib_->pixel_to_pose(focus_pixel, focus_pose_, track_coord_);
+	if (ret < 0)
+		return -1;
 	
 	return 0;
 }
@@ -86,6 +93,18 @@ void ptz_track::track_process()
 	{
 		struct timeval tv[2];
 		gettimeofday(&tv[0], NULL);
+		
+		struct fit_calib_ptz_pose focus_pose;
+		{
+			std::unique_lock<std::mutex> lock(mux_);
+			focus_pose = focus_pose_;
+		}
+		
+		if (!ptz_->is_opened())
+		{
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+			continue;
+		}	
 		
 		
 		int ptz_pose[FIT_CALIB_PTZ_MAX_CHANNEL]; 
@@ -105,7 +124,7 @@ void ptz_track::track_process()
 		float ptz_diff[FIT_CALIB_PTZ_MAX_CHANNEL];
 		for (int i = 0; i < FIT_CALIB_PTZ_MAX_CHANNEL; i++)
 		{
-			ptz_diff[i] = focus_pose_.val[i] - (float)ptz_pose[i];
+			ptz_diff[i] = focus_pose.val[i] - (float)ptz_pose[i];
 		}	
 		
 		bool pan_mask = (track_mask_ & PTZ_TRACK_PTZ_PAN_MASK) ? true : false;
@@ -210,14 +229,14 @@ void ptz_track::track_process()
 				{  
 					if (move_pan || move_tilt)
 					{
-						int pan_position = move_pan ? focus_pose_.val[FIT_CALIB_PTZ_PAN] : ptz_pose[FIT_CALIB_PTZ_PAN];
-						int tilt_position = move_tilt ? focus_pose_.val[FIT_CALIB_PTZ_TILT] : ptz_pose[FIT_CALIB_PTZ_TILT];
+						int pan_position = move_pan ? focus_pose.val[FIT_CALIB_PTZ_PAN] : ptz_pose[FIT_CALIB_PTZ_PAN];
+						int tilt_position = move_tilt ? focus_pose.val[FIT_CALIB_PTZ_TILT] : ptz_pose[FIT_CALIB_PTZ_TILT];
 						ptz_->set_pantilt_absolute_position(pan_position, tilt_position, ptz_->get_max_pan_speed(), ptz_->get_max_tilt_speed());
 					}	
 					
 					if (move_zoom)
 					{
-						int zoom_position = focus_pose_.val[FIT_CALIB_PTZ_ZOOM];
+						int zoom_position = focus_pose.val[FIT_CALIB_PTZ_ZOOM];
 						ptz_->set_zoom_absolute_position(zoom_position, ptz_->get_max_zoom_speed());
 					}	
 					
@@ -292,9 +311,7 @@ int ptz_track::pid_paras_from_string(std::string value)
 		Json::Reader reader;
 		Json::Value jroot;
 		Json::Value jpids;
-		
-		
-		
+		 
 		if (!reader.parse(value, jroot))
 			return -1;
 		
@@ -319,7 +336,6 @@ int ptz_track::pid_paras_from_string(std::string value)
         printf( "jsoncpp struct error: %s.\n", ex.what());
         return -1;
 	}
-	samples = _samples;
 	return 0;
 }
 

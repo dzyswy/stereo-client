@@ -79,6 +79,7 @@ public:
 	
 	int open_device(const char *ip, int cmd_port, int stream_port, int stream_index);
 	int close_device();
+	int is_opened();
 	
 	int set_value(const char *cmd, int value, int timeout = 5000);
 	int set_value(const char *cmd, float value, int timeout = 5000);
@@ -100,11 +101,15 @@ public:
 	void get_gyro_angle(struct stereo_gyro_angle &gyro_angle);
 	int get_reconnect_count();
 	
+	void detect_box_to_pixel(struct stereo_detect_box &detect_box, struct stereo_pixel_point &detect_pixel);
+	void detect_pixel_to_box(struct stereo_pixel_point &detect_pixel, struct stereo_detect_box &detect_box);
+	
 protected:
 	std::string ip_;
 	int stream_port_;
 	int stream_mode_;
 	int cmd_port_;
+	int open_;
 	
 	std::mutex mux_;
 	
