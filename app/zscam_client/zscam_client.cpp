@@ -89,10 +89,9 @@ zscam_client::zscam_client(QWidget *parent)
 	
 	
 	timer_slow_ = new QTimer(this);
-	connect(timer_slow_, SIGNAL(timeout()), this, SLOT(do_timer_slow_timeout()));
-	timer_slow_->start(2500);
 	
-	
+	load_config("zscam_client.ini");
+
 	connect(this, SIGNAL(fresh_frame_signal()), this, SLOT(do_fresh_frame()), Qt::QueuedConnection);
 	connect(ui.label_video, SIGNAL(Mouse_Pressed(int, int)), this, SLOT(do_video_label_mouse_pressed(int, int)));
 	
@@ -107,20 +106,27 @@ zscam_client::zscam_client(QWidget *parent)
 	
 	connect(ui.toolButton_tele, SIGNAL(released()), this, SLOT(toolButton_zoom_stop()));
 	connect(ui.toolButton_wide, SIGNAL(released()), this, SLOT(toolButton_zoom_stop()));
+	
+	connect(timer_slow_, SIGNAL(timeout()), this, SLOT(do_timer_slow_timeout()));
+	timer_slow_->start(2500);
  
 }
 
 zscam_client::~zscam_client()
 {
 	timer_slow_->stop();
-	delete timer_slow_;
 	
+	save_config("zscam_client.ini");
+	
+	
+	delete timer_slow_;
 	delete xtrack_;
 	delete xfit_;
 	delete xptz_;
 	delete xfilter_;
-	
 	delete camera_;
+	
+	
 }
 
 
@@ -1063,7 +1069,7 @@ void zscam_client::show_fit_calib_all_samples(QPixmap *dst, QColor color)
 {
 	int len = 30;
 	QPainter painter(dst);
-	struct fit_calib_samples &samples = xfit_->get_samples();
+	struct fit_calib_samples& samples = xfit_->get_samples();
 	for (int i = 0; i < samples.samples.size(); i++) 
 	{
 		int x = samples.samples[i].second.val[FIT_CALIB_GRAPH_COORD][0];
@@ -1095,8 +1101,9 @@ int zscam_client::load_config(const char *config_name)
 		return -1;
 	
 	svalue = ini.GetValue("ptz_track", "ptz_name", "");
+	ptz_name_ = svalue;
 	ui.comboBox_ptz_name->clear();
-	ui.comboBox_ptz_name->addItem(QString::fromStdString(svalue));
+	ui.comboBox_ptz_name->addItem(QString::fromStdString(ptz_name_));
 	 
 	svalue = ini.GetValue("ptz_track", "min_number_count", "2");
 	value = atoi(svalue.c_str());
@@ -1117,7 +1124,7 @@ int zscam_client::load_config(const char *config_name)
 	value = atoi(svalue.c_str());
 	xfilter_->set_min_stable_count(value);
 	ui.spinBox_min_stable_count->setValue(value);
-	
+
 	svalue = ini.GetValue("ptz_track", "samples", "");
 	struct fit_calib_samples sample; 
 	ret = sample.from_string(svalue);
@@ -1190,8 +1197,8 @@ int zscam_client::save_config(const char *config_name)
 	ini.SetValue("ptz_track", "stable_angle", to_string(xfilter_->get_stable_angle()).c_str());
 	ini.SetValue("ptz_track", "min_stable_count", to_string(xfilter_->get_min_stable_count()).c_str());
 	
-	struct fit_calib_samples &sample = xfit_->get_samples(); 
-	ret = sample.to_string(svalue);
+	struct fit_calib_samples& samples = xfit_->get_samples();
+	ret = samples.to_string(svalue);
 	if (ret == 0) {
 		ini.SetValue("ptz_track", "samples", svalue.c_str()); 
 	}
@@ -1212,7 +1219,6 @@ int zscam_client::save_config(const char *config_name)
 	
 	return 0;
 }
-
 
 
 

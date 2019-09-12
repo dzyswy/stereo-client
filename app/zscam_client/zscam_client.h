@@ -113,6 +113,7 @@ public:
 	int open_;
 	int ptz_open_;
 	int ptz_track_run_;
+	std::string ptz_name_;
 	
 	
 	QPixmap default_pixmap_;
@@ -714,7 +715,7 @@ private slots:
 			break;
 		}
 	}
-	void on_checkBox_checkBox_test_track_stateChanged(int arg1)
+	void on_checkBox_test_track_stateChanged(int arg1)
 	{
 		if (!ptz_open_)
 			return;

@@ -22,9 +22,12 @@ ptz_track::ptz_track(ptz_ctl_visca *ptz, fit_calib *calib, float period)
 	track_mask_ = PTZ_TRACK_PTZ_ALL_MASK;
 	track_coord_ = FIT_CALIB_BALL_COORD;
 	lock_time_ = 10;
+	
 	lock_state_ = PTZ_TRACK_TRACK_UNLOCKED;
 	
+	memset(&focus_pose_, 0, sizeof(focus_pose_));
 	
+	going = 0;
 	run_thread_ = NULL;
 }
 
@@ -278,8 +281,6 @@ int ptz_track::pid_paras_to_string(std::string &value)
 		for (int i = 0; i < FIT_CALIB_PTZ_MAX_CHANNEL; i++)
 		{ 
 			Json::Value jpid;
-			
-			jpid["kp"] = 
 			
 			jpid["kp"] = get_kp(i);
 			jpid["ki"] = get_ki(i);

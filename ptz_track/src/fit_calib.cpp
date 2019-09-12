@@ -18,7 +18,6 @@ using namespace std;
 
 fit_calib::fit_calib()
 {
- 
 	set_degree(FIT_CALIB_GRAPH_COORD, FIT_CALIB_PTZ_PAN, 3);
 	set_degree(FIT_CALIB_GRAPH_COORD, FIT_CALIB_PTZ_TILT, 3);
 	set_degree(FIT_CALIB_GRAPH_COORD, FIT_CALIB_PTZ_ZOOM, 3);
@@ -34,6 +33,8 @@ fit_calib::fit_calib()
 	set_degree(FIT_CALIB_BALL_COORD, FIT_CALIB_PTZ_PAN, 3);
 	set_degree(FIT_CALIB_BALL_COORD, FIT_CALIB_PTZ_TILT, 3);
 	set_degree(FIT_CALIB_BALL_COORD, FIT_CALIB_PTZ_ZOOM, 3);
+	
+	
 	
 	
 }

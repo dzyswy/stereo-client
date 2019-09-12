@@ -8,7 +8,7 @@
 #include <exception>
 #include <string>
 #include <vector>
-
+#include <iostream>
 
 
 
@@ -46,8 +46,20 @@ struct fit_calib_samples
 {
 	std::vector<std::pair<struct fit_calib_ptz_pose, struct fit_calib_stereo_pixel> > samples;
 	
+	fit_calib_samples()
+	{ 
+		samples.clear();
+	}
+	
+	fit_calib_samples& operator=(const fit_calib_samples& value)
+	{
+		samples = value.samples;
+	}
+	
+	
 	int to_string(std::string &value);
 	int from_string(std::string &value);
+	
 	
 };
 
