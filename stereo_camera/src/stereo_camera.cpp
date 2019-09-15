@@ -41,7 +41,7 @@ int stereo_camera::open_device(const char *ip, int cmd_port, int stream_port, in
 	ret = xstream_->connect_stream(ip, stream_port, stream_index);
 	if (ret < 0)
 		return -1;
-	open_ = 0;
+	open_ = 1;
 
 	return 0;
 }	

@@ -19,7 +19,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../../ptz_track/include)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} ZSCAM_CLIENT_SRCS)
 
 SET(CMAKE_AUTOMOC ON)
-
+set(QMAKE_CXXFLAGS ${QMAKE_CXXFLAGS} -std=c++11)
 
 #find_package(OpenCV REQUIRED)
 #if(NOT OpenCV_FOUND)
@@ -45,7 +45,7 @@ set(QRC_SOURCE_FILES zscam_client.qrc)
 qt5_add_resources(QRC_FILES ${QRC_SOURCE_FILES})
 
 
-qt5_wrap_ui(UI_HEADERS zscam_client.ui) # ftp_dialog.ui update_dialog.ui
+qt5_wrap_ui(UI_HEADERS zscam_client.ui ftp_dialog.ui) # update_dialog.ui
 ADD_EXECUTABLE(zscam_client ${ZSCAM_CLIENT_SRCS} ${UI_HEADERS} ${QRC_FILES})
 TARGET_LINK_LIBRARIES(zscam_client 
 	stereo_camera 

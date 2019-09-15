@@ -47,8 +47,8 @@ zscam_client::zscam_client(QWidget *parent)
 	: QWidget(parent)
 {
 	ui.setupUi(this);
-	ui.plainTextEdit_all_boxes->setMaximumBlockCount(50);
-	ui.plainTextEdit_min_boxes->setMaximumBlockCount(50);
+	ui.plainTextEdit_all_boxes->setMaximumBlockCount(500);
+	ui.plainTextEdit_min_boxes->setMaximumBlockCount(500);
 	
 	
 	width = 960;
@@ -61,7 +61,10 @@ zscam_client::zscam_client(QWidget *parent)
 	
 	draw_poly_mask_mode_ = 0;
 	show_cursor_mode_ = 0;
-	show_detect_box_mask_ = SHOW_GRAPH_COORD_INFO_EN;
+	show_detect_box_mask_ = SHOW_DEPTH_COORD_INFO_EN;
+	
+	show_mot_ = 1;
+	show_sot_ = 0;
 	
 	
 	show_poly_mask_mode_ = 0; 
@@ -86,6 +89,7 @@ zscam_client::zscam_client(QWidget *parent)
 	xptz_ = new ptz_ctl_visca;
 	xfit_ = new fit_calib;
 	xtrack_ = new ptz_track(xptz_, xfit_, 150);
+	
 	
 	
 	timer_slow_ = new QTimer(this);
@@ -145,6 +149,8 @@ void zscam_client::on_pushButton_open_camera_clicked()
 			return;
 		}
 		
+		
+		
 		open_ = 1;
 		run_thread_ = new std::thread([this] () {stream_process();});
 		init_ui();
@@ -153,7 +159,7 @@ void zscam_client::on_pushButton_open_camera_clicked()
 	}	
 	else
 	{
-		open_ = 0;
+		open_ = 0; 
 		if (run_thread_)
 		{
 			run_thread_->join();
@@ -263,18 +269,36 @@ void zscam_client::do_fresh_frame()
 		struct stereo_detect_box &detect_box = detect_boxes[i];
 		string str = gen_detect_box_str(detect_box, show_detect_box_mask_);
 		ui.plainTextEdit_all_boxes->appendPlainText(QString::fromStdString(str));
+	}
+		
+	if (show_mot_)
+		show_detect_boxes(&pixmap, detect_boxes);	
+	
+	if (number_state_ != STEREO_FILTER_NO_TARGET)
+	{
+		string str = gen_detect_box_str(focus_box_, show_detect_box_mask_);
+		str += " ";
+		str += to_string(number_state_);
+		str += " ";
+		str += to_string(statble_state_);
+		ui.plainTextEdit_min_boxes->appendPlainText(QString::fromStdString(str));
+		
+		if (show_sot_) {
+			Qt::PenStyle style = (statble_state_ == 1) ? Qt::SolidLine : Qt::DotLine;
+			QColor color = (number_state_ == STEREO_FILTER_SINGLE_TARGET) ? Qt::blue : Qt::darkBlue ;
+			show_detect_box(&pixmap, focus_box_, Qt::blue, style, 2);
+		}
+			
 	}	
+	
 	
 	ui.doubleSpinBox_gyro_roll->setValue(gyro_angle.roll);
 	ui.doubleSpinBox_gyro_pitch->setValue(gyro_angle.pitch);
 	
-	
-	
-	show_detect_boxes(&pixmap, detect_boxes);
 
 	if (show_poly_mask_mode_)
 	{
-		show_poly_mask(&pixmap, poly_mask_points_[0], Qt::green);
+		show_poly_mask(&pixmap, poly_mask_points_[0], Qt::yellow);
 	}
 	
 	if (draw_poly_mask_mode_)
@@ -707,7 +731,7 @@ void zscam_client::show_center_cursor(QPixmap *dst, int x, int y)
 	if ((x >= 0) && (y >= 0))
 	{
 		QPainter painter(dst);
-		painter.setPen(QPen(Qt::blue, 1.5, Qt::SolidLine));
+		painter.setPen(QPen(Qt::yellow, 1.5, Qt::SolidLine));
 		painter.drawLine(0, y, width - 1, y);
 		painter.drawLine(x, 0, x, height - 1);
 		int w = 20, h = 20;
@@ -729,42 +753,48 @@ void zscam_client::show_mouse_press_point(QPixmap *dst, int x, int y)
 
 void zscam_client::show_detect_boxes(QPixmap *dst, vector<struct stereo_detect_box> &detect_boxes)
 {
-	QPainter painter(dst);
-		 
-	int box_num = detect_boxes.size();
-	for (int i = 0; i < box_num; i++)
+	for (int i = 0; i < detect_boxes.size(); i++)
 	{
 		struct stereo_detect_box &detect_box = detect_boxes[i];
 		int id = detect_box.id;
-		int box_x = detect_box.box_x;
-		int box_y = detect_box.box_y;
-		int box_w = detect_box.box_w;
-		int box_h = detect_box.box_h;
 		QColor color = QColor(255, 255, 255);
-		if (id > 0) 
-		{
+		if (id > 0)  {
 			color = QColor((id * 10) % 255, (id * 20) % 255, (id * 30) % 255);
 		}	
-		
-		painter.setPen(QPen(color, 1.5, Qt::SolidLine));
-		painter.drawRect(box_x, box_y, box_w, box_h);
-		
-	//	std::stringstream os;
-	//	os << "x=" << detect_box.x << " y=" << detect_box.y << " d=" << detect_box.d;
-		painter.setPen(QPen(color, 2, Qt::SolidLine));
-		string str = gen_detect_box_str(detect_box, show_detect_box_mask_);
-		painter.drawText(box_x, box_y, QString::fromStdString(str));
-	}	
+		show_detect_box(dst, detect_box, color);	
+	}
 }
+
+void zscam_client::show_detect_box(QPixmap *dst, struct stereo_detect_box &detect_box, QColor color, Qt::PenStyle style, float line)
+{
+	QPainter painter(dst);
+	
+	int box_x = detect_box.box_x;
+	int box_y = detect_box.box_y;
+	int box_w = detect_box.box_w;
+	int box_h = detect_box.box_h;
+	painter.setPen(QPen(color, line, style));
+	painter.drawRect(box_x, box_y, box_w, box_h);
+	
+	painter.setPen(QPen(color, 2, Qt::SolidLine));
+	string str = gen_detect_box_str(detect_box, show_detect_box_mask_);
+	painter.drawText(box_x, box_y, QString::fromStdString(str));
+	
+}
+
 
 string zscam_client::gen_detect_box_str(struct stereo_detect_box &detect_box, int mask)
 {
 	std::stringstream os;
 	os << "id=" << detect_box.id << " ";
 	if (mask & SHOW_GRAPH_COORD_INFO_EN) {
-	//	os << "box=(" << detect_box.box_x << " " << detect_box.box_y << " " << detect_box.box_w << " " << detect_box.box_h << ") ";
+		os << "box=(" << detect_box.box_x << " " << detect_box.box_y << " " << detect_box.box_w << " " << detect_box.box_h << ") ";	
+	}
+	
+	if (mask & SHOW_DEPTH_COORD_INFO_EN) {
 		os << "x=" << detect_box.x << " y=" << detect_box.y << " d=" << detect_box.d << " ";
 	}
+		
 	
 	if (mask & SHOW_CAMERA_COORD_INFO_EN) {
 		os << "xcm=" << detect_box.xcm << " ycm=" << detect_box.ycm << " zcm=" << detect_box.zcm << " ";
@@ -811,72 +841,35 @@ void zscam_client::show_poly_mask_points(QPixmap *dst, vector<pair<float, float>
 }
 
 
-
-
-
-/*
 void zscam_client::on_pushButton_update_clicked()
 {
 	int ret;
-	int isOk;
-	int update_mode = (ui.checkBox_update_mode->checkState() == Qt::Checked) ? 1 : 0;
-	int force = (ui.checkBox_update_force->checkState() == Qt::Checked) ? 1 : 0;
+	string src_name = QFileDialog::getOpenFileName(0, QString::fromLocal8Bit("选择文件"), QCoreApplication::applicationDirPath(), QString::fromLocal8Bit("所有文件(*)")).toStdString();
 	
-	ret = camera_->get_value("kill_stereo_streamer", isOk);
-	if ((ret < 0) || (isOk < 0)) {
-		QMessageBox::warning(this, QString::fromLocal8Bit("错误"), QString::fromLocal8Bit("清理升级环境失败"));
+	string ip = ui.comboBox_ip->currentText().toStdString();
+	string ftp_host = ip;
+	ftp_host += string(":21");
+	ftp_client xftp(ftp_host.c_str(), "anonymous", "null");
+ 
+	ret = xftp.connect_device();
+	if (ret < 0) {
+		QMessageBox::warning(this, QString::fromLocal8Bit("错误"), QString::fromLocal8Bit("连接双目失败"));
 		return;
 	}
-		
+		 
+	ftp_dialog dialog(&xftp, src_name.c_str(), "/run/media/mmcblk1p4/update.bin");
 	
-	if (update_mode == 0)
-	{
-		QString src_name = QFileDialog::getOpenFileName(0, QString::fromLocal8Bit("选择文件"), QCoreApplication::applicationDirPath(), QString::fromLocal8Bit("所有文件(*)"));
-
-		QString ftp_ip = ui.comboBox_ip->currentText();
-		ftp_dialog dialog(ftp_ip.toStdString().c_str(), src_name.toStdString().c_str(), "/update/ota.bin", "zynq:3g*aAcdV", this);
-		dialog.exec();
-		
-		isOk = dialog.get_success();
-		if (!isOk) {
-			QMessageBox::warning(this, QString::fromLocal8Bit("错误"), QString::fromLocal8Bit("上传升级包失败"));
-			return;
-		}
-		
-		ret = camera_->set_value("set_update_system", force);
-		if (ret < 0) {
-			QMessageBox::warning(this, QString::fromLocal8Bit("错误"), QString::fromLocal8Bit("发送升级命令失败"));
-			return;
-		}
-	}	
-	else
-	{
-		string ftp_host = ui.lineEdit_ftp_host->text().toStdString();
-		string ftp_src_file = ui.lineEdit_ftp_src_file->text().toStdString();
-		string ftp_user = ui.lineEdit_ftp_user->text().toStdString();
-		string ftp_passwd = ui.lineEdit_ftp_passwd->text().toStdString();
-		
-		ret = camera_->download_update_system(ftp_host, ftp_src_file, ftp_user, ftp_passwd, force);
-		if (ret < 0) {
-			QMessageBox::warning(this, QString::fromLocal8Bit("错误"), QString::fromLocal8Bit("发送升级命令失败"));
-			return;
-		}
-	}	
-    
-	 
-	update_dialog update_gui(camera_);
-	update_gui.exec();
-	isOk = update_gui.get_success();
+	
+	dialog.exec();
+	
+	int isOk = dialog.get_success();
 	if (!isOk) {
-		QMessageBox::warning(this, QString::fromLocal8Bit("错误"), QString::fromLocal8Bit("升级失败"));
+		QMessageBox::warning(this, QString::fromLocal8Bit("错误"), QString::fromLocal8Bit("上传升级包失败"));
 		return;
 	}
 	QMessageBox::information(this, QString::fromLocal8Bit("成功"), QString::fromLocal8Bit("升级成功，请重启设备"));
+
 }
-*/
-
-
-
 
 
 void zscam_client::on_pushButton_open_ptz_clicked()
@@ -1097,8 +1090,11 @@ int zscam_client::load_config(const char *config_name)
 	CSimpleIniA ini;
 	ini.SetUnicode();
 	ret = ini.LoadFile(config_name);
-	if (ret < 0)
+	if (ret < 0) {
+		printf("Failed to load %s\n", config_name);
 		return -1;
+	}
+		
 	
 	svalue = ini.GetValue("ptz_track", "ptz_name", "");
 	ptz_name_ = svalue;
@@ -1106,7 +1102,9 @@ int zscam_client::load_config(const char *config_name)
 	ui.comboBox_ptz_name->addItem(QString::fromStdString(ptz_name_));
 	 
 	svalue = ini.GetValue("ptz_track", "min_number_count", "2");
+	
 	value = atoi(svalue.c_str());
+	cout << "min_number_count: " << value << endl;
 	xfilter_->set_min_number_count(value);
 	ui.spinBox_min_number_count->setValue(value);
 	
@@ -1119,6 +1117,11 @@ int zscam_client::load_config(const char *config_name)
 	fvalue = atof(svalue.c_str());
 	xfilter_->set_stable_angle(fvalue);
 	ui.doubleSpinBox_stable_angle->setValue(fvalue);
+	
+	svalue = ini.GetValue("ptz_track", "stable_distance", "50");
+	fvalue = atof(svalue.c_str());
+	xfilter_->set_stable_distance(fvalue);
+	ui.doubleSpinBox_stable_distance->setValue(fvalue);
 	
 	svalue = ini.GetValue("ptz_track", "min_stable_count", "16");
 	value = atoi(svalue.c_str());
@@ -1174,7 +1177,14 @@ int zscam_client::load_config(const char *config_name)
 	svalue = ini.GetValue("ptz_track", "lock_time", "16");
 	value = atoi(svalue.c_str());
 	xtrack_->set_lock_time(value);
-	ui.spinBox_min_number_count->setValue(value);
+	ui.spinBox_track_lock_time->setValue(value);
+	
+	ret = ini.SaveFile(config_name);
+	if (ret < 0) {
+		printf("Failed to save %s\n", config_name);
+		return -1;
+	}
+	
 	
 	return 0;
 }
@@ -1186,8 +1196,10 @@ int zscam_client::save_config(const char *config_name)
 	CSimpleIniA ini;
 	ini.SetUnicode();
 	ret = ini.LoadFile(config_name);
-	if (ret < 0)
+	if (ret < 0) {
+		printf("Failed to load %s\n", config_name);
 		return -1;
+	}
 	
 	string ptz_name = ui.comboBox_ip->currentText().toStdString();
 	ini.SetValue("ptz_track", "ptz_name", ptz_name.c_str());
@@ -1195,6 +1207,7 @@ int zscam_client::save_config(const char *config_name)
 	ini.SetValue("ptz_track", "min_number_count", to_string(xfilter_->get_min_number_count()).c_str());
 	ini.SetValue("ptz_track", "max_number_count", to_string(xfilter_->get_max_number_count()).c_str());
 	ini.SetValue("ptz_track", "stable_angle", to_string(xfilter_->get_stable_angle()).c_str());
+	ini.SetValue("ptz_track", "stable_distance", to_string(xfilter_->get_stable_distance()).c_str());
 	ini.SetValue("ptz_track", "min_stable_count", to_string(xfilter_->get_min_stable_count()).c_str());
 	
 	struct fit_calib_samples& samples = xfit_->get_samples();
@@ -1214,8 +1227,10 @@ int zscam_client::save_config(const char *config_name)
 	ini.SetValue("ptz_track", "lock_time", to_string(xtrack_->get_lock_time()).c_str());
 	 
 	ret = ini.SaveFile(config_name);
-	if (ret < 0)
+	if (ret < 0) {
+		printf("Failed to save %s\n", config_name);
 		return -1;
+	}
 	
 	return 0;
 }

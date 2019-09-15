@@ -1,8 +1,8 @@
 IF (WIN32)
-  ADD_LIBRARY(visca STATIC libvisca.c libvisca_win32.c)
+  ADD_LIBRARY(visca STATIC libvisca.cpp libvisca_win32.cpp)
   SET_TARGET_PROPERTIES(visca PROPERTIES COMPILE_FLAGS "-DDLL_EXPORTS=1")
 ELSE()
-  ADD_LIBRARY(visca STATIC libvisca.c libvisca_posix.c)
+  ADD_LIBRARY(visca STATIC libvisca.cpp libvisca_posix.cpp)
   SET_TARGET_PROPERTIES(visca PROPERTIES SOVERSION 0.2.0)
 ENDIF()
 

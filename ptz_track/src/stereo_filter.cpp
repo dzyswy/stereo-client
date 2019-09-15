@@ -12,6 +12,7 @@ stereo_filter::stereo_filter(stereo_camera *camera)
 	min_number_count_ = 2;
 	max_number_count_ = 4;
 	stable_angle_ = 1;
+	stable_distance_ = 50;
 	min_stable_count_ = 3;
 	
 	clear_filter(); 
@@ -141,15 +142,25 @@ void stereo_filter::compute(std::vector<struct stereo_detect_box> &detect_boxes,
  
 	 
 	//stable
-	float dist = -1;
+	float dist_angle = -1;
 	if (pre_box.d)
 	{
 		float dx = fabs(pre_box.xa - focus_box.xa);
 		float dy = fabs(pre_box.ya - focus_box.ya);
-		dist = max(dx, dy);
+		dist_angle = max(dx, dy);
 	}	
 	
-	if ((dist > 0) && (dist < stable_angle_)) {
+	float dist_space = -1;
+	if (pre_box.d)
+	{
+		float dx = (pre_box.xcm - focus_box.xcm);
+		float dy = (pre_box.ycm - focus_box.ycm);
+		float dz = (pre_box.zcm - focus_box.zcm);
+		
+		dist_space = sqrt(dx * dx + dy * dy + dz * dz);
+	}	
+	
+	if (((dist_angle > 0) && (dist_angle < stable_angle_)) || ((dist_space > 0)) && (dist_space < stable_distance_)) {
 		statble_count_++;
 	} 
 	else {

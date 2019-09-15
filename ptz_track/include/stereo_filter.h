@@ -40,6 +40,7 @@ protected:
 	int min_number_count_;
 	int max_number_count_; 
 	float stable_angle_;
+	float stable_distance_;
 	int min_stable_count_;
 	
 	int number_state_;
@@ -66,6 +67,11 @@ public:
 		stable_angle_ = value;
 	}
 	
+	void set_stable_distance(float value)
+	{
+		stable_distance_ = value;
+	}
+	
 	void set_min_stable_count(int value)
 	{
 		min_stable_count_ = value;
@@ -85,6 +91,11 @@ public:
 	float get_stable_angle()
 	{
 		return stable_angle_;
+	}
+	
+	float get_stable_distance()
+	{
+		return stable_distance_;
 	}
 	
 	int get_min_stable_count()

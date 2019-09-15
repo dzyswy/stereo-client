@@ -36,15 +36,16 @@
 #include "ptz_ctl_visca.h"
 #include "fit_calib.h"
 #include "ptz_track.h"
-
-
+#include "ftp_client.h"
+#include "ftp_dialog.h"
 
 
 
 #define SHOW_GRAPH_COORD_INFO_EN		(1 << 0)
-#define SHOW_CAMERA_COORD_INFO_EN		(1 << 1)
-#define SHOW_ROOM_COORD_INFO_EN			(1 << 2)
-#define SHOW_BALL_COORD_INFO_EN			(1 << 3)
+#define SHOW_DEPTH_COORD_INFO_EN		(1 << 1)
+#define SHOW_CAMERA_COORD_INFO_EN		(1 << 2)
+#define SHOW_ROOM_COORD_INFO_EN			(1 << 3)
+#define SHOW_BALL_COORD_INFO_EN			(1 << 4)
 
 
 
@@ -83,6 +84,7 @@ public:
 private:
 	void stream_process();
 	void show_detect_boxes(QPixmap *dst, vector<struct stereo_detect_box> &target_boxes);
+	void show_detect_box(QPixmap *dst, struct stereo_detect_box &detect_box, QColor color, Qt::PenStyle style = Qt::SolidLine, float line = 2);
 	string gen_detect_box_str(struct stereo_detect_box &detect_box, int mask);
 	void init_ui();
 	void show_center_cursor(QPixmap *dst, int x, int y);
@@ -108,6 +110,7 @@ public:
 	ptz_ctl_visca *xptz_;
 	fit_calib *xfit_;
 	ptz_track *xtrack_;
+	
 	
 	
 	int open_;
@@ -152,6 +155,8 @@ public:
 
 	int show_cursor_mode_;
 	int show_detect_box_mask_;
+	int show_mot_;
+	int show_sot_;
 	
 	int draw_poly_mask_mode_;
 	int show_poly_mask_mode_;
@@ -623,6 +628,32 @@ private slots:
 
 	}
 	
+	void on_checkBox_show_mot_stateChanged(int state)
+	{
+		switch (state)
+		{
+			case Qt::Unchecked:
+				show_mot_ = 0;
+				break;
+			case Qt::Checked:
+				show_mot_ = 1;
+				break;
+		}
+	}
+	
+	void on_checkBox_show_sot_stateChanged(int state)
+	{
+		switch (state)
+		{
+			case Qt::Unchecked:
+				show_sot_ = 0;
+				break;
+			case Qt::Checked:
+				show_sot_ = 1;
+				break;
+		}
+	}
+	
 	
 	void on_checkBox_graph_coord_stateChanged(int state)
 	{
@@ -633,6 +664,19 @@ private slots:
 				break;
 			case Qt::Checked:
 				show_detect_box_mask_ |= SHOW_GRAPH_COORD_INFO_EN;
+				break;
+		}
+	}
+	
+	void on_checkBox_depth_coord_stateChanged(int state)
+	{
+		switch (state)
+		{
+			case Qt::Unchecked:
+				show_detect_box_mask_ &= ~SHOW_DEPTH_COORD_INFO_EN;
+				break;
+			case Qt::Checked:
+				show_detect_box_mask_ |= SHOW_DEPTH_COORD_INFO_EN;
 				break;
 		}
 	}
@@ -689,6 +733,7 @@ private slots:
 		}
 	}
 	
+	void on_pushButton_update_clicked();
 	
 	//ptz
 	void on_pushButton_open_ptz_clicked();
@@ -887,10 +932,17 @@ private slots:
 		xfilter_->set_stable_angle((float)value);
 	}
 	
+	void on_doubleSpinBox_stable_distance_valueChanged(double value)
+	{
+		xfilter_->set_stable_distance((float)value);
+	}
+	
 	void on_spinBox_min_stable_count_valueChanged(int value)
 	{
 		xfilter_->set_min_stable_count(value);
 	}
+	
+	
 	
 	void on_pushButton_set_pid_clicked()
 	{

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1217</width>
-    <height>867</height>
+    <width>1142</width>
+    <height>612</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -261,15 +261,15 @@
          </size>
         </property>
         <property name="currentIndex">
-         <number>4</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="page">
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>0</y>
+           <y>-27</y>
            <width>334</width>
-           <height>869</height>
+           <height>906</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -287,7 +287,7 @@
          <attribute name="label">
           <string>双目摄像机</string>
          </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
+         <layout class="QVBoxLayout" name="verticalLayout">
           <item>
            <widget class="QGroupBox" name="groupBox_3">
             <property name="sizePolicy">
@@ -685,15 +685,15 @@
             <property name="title">
              <string>目标信息</string>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout">
-             <item>
+            <layout class="QGridLayout" name="gridLayout_21">
+             <item row="0" column="0">
               <widget class="QLabel" name="label_10">
                <property name="text">
                 <string>多目标：</string>
                </property>
               </widget>
              </item>
-             <item>
+             <item row="1" column="0" colspan="2">
               <widget class="QPlainTextEdit" name="plainTextEdit_all_boxes">
                <property name="minimumSize">
                 <size>
@@ -703,14 +703,14 @@
                </property>
               </widget>
              </item>
-             <item>
+             <item row="2" column="0">
               <widget class="QLabel" name="label_11">
                <property name="text">
                 <string>单目标：</string>
                </property>
               </widget>
              </item>
-             <item>
+             <item row="3" column="0" colspan="2">
               <widget class="QPlainTextEdit" name="plainTextEdit_min_boxes">
                <property name="minimumSize">
                 <size>
@@ -720,52 +720,53 @@
                </property>
               </widget>
              </item>
-             <item>
+             <item row="4" column="0">
               <layout class="QGridLayout" name="gridLayout_12">
-               <item row="0" column="0" rowspan="2">
-                <widget class="QCheckBox" name="checkBox_graph_coord">
+               <item row="0" column="0">
+                <widget class="QCheckBox" name="checkBox_show_mot">
                  <property name="text">
-                  <string>二维坐标系</string>
+                  <string>多目标显示</string>
                  </property>
                  <property name="checked">
                   <bool>true</bool>
                  </property>
                 </widget>
                </item>
-               <item row="0" column="1" rowspan="2">
+               <item row="0" column="1">
+                <widget class="QCheckBox" name="checkBox_show_sot">
+                 <property name="text">
+                  <string>单目标显示</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QCheckBox" name="checkBox_graph_coord">
+                 <property name="text">
+                  <string>二维坐标系</string>
+                 </property>
+                 <property name="checked">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QCheckBox" name="checkBox_depth_coord">
+                 <property name="text">
+                  <string>视差坐标系</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
                 <widget class="QCheckBox" name="checkBox_camera_coord">
                  <property name="text">
                   <string>摄像机坐标系</string>
                  </property>
                 </widget>
                </item>
-               <item row="0" column="2">
-                <spacer name="horizontalSpacer_13">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="1" column="2" rowspan="2">
-                <spacer name="horizontalSpacer_31">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="2" column="0">
+               <item row="2" column="1">
                 <widget class="QCheckBox" name="checkBox_room_coord">
                  <property name="text">
                   <string>教室坐标系</string>
@@ -775,7 +776,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="1">
+               <item row="3" column="0">
                 <widget class="QCheckBox" name="checkBox_ball_coord">
                  <property name="text">
                   <string>球坐标系</string>
@@ -783,6 +784,19 @@
                 </widget>
                </item>
               </layout>
+             </item>
+             <item row="4" column="1">
+              <spacer name="horizontalSpacer_31">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>97</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
              </item>
             </layout>
            </widget>
@@ -1544,8 +1558,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>350</width>
-           <height>697</height>
+           <width>334</width>
+           <height>557</height>
           </rect>
          </property>
          <property name="minimumSize">
@@ -1946,8 +1960,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>350</width>
-           <height>697</height>
+           <width>334</width>
+           <height>696</height>
           </rect>
          </property>
          <property name="minimumSize">
@@ -2600,7 +2614,7 @@
            <x>0</x>
            <y>0</y>
            <width>350</width>
-           <height>697</height>
+           <height>442</height>
           </rect>
          </property>
          <property name="minimumSize">
@@ -2619,6 +2633,9 @@
              <string>目标参数</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_4">
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="spinBox_max_number_count"/>
+             </item>
              <item row="0" column="0">
               <widget class="QLabel" name="label_92">
                <property name="text">
@@ -2629,15 +2646,12 @@
              <item row="0" column="1">
               <widget class="QSpinBox" name="spinBox_min_number_count"/>
              </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_93">
+             <item row="5" column="0">
+              <widget class="QLabel" name="label_95">
                <property name="text">
-                <string>max_number_count:</string>
+                <string>min_stable_count:</string>
                </property>
               </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QSpinBox" name="spinBox_max_number_count"/>
              </item>
              <item row="2" column="0">
               <widget class="QLabel" name="label_94">
@@ -2646,18 +2660,28 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_stable_angle"/>
+             <item row="5" column="1">
+              <widget class="QSpinBox" name="spinBox_min_stable_count"/>
              </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="label_95">
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_93">
                <property name="text">
-                <string>min_stable_count:</string>
+                <string>max_number_count:</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="1">
-              <widget class="QSpinBox" name="spinBox_min_stable_count"/>
+             <item row="4" column="1">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_stable_distance"/>
+             </item>
+             <item row="2" column="1">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_stable_angle"/>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="label_96">
+               <property name="text">
+                <string>stable_distance:</string>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>
