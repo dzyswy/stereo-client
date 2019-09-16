@@ -119,8 +119,7 @@ public:
 	std::string ptz_name_;
 	
 	
-	QPixmap default_pixmap_;
-	std::vector<unsigned char> frame_buffer_;
+	QPixmap pixmap_;
 	std::vector<struct stereo_detect_box> detect_boxes_;
 	struct stereo_gyro_angle gyro_angle_;
 	std::mutex mux_;

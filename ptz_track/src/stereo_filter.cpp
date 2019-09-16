@@ -15,11 +15,16 @@ stereo_filter::stereo_filter(stereo_camera *camera)
 	stable_distance_ = 50;
 	min_stable_count_ = 3;
 	
+	focus_boxes_.resize(STEREO_FILTER_MAX_FOCUS_BOX_NUM);
+	
 	clear_filter(); 
 }
 
 void stereo_filter::compute(std::vector<struct stereo_detect_box> &detect_boxes, int &number_state, struct stereo_detect_box &focus_box, int &statble_state)
 {
+	static int frame_count = 0;
+	frame_count++;
+	
 	int detect_count = detect_boxes.size();
 	if (detect_count == 0) {
 		number_count_[STEREO_FILTER_NO_TARGET]++;
@@ -83,6 +88,7 @@ void stereo_filter::compute(std::vector<struct stereo_detect_box> &detect_boxes,
 	}
 	number_state = number_state_;
 	
+
 	//focus_box
 	struct stereo_detect_box pre_box = pre_focus_box_;
 	int min_dist = 10000000, min_id = -1;
@@ -138,35 +144,46 @@ void stereo_filter::compute(std::vector<struct stereo_detect_box> &detect_boxes,
 	} else {
 		focus_box = detect_boxes[index];
 	}
-	pre_focus_box_ = focus_box;
- 
+
+	focus_boxes_[frame_count % STEREO_FILTER_MAX_FOCUS_BOX_NUM] = focus_box;
 	 
 	//stable
-	float dist_angle = -1;
-	if (pre_box.d)
-	{
-		float dx = fabs(pre_box.xa - focus_box.xa);
-		float dy = fabs(pre_box.ya - focus_box.ya);
-		dist_angle = max(dx, dy);
-	}	
 	
-	float dist_space = -1;
-	if (pre_box.d)
-	{
-		float dx = (pre_box.xcm - focus_box.xcm);
-		float dy = (pre_box.ycm - focus_box.ycm);
-		float dz = (pre_box.zcm - focus_box.zcm);
-		
-		dist_space = sqrt(dx * dx + dy * dy + dz * dz);
-	}	
-	
-	if (((dist_angle > 0) && (dist_angle < stable_angle_)) || ((dist_space > 0)) && (dist_space < stable_distance_)) {
-		statble_count_++;
-	} else {
-		statble_count_ = 0;
-	}
-	statble_state = (statble_count_ >= min_stable_count_) ? 1 : 0;	
+	if (frame_count > STEREO_FILTER_MAX_FOCUS_BOX_NUM)
+	{ 
+		float x[2][2], y[2][2], z[2][2];
+		for (int i = 0; i < STEREO_FILTER_MAX_FOCUS_BOX_NUM; i++)
+		{
+			x[0][0] = (i == 0) ? (float)focus_boxes_[i].xa : min(x[0][0], (float)focus_boxes_[i].xa);
+			x[0][1] = (i == 0) ? (float)focus_boxes_[i].xcm : min(x[0][1], (float)focus_boxes_[i].xcm);
+			x[1][0] = (i == 0) ? (float)focus_boxes_[i].xa : max(x[0][0], (float)focus_boxes_[i].xa);
+			x[1][1] = (i == 0) ? (float)focus_boxes_[i].xcm : max(x[0][1], (float)focus_boxes_[i].xcm);
 			
+			y[0][0] = (i == 0) ? (float)focus_boxes_[i].ya : min(y[0][0], (float)focus_boxes_[i].ya);
+			y[0][1] = (i == 0) ? (float)focus_boxes_[i].ycm : min(y[0][1], (float)focus_boxes_[i].ycm);
+			y[1][0] = (i == 0) ? (float)focus_boxes_[i].ya : max(y[0][0], (float)focus_boxes_[i].ya);
+			y[1][1] = (i == 0) ? (float)focus_boxes_[i].ycm : max(x[0][1], (float)focus_boxes_[i].ycm);
+			
+		//	z[0][0] = (i == 0) ? focus_boxes_[i].r : min(z[0][0], focus_boxes_[i].r);
+		//	z[0][1] = (i == 0) ? focus_boxes_[i].zcm : min(z[0][1], focus_boxes_[i].zcm);
+		//	z[1][0] = (i == 0) ? focus_boxes_[i].r : max(z[0][0], focus_boxes_[i].r);
+		//	z[1][1] = (i == 0) ? focus_boxes_[i].zcm : max(z[0][1], focus_boxes_[i].zcm);
+		}	
+		 
+		float dist_angle = max(fabs(x[0][0] - x[1][0]), fabs(y[0][0] - y[1][0]));
+		float dist_space = max(fabs(x[0][1] - x[1][1]), fabs(y[0][1] - y[1][1]));
+		if ((dist_angle < stable_angle_) || (dist_space < stable_distance_)) {
+			statble_count_++;
+		} else {
+			statble_count_ = 0;
+		}
+		statble_state = (statble_count_ >= min_stable_count_) ? 1 : 0;	
+	//	cout << "index: " << index << " ,dist_angle: " << dist_angle << " ,dist_space: " << dist_space << " ,statble_count: " << statble_count_ << endl;
+		
+		
+	}	
+	
+		 
 }
 
 

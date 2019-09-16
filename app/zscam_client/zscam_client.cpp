@@ -71,7 +71,7 @@ zscam_client::zscam_client(QWidget *parent)
 	poly_mask_points_[0].clear();
 	poly_mask_points_[1].clear();
 	
-	default_pixmap_ = QPixmap(width, height);
+	pixmap_ = QPixmap(width, height);
 	
 	save_avi_ = 0;
 	save_pic_ = 0;
@@ -204,30 +204,30 @@ void zscam_client::stream_process()
 			}	
 		}	
 		
-
+		{
+			std::unique_lock<std::mutex> lock(mux_);
+			detect_boxes_ = detect_boxes;
+			gyro_angle_ = gyro_angle; 
+			bool ok = pixmap_.loadFromData((const unsigned char *)&frame_buffer[0], frame_buffer.size());
+			if (!ok)
+				continue;
+		}
+		  
 		if (save_avi_ == 1)
 		{
-			QPixmap pixmap;
-			bool ok = pixmap.loadFromData((const unsigned char *)&frame_buffer[0], frame_buffer.size());
-			if (ok) {
-				ret = mrecord.open_media(avi_name_.c_str(), pixmap.width(), pixmap.height(), 15);
-				if (ret < 0) {
-					save_avi_ = 2;
-				} else {
-					save_avi_ = 3;
-				}
+			ret = mrecord.open_media(avi_name_.c_str(), pixmap_.width(), pixmap_.height(), 15);
+			if (ret < 0) {
+				save_avi_ = 2;
 			} else {
-				ok = 2;
+				save_avi_ = 3;
 			}
-			 
 		}	
 		else if (save_avi_ == 3) {
 			ret = mrecord.write_frame((char *)&frame_buffer[0], frame_buffer.size(), 1);
 			record_frame_count_++;
 			if ((ret < 0) || (record_frame_count_ > 10000)) {
 				mrecord.close_media();
-				save_avi_ = 2;
-				
+				save_avi_ = 2; 
 			}
 		}
 		
@@ -237,13 +237,7 @@ void zscam_client::stream_process()
 			save_pic_ = 0;
 		}
 		 
-		{
-			std::unique_lock<std::mutex> lock(mux_);
-			frame_buffer_ = frame_buffer;
-			detect_boxes_ = detect_boxes;
-			gyro_angle_ = gyro_angle; 
-		}
-		 
+		
 		emit fresh_frame_signal();
 	}	
 	cout << "leave client stream thread!\n";
@@ -257,9 +251,8 @@ void zscam_client::do_fresh_frame()
 	struct stereo_gyro_angle gyro_angle;
 	{
 		std::unique_lock<std::mutex> lock(mux_);
-		bool ok = pixmap.loadFromData((const unsigned char *)&frame_buffer_[0], frame_buffer_.size());
-		if (!ok)
-			pixmap = default_pixmap_;
+
+		pixmap = pixmap_;
 		detect_boxes = detect_boxes_;
 		gyro_angle = gyro_angle_;
 	}
@@ -287,8 +280,7 @@ void zscam_client::do_fresh_frame()
 			Qt::PenStyle style = (statble_state_ == 1) ? Qt::SolidLine : Qt::DotLine;
 			QColor color = (number_state_ == STEREO_FILTER_SINGLE_TARGET) ? Qt::blue : Qt::darkBlue ;
 			show_detect_box(&pixmap, focus_box_, Qt::blue, style, 2);
-		}
-			
+		} 
 	}	
 	
 	
@@ -775,6 +767,10 @@ void zscam_client::show_detect_box(QPixmap *dst, struct stereo_detect_box &detec
 	int box_h = detect_box.box_h;
 	painter.setPen(QPen(color, line, style));
 	painter.drawRect(box_x, box_y, box_w, box_h);
+	
+	painter.setPen(QPen(color, 4, Qt::SolidLine));
+	painter.drawPoint(detect_box.x, detect_box.y);
+	
 	
 	painter.setPen(QPen(color, 2, Qt::SolidLine));
 	string str = gen_detect_box_str(detect_box, show_detect_box_mask_);

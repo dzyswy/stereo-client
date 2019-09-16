@@ -19,7 +19,7 @@ enum stereo_filter_number_state_type
 };
 
 
-#define STEREO_FILTER_BUFFER_NUMBER	3
+#define STEREO_FILTER_MAX_FOCUS_BOX_NUM			8
 
 
 class stereo_filter
@@ -49,6 +49,8 @@ protected:
 	int statble_state_;
 	int statble_count_;
 	struct stereo_detect_box pre_focus_box_;
+	std::vector<struct stereo_detect_box> focus_boxes_;
+	
 	
 	
 public:
