@@ -162,8 +162,7 @@ void stereo_filter::compute(std::vector<struct stereo_detect_box> &detect_boxes,
 	
 	if (((dist_angle > 0) && (dist_angle < stable_angle_)) || ((dist_space > 0)) && (dist_space < stable_distance_)) {
 		statble_count_++;
-	} 
-	else {
+	} else {
 		statble_count_ = 0;
 	}
 	statble_state = (statble_count_ >= min_stable_count_) ? 1 : 0;	

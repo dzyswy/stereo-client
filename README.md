@@ -1,2 +1,10 @@
 # stereo-client
 stereo client
+
+
+
+
+
+
+
+

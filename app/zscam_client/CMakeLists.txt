@@ -34,7 +34,7 @@ set(QMAKE_CXXFLAGS ${QMAKE_CXXFLAGS} -std=c++11)
 
 
 if (UNIX)
-	set(LIBS pthread)
+	set(LIBS ${LIBS} pthread)
 endif ()
 
  
