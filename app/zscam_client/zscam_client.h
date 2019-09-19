@@ -567,10 +567,6 @@ private slots:
 			if (ret < 0)
 				break;
 			
-			ret = camera_->do_action("config_network");
-			if (ret < 0)
-				break;
-			
 			QMessageBox::warning(this, QString::fromLocal8Bit("成功"), QString::fromLocal8Bit("网络参数设置成功，重启设备生效"));
 			return;
 		}	
