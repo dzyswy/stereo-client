@@ -267,7 +267,7 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>-27</y>
+           <y>0</y>
            <width>334</width>
            <height>906</height>
           </rect>
@@ -701,6 +701,9 @@
                  <height>180</height>
                 </size>
                </property>
+               <property name="plainText">
+                <string/>
+               </property>
               </widget>
              </item>
              <item row="2" column="0">
@@ -812,9 +815,9 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>0</y>
+           <y>-382</y>
            <width>334</width>
-           <height>806</height>
+           <height>834</height>
           </rect>
          </property>
          <property name="minimumSize">
@@ -1431,22 +1434,24 @@
              <string>检测和跟踪</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_5">
-             <item row="3" column="1">
-              <widget class="QSpinBox" name="spinBox_detect_min_space_size">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
+             <item row="6" column="0">
+              <widget class="QLabel" name="label_43">
+               <property name="text">
+                <string>detect_min_iou</string>
                </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>22</height>
-                </size>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="label_22">
+               <property name="text">
+                <string>detect_min_nms_dist</string>
                </property>
-               <property name="maximum">
-                <number>100000</number>
+              </widget>
+             </item>
+             <item row="7" column="0">
+              <widget class="QLabel" name="label_23">
+               <property name="text">
+                <string>track_max_cost：</string>
                </property>
               </widget>
              </item>
@@ -1469,22 +1474,55 @@
                </property>
               </widget>
              </item>
-             <item row="5" column="0">
-              <widget class="QLabel" name="label_23">
-               <property name="text">
-                <string>track_max_cost：</string>
+             <item row="6" column="1">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_min_iou">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+               <property name="decimals">
+                <number>3</number>
+               </property>
+               <property name="minimum">
+                <double>-360.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>360.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.001000000000000</double>
                </property>
               </widget>
              </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_20">
-               <property name="text">
-                <string>detect_min_wsize：</string>
+             <item row="3" column="1">
+              <widget class="QSpinBox" name="spinBox_detect_min_space_size">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>45</width>
+                 <height>22</height>
+                </size>
+               </property>
+               <property name="maximum">
+                <number>100000</number>
                </property>
               </widget>
              </item>
-             <item row="5" column="1">
-              <widget class="QSpinBox" name="spinBox_track_max_cost">
+             <item row="4" column="1">
+              <widget class="QSpinBox" name="spinBox_detect_min_nms_dist">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -1509,8 +1547,15 @@
                </property>
               </widget>
              </item>
-             <item row="4" column="1">
-              <widget class="QSpinBox" name="spinBox_detect_min_nms_dist">
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_20">
+               <property name="text">
+                <string>detect_min_wsize：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="1">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_track_max_cost">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -1523,15 +1568,17 @@
                  <height>22</height>
                 </size>
                </property>
-               <property name="maximum">
-                <number>100000</number>
+               <property name="decimals">
+                <number>3</number>
                </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="label_22">
-               <property name="text">
-                <string>detect_min_nms_dist</string>
+               <property name="minimum">
+                <double>-360.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>360.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.001000000000000</double>
                </property>
               </widget>
              </item>

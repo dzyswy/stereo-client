@@ -638,10 +638,15 @@ void zscam_client::init_ui()
 	if (ret == 0) {
 		ui.spinBox_detect_min_space_size->setValue(value);
 	}
- 
-	ret = camera_->get_value("track_max_cost", value);
+	
+	ret = camera_->get_value("detect_min_iou", fvalue);
 	if (ret == 0) {
-		ui.spinBox_track_max_cost->setValue(value);
+		ui.doubleSpinBox_min_iou->setValue((double)fvalue);
+	}
+ 
+	ret = camera_->get_value("track_max_cost", fvalue);
+	if (ret == 0) {
+		ui.doubleSpinBox_track_max_cost->setValue(fvalue);
 	}
 	
 	ret = camera_->get_value("detect_min_nms_dist", value);

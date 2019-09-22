@@ -54,6 +54,7 @@ struct fit_calib_samples
 	fit_calib_samples& operator=(const fit_calib_samples& value)
 	{
 		samples = value.samples;
+		return *this;
 	}
 	
 	

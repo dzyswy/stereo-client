@@ -1,4 +1,5 @@
 // enable > 2gb support (LFS)
+#include "ftplib.h"
 
 #ifndef NOLFS
 #define _LARGEFILE_SOURCE
@@ -9,7 +10,7 @@
 #include <openssl/ssl.h>
 #endif
 
-#include "ftplib.h"
+
 
 #ifndef NOSSL
 #include <openssl/ssl.h>

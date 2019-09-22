@@ -31,8 +31,8 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/ptz_track/include)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/libs)
 
 link_directories(${PROJECT_BINARY_DIR}/libs)
-
-
+link_directories(${PROJECT_BINARY_DIR}/libs/Debug)
+link_directories(${PROJECT_BINARY_DIR}/libs/Release)
 
 
 ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/rpclib)

@@ -15,6 +15,11 @@
 #include <ctime>
 
 
+#define off64_t long
+#define fseeko64 fseek
+#define fopen64 fopen
+
+
 class ftplib;
 
 class ftp_client

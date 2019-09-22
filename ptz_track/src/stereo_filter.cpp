@@ -3,7 +3,8 @@
 
 using namespace std;
 
-
+#define min(a, b) (((a) < (b)) ? (a) : (b))
+#define max(a, b) (((a) > (b)) ? (a) : (b))
 
 stereo_filter::stereo_filter(stereo_camera *camera)
 {
@@ -106,10 +107,11 @@ void stereo_filter::compute(std::vector<struct stereo_detect_box> &detect_boxes,
 			
 			if (detect_box.d > 0)
 			{
-				float xcm = (pre_box.xcm - detect_box.xcm);
-				float ycm = (pre_box.ycm - detect_box.ycm);
-				float zcm = (pre_box.zcm - detect_box.zcm);
-				float dist = sqrt(xcm * xcm + ycm * ycm + zcm * zcm);
+				float dx = fabs(pre_box.x - detect_box.x) / 960;
+				float dy = fabs(pre_box.y - detect_box.y) / 540;
+				float dz = fabs(pre_box.d - detect_box.d) / 256;
+				
+				float dist = sqrt(dx * dx + dy * dy + dz * dz);
 				if (dist < min_dist)
 				{
 					min_dist = dist;
@@ -117,8 +119,7 @@ void stereo_filter::compute(std::vector<struct stereo_detect_box> &detect_boxes,
 				}	
 			}	
 		}	
-		
-
+		 
 		if ((min_id == -1) || (detect_box.id < min_id)) 
 		{
 			min_id = detect_box.id;

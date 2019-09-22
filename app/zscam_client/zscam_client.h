@@ -467,7 +467,11 @@ private slots:
 	{
 		camera_->set_value("detect_min_nms_dist", arg1.toInt());
 	}
-
+	
+	void on_doubleSpinBox_min_iou_valueChanged(const QString &arg1)
+	{
+		camera_->set_value("detect_min_iou", (float)arg1.toDouble());
+	}
 
 	void on_checkBox_track_mode_stateChanged(int state)
 	{
@@ -482,9 +486,9 @@ private slots:
 		}
 	}
 
-	void on_spinBox_track_max_cost_valueChanged(const QString &arg1)
+	void on_doubleSpinBox_track_max_cost_valueChanged(const QString &arg1)
 	{
-		camera_->set_value("track_max_cost", arg1.toInt());
+		camera_->set_value("track_max_cost", (float)arg1.toDouble());
 	}
 	
 	void on_comboBox_http_out_mode_currentIndexChanged(int index)

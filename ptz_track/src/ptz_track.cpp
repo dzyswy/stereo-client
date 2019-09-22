@@ -8,9 +8,27 @@
 using namespace std;
 
 
-
-
-
+/*
+#ifdef WIN32
+int gettimeofday(struct timeval *tp, void *tzp)
+{
+  time_t clock;
+  struct tm tm;
+  SYSTEMTIME wtm;
+  GetLocalTime(&wtm);
+  tm.tm_year   = wtm.wYear - 1900;
+  tm.tm_mon   = wtm.wMonth - 1;
+  tm.tm_mday   = wtm.wDay;
+  tm.tm_hour   = wtm.wHour;
+  tm.tm_min   = wtm.wMinute;
+  tm.tm_sec   = wtm.wSecond;
+  tm. tm_isdst  = -1;
+  clock = mktime(&tm);
+  tp->tv_sec = clock;
+  tp->tv_usec = wtm.wMilliseconds * 1000;
+  return (0);
+}
+#endif*/
 
 ptz_track::ptz_track(ptz_ctl_visca *ptz, fit_calib *calib, float period)
 {
@@ -95,7 +113,7 @@ void ptz_track::track_process()
 	while(going)
 	{
 		struct timeval tv[2];
-		gettimeofday(&tv[0], NULL);
+	//	gettimeofday(&tv[0], NULL);
 		
 		struct fit_calib_ptz_pose focus_pose;
 		{
@@ -260,7 +278,7 @@ void ptz_track::track_process()
 			}
 		}
 			 
-		gettimeofday(&tv[1], NULL);
+	//	gettimeofday(&tv[1], NULL);
 		
 		int time_used = (tv[1].tv_sec - tv[0].tv_sec) * 1000 + (tv[1].tv_usec - tv[0].tv_usec) / 1000;
 		int time_leave = period_ - time_used;

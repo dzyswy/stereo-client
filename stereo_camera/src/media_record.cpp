@@ -26,7 +26,7 @@ int media_record::open_media(const char *file_name, int width, int height, doubl
 		return -1;
 	}
 		
-	avifile = AVI_open_output_file(file_name);
+	avifile = AVI_open_output_file((char *)file_name);
 	if (!avifile)
 		return -1;
 	
@@ -76,7 +76,7 @@ int media_record::write_frame(char *data, long bytes, int keyframe)
 
 int media_record::save_picture(const char *file_name, unsigned char *buf, int size)
 {
-	return get_picture(file_name, buf, size);
+	return get_picture((char *)file_name, buf, size);
 }
 
 

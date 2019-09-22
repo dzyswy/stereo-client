@@ -3,10 +3,17 @@
 
 #include <iostream>
 #include <ctime>
-#include <sys/time.h>
+//#include <sys/time.h>
 #include <cmath>
 #include <chrono>
 #include <ratio>
+
+#ifndef _WIN32
+#include <unistd.h>
+#include <sys/time.h>
+#else 
+#include <windows.h>	
+#endif
 
 #include "pid_inc.h"
 #include "fit_calib.h"
