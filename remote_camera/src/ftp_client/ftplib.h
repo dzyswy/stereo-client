@@ -119,7 +119,8 @@ struct ftphandle {
 };
 
 #if defined(_WIN32)
-class DLLIMPORT ftplib {
+//class DLLIMPORT ftplib {
+class ftplib {
 #else
 class ftplib {
 #endif

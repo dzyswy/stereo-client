@@ -19,7 +19,6 @@ if (UNIX)
 endif()
 
 
-SET(LIBS ${LIBS} stereo_camera)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
