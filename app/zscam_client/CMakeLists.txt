@@ -39,7 +39,7 @@ set(QRC_SOURCE_FILES zscam_client.qrc)
 qt5_add_resources(QRC_FILES ${QRC_SOURCE_FILES})
 
 
-SET(LIBS ${LIBS} remote_camera)
+SET(LIBS ${LIBS} stereo_camera)
 SET(LIBS ${LIBS} ptz_track) 
 
 

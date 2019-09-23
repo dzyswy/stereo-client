@@ -8,7 +8,7 @@ ENDIF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 # Project setup
 ########################################################################
 CMAKE_MINIMUM_REQUIRED(VERSION 3.9.0)
-PROJECT(remote_camera CXX)
+PROJECT(stereo_camera CXX)
 ENABLE_TESTING()
 
 
