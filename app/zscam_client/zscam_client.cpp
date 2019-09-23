@@ -82,6 +82,9 @@ zscam_client::zscam_client(QWidget *parent)
 	open_ = 0;
 	run_thread_ = NULL;
 	
+	ptz_open_ = 0;
+	ptz_track_run_ = 0;
+	
 	
 	camera_ = new stereo_camera("zynq_stereo_camera", 45789, 5, 0);
 	
