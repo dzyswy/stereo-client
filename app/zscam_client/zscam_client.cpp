@@ -62,10 +62,11 @@ zscam_client::zscam_client(QWidget *parent)
 	draw_poly_mask_mode_ = 0;
 	show_cursor_mode_ = 0;
 	show_detect_box_mask_ = SHOW_DEPTH_COORD_INFO_EN;
+	test_track_mode_ = 0;
 	
 	show_mot_ = 1;
 	show_sot_ = 0;
-	
+
 	
 	show_poly_mask_mode_ = 0; 
 	poly_mask_points_[0].clear();
@@ -387,14 +388,18 @@ void zscam_client::do_video_label_mouse_pressed(int x, int y)
 	if (draw_poly_mask_mode_)
 	{
 		poly_mask_points_[1].push_back(std::make_pair(sx, sy));
-	}	
+	}
+
+	struct stereo_pixel_point point;
+	ret = camera_->get_pixel_point(x, y, point);
+	if ((ret < 0) || (point.d <= 0))
+		return;	
+	
+	printf("xcm=%d, ycm=%d, zcm=%d\n", point.xcm, point.ycm, point.zcm);
 	
 	if (test_track_mode_)
 	{
-		struct stereo_pixel_point point;
-		ret = camera_->get_pixel_point(x, y, point);
-		if ((ret < 0) || (point.d <= 0))
-			return;
+		
 		 
 		struct stereo_detect_box detect_box;
 		camera_->detect_pixel_to_box(point, detect_box);
@@ -879,7 +884,7 @@ void zscam_client::on_pushButton_update_clicked()
 void zscam_client::on_pushButton_open_ptz_clicked()
 {
 	int ret;
-	string ptz_name = ui.comboBox_ip->currentText().toStdString();
+	string ptz_name = ui.comboBox_ptz_name->currentText().toStdString();
 
 	if (!ptz_open_)
 	{
@@ -1107,8 +1112,7 @@ int zscam_client::load_config(const char *config_name)
 	 
 	svalue = ini.GetValue("ptz_track", "min_number_count", "2");
 	
-	value = atoi(svalue.c_str());
-	cout << "min_number_count: " << value << endl;
+	value = atoi(svalue.c_str()); 
 	xfilter_->set_min_number_count(value);
 	ui.spinBox_min_number_count->setValue(value);
 	
@@ -1116,11 +1120,6 @@ int zscam_client::load_config(const char *config_name)
 	value = atoi(svalue.c_str());
 	xfilter_->set_max_number_count(value);
 	ui.spinBox_max_number_count->setValue(value);
-	
-	svalue = ini.GetValue("ptz_track", "stable_angle", "1");
-	fvalue = atof(svalue.c_str());
-	xfilter_->set_stable_angle(fvalue);
-	ui.doubleSpinBox_stable_angle->setValue(fvalue);
 	
 	svalue = ini.GetValue("ptz_track", "stable_distance", "50");
 	fvalue = atof(svalue.c_str());
@@ -1205,12 +1204,11 @@ int zscam_client::save_config(const char *config_name)
 		return -1;
 	}
 	
-	string ptz_name = ui.comboBox_ip->currentText().toStdString();
+	string ptz_name = ui.comboBox_ptz_name->currentText().toStdString();
 	ini.SetValue("ptz_track", "ptz_name", ptz_name.c_str());
 	 
 	ini.SetValue("ptz_track", "min_number_count", to_string(xfilter_->get_min_number_count()).c_str());
 	ini.SetValue("ptz_track", "max_number_count", to_string(xfilter_->get_max_number_count()).c_str());
-	ini.SetValue("ptz_track", "stable_angle", to_string(xfilter_->get_stable_angle()).c_str());
 	ini.SetValue("ptz_track", "stable_distance", to_string(xfilter_->get_stable_distance()).c_str());
 	ini.SetValue("ptz_track", "min_stable_count", to_string(xfilter_->get_min_stable_count()).c_str());
 	

@@ -926,11 +926,6 @@ private slots:
 		xfilter_->set_max_number_count(value);
 	}
 	
-	void on_doubleSpinBox_stable_angle_valueChanged(double value)
-	{
-		xfilter_->set_stable_angle((float)value);
-	}
-	
 	void on_doubleSpinBox_stable_distance_valueChanged(double value)
 	{
 		xfilter_->set_stable_distance((float)value);

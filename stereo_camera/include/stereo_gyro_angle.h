@@ -15,6 +15,9 @@
 
 struct stereo_gyro_angle
 {
+	float xabs;
+	float yabs;
+	float zabs;
 	float roll;
 	float pitch;
 	

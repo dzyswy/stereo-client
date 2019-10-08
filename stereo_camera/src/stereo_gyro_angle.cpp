@@ -11,7 +11,10 @@ int stereo_gyro_angle::to_string(std::string &value)
 	try {
 		Json::Value jroot;
 		Json::Value jgyro_angle;
-
+		
+		jgyro_angle["xabs"] = xabs;
+		jgyro_angle["yabs"] = yabs;
+		jgyro_angle["zabs"] = zabs;
 		jgyro_angle["roll"] = roll;
 		jgyro_angle["pitch"] = pitch;
 		
@@ -34,9 +37,6 @@ int stereo_gyro_angle::to_string(std::string &value)
 
 int stereo_gyro_angle::from_string(std::string &value)
 {
-	float _roll;
-	float _pitch;
-	
 	try {
 		Json::Reader reader;
 		Json::Value jroot;
@@ -49,14 +49,22 @@ int stereo_gyro_angle::from_string(std::string &value)
 			return -1;
 
 		jgyro_angle = jroot["gyro_angle"];
-		if (jgyro_angle["roll"].empty())
+		if (jgyro_angle["xabs"].empty())
 			return -1;
-		
+		if (jgyro_angle["yabs"].empty())
+			return -1;
+		if (jgyro_angle["zabs"].empty())
+			return -1; 
+		if (jgyro_angle["roll"].empty())
+			return -1; 
 		if (jgyro_angle["pitch"].empty())
 			return -1;
-
-		_roll = jgyro_angle["roll"].asFloat();
-		_pitch = jgyro_angle["pitch"].asFloat();
+		
+		xabs = jgyro_angle["xabs"].asFloat();
+		yabs = jgyro_angle["yabs"].asFloat();
+		zabs = jgyro_angle["zabs"].asFloat();
+		roll = jgyro_angle["roll"].asFloat();
+		pitch = jgyro_angle["pitch"].asFloat();
 		
 	} catch(std::exception &ex)
     {
@@ -64,8 +72,6 @@ int stereo_gyro_angle::from_string(std::string &value)
         return -1;
 	}
 
-	roll = _roll;
-	pitch = _pitch;
 	return 0;
 }
 

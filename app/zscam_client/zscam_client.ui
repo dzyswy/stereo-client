@@ -815,7 +815,7 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>-382</y>
+           <y>0</y>
            <width>334</width>
            <height>834</height>
           </rect>
@@ -2680,35 +2680,12 @@
              <string>目标参数</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_4">
-             <item row="1" column="1">
-              <widget class="QSpinBox" name="spinBox_max_number_count"/>
-             </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_92">
-               <property name="text">
-                <string>min_number_count:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QSpinBox" name="spinBox_min_number_count"/>
-             </item>
-             <item row="5" column="0">
+             <item row="4" column="0">
               <widget class="QLabel" name="label_95">
                <property name="text">
                 <string>min_stable_count:</string>
                </property>
               </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_94">
-               <property name="text">
-                <string>stable_angle:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="1">
-              <widget class="QSpinBox" name="spinBox_min_stable_count"/>
              </item>
              <item row="1" column="0">
               <widget class="QLabel" name="label_93">
@@ -2717,18 +2694,31 @@
                </property>
               </widget>
              </item>
-             <item row="4" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_stable_distance"/>
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="spinBox_max_number_count"/>
              </item>
-             <item row="2" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_stable_angle"/>
-             </item>
-             <item row="4" column="0">
+             <item row="3" column="0">
               <widget class="QLabel" name="label_96">
                <property name="text">
                 <string>stable_distance:</string>
                </property>
               </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_92">
+               <property name="text">
+                <string>min_number_count:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QSpinBox" name="spinBox_min_stable_count"/>
+             </item>
+             <item row="3" column="1">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_stable_distance"/>
+             </item>
+             <item row="0" column="1">
+              <widget class="QSpinBox" name="spinBox_min_number_count"/>
              </item>
             </layout>
            </widget>
@@ -2941,21 +2931,21 @@
                </property>
               </widget>
              </item>
+             <item row="1" column="0">
+              <spacer name="verticalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>48</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
             </layout>
            </widget>
-          </item>
-          <item>
-           <spacer name="verticalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>48</height>
-             </size>
-            </property>
-           </spacer>
           </item>
          </layout>
         </widget>
