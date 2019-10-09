@@ -261,7 +261,7 @@
          </size>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="page">
          <property name="geometry">
@@ -2006,9 +2006,9 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>0</y>
+           <y>-224</y>
            <width>334</width>
-           <height>696</height>
+           <height>670</height>
           </rect>
          </property>
          <property name="minimumSize">
@@ -2401,7 +2401,7 @@
              <item row="2" column="0">
               <widget class="QLabel" name="label_42">
                <property name="text">
-                <string>坐标系：</string>
+                <string>安装模式：</string>
                </property>
               </widget>
              </item>
@@ -2410,11 +2410,9 @@
              </item>
              <item row="1" column="1">
               <widget class="QComboBox" name="comboBox_sample_index">
-               <item>
-                <property name="text">
-                 <string>-1</string>
-                </property>
-               </item>
+               <property name="currentText">
+                <string/>
+               </property>
               </widget>
              </item>
              <item row="4" column="0">
@@ -2467,13 +2465,6 @@
              <item row="5" column="1">
               <widget class="QDoubleSpinBox" name="doubleSpinBox_sample_pose2"/>
              </item>
-             <item row="6" column="0">
-              <widget class="QPushButton" name="pushButton_get_sample">
-               <property name="text">
-                <string>读取</string>
-               </property>
-              </widget>
-             </item>
              <item row="5" column="0">
               <widget class="QLabel" name="label_35">
                <property name="text">
@@ -2498,10 +2489,31 @@
                </property>
               </widget>
              </item>
-             <item row="7" column="1">
+             <item row="2" column="1">
+              <widget class="QComboBox" name="comboBox_fit_mode">
+               <item>
+                <property name="text">
+                 <string>重合模式</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>同轴模式</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="7" column="2">
               <widget class="QPushButton" name="pushButton_fit_calib">
                <property name="text">
                 <string>标定</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="1">
+              <widget class="QPushButton" name="pushButton_clear_samples">
+               <property name="text">
+                <string>清空</string>
                </property>
               </widget>
              </item>
@@ -2549,58 +2561,13 @@
               </layout>
              </item>
              <item row="1" column="0">
-              <widget class="QLabel" name="label_85">
-               <property name="text">
-                <string>坐标系:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QComboBox" name="comboBox_ptz_track_coord">
-               <item>
-                <property name="text">
-                 <string>图像坐标系</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>相机坐标系</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>教室坐标系</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>球坐标系</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="2" column="0">
               <widget class="QLabel" name="label_87">
                <property name="text">
                 <string>跟踪模式:</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
-              <widget class="QComboBox" name="comboBox_ptz_track_mode">
-               <item>
-                <property name="text">
-                 <string>连续跟踪</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>锁定跟踪</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="3" column="0" colspan="2">
+             <item row="2" column="0" colspan="2">
               <layout class="QHBoxLayout" name="horizontalLayout_10">
                <item>
                 <spacer name="horizontalSpacer_14">
@@ -2636,6 +2603,20 @@
                 </spacer>
                </item>
               </layout>
+             </item>
+             <item row="1" column="1">
+              <widget class="QComboBox" name="comboBox_ptz_track_mode">
+               <item>
+                <property name="text">
+                 <string>连续跟踪</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>锁定跟踪</string>
+                </property>
+               </item>
+              </widget>
              </item>
             </layout>
            </widget>

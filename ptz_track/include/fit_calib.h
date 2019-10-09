@@ -5,7 +5,43 @@
 
 
 #include "fit_calib_samples.h"
+#include "stereo_pixel_point.h"
 
+//sensor -> ptz
+
+enum FIT_CALIB_FIT_MODE_TYPE
+{
+	FIT_CALIB_CLOSE_TO_MODE = 0,
+	FIT_CALIB_IN_LINE_MODE = 1,
+	
+};
+
+enum fit_calib_coord_type
+{
+	FIT_CALIB_GRAPH_COORD = 0,
+	FIT_CALIB_CAMEAR_COORD = 1,
+	FIT_CALIB_ROOM_COORD = 2,
+	FIT_CALIB_BALL_COORD = 3,
+	FIT_CALIB_MAX_COORD = 4,
+};
+
+enum fit_calib_ptz_channel_type
+{
+	FIT_CALIB_PTZ_PAN = 0,
+	FIT_CALIB_PTZ_TILT = 1,
+	FIT_CALIB_PTZ_ZOOM = 2,
+	FIT_CALIB_PTZ_MAX_CHANNEL = 3,
+};
+
+struct fit_calib_ptz_pose
+{
+	float val[FIT_CALIB_PTZ_MAX_CHANNEL];
+};
+
+struct fit_calib_stereo_pixel
+{
+	float val[FIT_CALIB_PTZ_MAX_CHANNEL];
+};
 
 
 
@@ -13,38 +49,47 @@ class fit_calib
 {
 public:
 	fit_calib();
+
+	void set_fit_mode(int value);
+	int get_fit_mode();
  
-	int pose_to_pixel(float pose, float &pixel, int coord, int channel);
-	int pixel_to_pose(float pixel, float &pose, int coord, int channel);
-	int pixel_to_pose(struct fit_calib_stereo_pixel &pixel, struct fit_calib_ptz_pose &pose, int coord);
- 
-	int gen_para();
-	int set_sample(int pan_pose, int tilt_pose, int zoom_pose, struct stereo_pixel_point &pixel, int index = -1);
-	int set_sample(struct fit_calib_ptz_pose &pose_sample, struct fit_calib_stereo_pixel &pixel_sample, int index = -1);
-	int get_sample(int pan_pose, int tilt_pose, int zoom_pose, struct stereo_pixel_point &pixel, int index);
-	int get_sample(struct fit_calib_ptz_pose &pose_sample, struct fit_calib_stereo_pixel &pixel_sample, int index);
-	void set_samples(struct fit_calib_samples &value) {samples_ = value;}
-	struct fit_calib_samples& get_samples() {return samples_;}
+	int set_sample(int pan, int tilt, int zoom, struct stereo_pixel_point &pixel, int index);
+	int get_sample(struct fit_calib_ptz_pose &ptz_pose, struct fit_calib_stereo_pixel &stereo_pixel, int index);	
 	void clear_samples();
-	int get_sample_count();
-	void to_pose_sample(int pan_pose, int tilt_pose, int zoom_pose, struct fit_calib_ptz_pose &pose_sample);
-	void to_pixel_sample(struct stereo_pixel_point &pixel, struct fit_calib_stereo_pixel &pixel_sample);
-	void from_pose_sample(struct fit_calib_ptz_pose &pose_sample, int &pan_pose, int &tilt_pose, int &zoom_pose);
-	void from_pixel_sample(struct fit_calib_stereo_pixel &pixel_sample, struct stereo_pixel_point &pixel);
+	void set_samples_size(int value);
+	int get_samples_size();
 	
-	int set_degree(int coord, int channel, int value);
-	int get_degree(int coord, int channel, int &value);
- 
+	int compute();
+	void to_ptz(struct stereo_pixel_point &pixel, int &pan, int &tilt, int &zoom);
+	
+	int set_paras(string &value);
+	int get_paras(string &value);
+	
+	
+protected:	 
+	void to_stereo_pixel(struct stereo_pixel_point &pixel, struct fit_calib_stereo_pixel &stereo_pixel);
+
 protected:
-	int calc_fit_para(double *first, double *second, int count, std::vector<double> &para);
-	
-	
-protected:	
+	int fit_mode_;
+	int coord_;
+	int degree_[FIT_CALIB_PTZ_MAX_CHANNEL];
 	 
-	struct fit_calib_samples samples_;
+	std::vector<std::pair<float, float> > samples_[FIT_CALIB_PTZ_MAX_CHANNEL];
+	poly_fit fits_[FIT_CALIB_PTZ_MAX_CHANNEL];
 	
-	std::vector<double> paras_[FIT_CALIB_MAX_COORD][FIT_CALIB_PTZ_MAX_CHANNEL][2];
+	
+public:
+	int get_coord()
+	{
+		return coord_;
+	}
 };
+
+
+
+
+
+
 
 
 

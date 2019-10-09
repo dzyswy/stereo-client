@@ -3,7 +3,7 @@
 #include "polynomialfit.h"
 #include "ptz_ctl_visca.h"
 #include "stereo_camera.h"
-
+#include "json/json.h"
 
 
 
@@ -12,281 +12,267 @@
 using namespace std;
 
 
-
-
-
-
 fit_calib::fit_calib()
 {
-	set_degree(FIT_CALIB_GRAPH_COORD, FIT_CALIB_PTZ_PAN, 3);
-	set_degree(FIT_CALIB_GRAPH_COORD, FIT_CALIB_PTZ_TILT, 3);
-	set_degree(FIT_CALIB_GRAPH_COORD, FIT_CALIB_PTZ_ZOOM, 3);
-	
-	set_degree(FIT_CALIB_CAMEAR_COORD, FIT_CALIB_PTZ_PAN, 3);
-	set_degree(FIT_CALIB_CAMEAR_COORD, FIT_CALIB_PTZ_TILT, 3);
-	set_degree(FIT_CALIB_CAMEAR_COORD, FIT_CALIB_PTZ_ZOOM, 3);
-	
-	set_degree(FIT_CALIB_ROOM_COORD, FIT_CALIB_PTZ_PAN, 3);
-	set_degree(FIT_CALIB_ROOM_COORD, FIT_CALIB_PTZ_TILT, 3);
-	set_degree(FIT_CALIB_ROOM_COORD, FIT_CALIB_PTZ_ZOOM, 3);
-	
-	set_degree(FIT_CALIB_BALL_COORD, FIT_CALIB_PTZ_PAN, 3);
-	set_degree(FIT_CALIB_BALL_COORD, FIT_CALIB_PTZ_TILT, 3);
-	set_degree(FIT_CALIB_BALL_COORD, FIT_CALIB_PTZ_ZOOM, 3);
-	
-	
-	
-	
-}
- 
-int fit_calib::pose_to_pixel(float pose, float &pixel, int coord, int channel)
-{
-	int ret;
-	int degree = 0;
-	ret = get_degree(coord, channel, degree);
-	if (ret < 0)
-		return -1;
-	
-	double sum = paras_[coord][channel][0][degree];
-	for (int i = 0; i < degree; i++)
-	{
-		sum += pow(pose, degree - i) * paras_[coord][channel][0][i];
-	}	
-	pixel = (float)sum;
-	return 0;
+	fit_mode_ = FIT_CALIB_CLOSE_TO_MODE;
+	coord_ = FIT_CALIB_BALL_COORD;
 }
 
-int fit_calib::pixel_to_pose(float pixel, float &pose, int coord, int channel)
+void fit_calib::set_fit_mode(int value)
 {
-	int ret;
-	int degree = 0;
-	ret = get_degree(coord, channel, degree);
-	if (ret < 0)
-		return -1;
+	fit_mode_ = value;
 	
-	double sum = paras_[coord][channel][1][degree];
-	for (int i = 0; i < degree; i++)
+	switch(fit_mode_)
 	{
-		sum += pow(pixel, degree - i) * paras_[coord][channel][1][i];
-	}	
-	pose = (float)sum;
-	return 0;
+		case FIT_CALIB_CLOSE_TO_MODE:
+		{
+			degree_[FIT_CALIB_PTZ_PAN] = 1;
+			degree_[FIT_CALIB_PTZ_TILT] = 1;
+			degree_[FIT_CALIB_PTZ_ZOOM] = 3;
+			
+		}break;
+		case FIT_CALIB_IN_LINE_MODE:
+		{
+			degree_[FIT_CALIB_PTZ_PAN] = 3;
+			degree_[FIT_CALIB_PTZ_TILT] = 3;
+			degree_[FIT_CALIB_PTZ_ZOOM] = 3;
+		}break;
+	}
 }
 
-int fit_calib::pixel_to_pose(struct fit_calib_stereo_pixel &pixel, struct fit_calib_ptz_pose &pose, int coord)
+int fit_calib::get_fit_mode()
 {
+	return fit_mode_;
+}
+
+
+int fit_calib::set_sample(int pan, int tilt, int zoom, struct stereo_pixel_point &pixel, int index)
+{
+	int sample_size = get_samples_size();
+	if ((index < 0) || (index >= sample_size))
+		return -1;
+	
+	struct fit_calib_ptz_pose ptz_pose = {0};
+	struct fit_calib_stereo_pixel stereo_pixel = {0};
+	
+	ptz_pose.val[FIT_CALIB_PTZ_PAN] = pan;
+	ptz_pose.val[FIT_CALIB_PTZ_TILT] = tilt;
+	ptz_pose.val[FIT_CALIB_PTZ_ZOOM] = zoom;
+	
+	to_stereo_pixel(pixel, stereo_pixel);
+	
 	for (int i = 0; i < FIT_CALIB_PTZ_MAX_CHANNEL; i++)
 	{
-		int ret = pixel_to_pose(pixel.val[coord][i], pose.val[i], coord, i);
-		if (ret < 0)
-			return -1;
-	}
-	
-	return 0;
-}
-
-int fit_calib::gen_para()
-{
-	int ret = 0;
-	int sample_count = get_sample_count();
-	double *first = new double [sample_count];
-	double *second = new double [sample_count];
-	
-	for (int i = 0; i < FIT_CALIB_MAX_COORD; i++)
-	{
-		for (int j = 0; j < FIT_CALIB_PTZ_MAX_CHANNEL; j++)
-		{
-			for (int k = 0; k < sample_count; k++)
-			{
-				std::pair<struct fit_calib_ptz_pose, struct fit_calib_stereo_pixel> &sample = samples_.samples[k];
-				
-				first[k] = (double)sample.first.val[j];
-				second[k] = (double)sample.second.val[i][j];
-			}	
-			ret = calc_fit_para(first, second, sample_count, paras_[i][j][0]);
-			if (ret < 0)
-				break;
-			ret = calc_fit_para(second, first, sample_count, paras_[i][j][1]);
-			if (ret < 0)
-				break;
-		}
-		if (ret < 0)
-			break;		
-	}
-
-	delete first;
-	delete second;
-	if (ret < 0)
-		return -1;
-	return 0;
-}
-
-
-int fit_calib::calc_fit_para(double *first, double *second, int count, vector<double> &para)
-{
-	int degree = para.size() - 1;
-	Polynomial pf;
-	pf.setAttribute(degree, false, 1.0);
-	pf.setSample(first, second, count, false, NULL);
-	if (!pf.process()) {
-		return -1;
-	}
-	pf.print();
-	for (int i = 0; i < para.size(); i++)
-	{
-		para[i] = pf.getResult(i);
-	}
-	return 0;
-}
-
- 
-int fit_calib::set_degree(int coord, int channel, int value) 
-{
-	if ((coord < 0) || (coord >= FIT_CALIB_MAX_COORD))
-		return -1;
-	if ((channel < 0) || (channel >= FIT_CALIB_PTZ_MAX_CHANNEL))
-		return -1;
+		samples_[i][index] = make_pair(ptz_pose.val[i], stereo_pixel.val[i]);
+	}	
 	 
-	paras_[coord][channel][0].resize(value);
-	paras_[coord][channel][1].resize(value);
 	return 0;
 }
 
-int fit_calib::get_degree(int coord, int channel, int &value)
+int fit_calib::get_sample(struct fit_calib_ptz_pose &ptz_pose, struct fit_calib_stereo_pixel &stereo_pixel, int index);
 {
-	if ((coord < 0) || (coord >= FIT_CALIB_MAX_COORD))
-		return -1;
-	if ((channel < 0) || (channel >= FIT_CALIB_PTZ_MAX_CHANNEL))
+	int sample_size = get_samples_size();
+	if ((index < 0) || (index >= sample_size))
 		return -1;
 	
-	value = paras_[coord][channel][0].size();
+	for (int i = 0; i < FIT_CALIB_PTZ_MAX_CHANNEL; i++)
+	{
+		ptz_pose.val[i] = samples_[i][index].first;
+		stereo_pixel.val[i] = samples_[i][index].second; 
+	}	 
+	
 	return 0;
-}
+}	
 
-int fit_calib::set_sample(int pan_pose, int tilt_pose, int zoom_pose, struct stereo_pixel_point &pixel, int index)
-{
-	int sample_count = get_sample_count();
-	if (index >= sample_count)
-		return -1;
-	
-	struct fit_calib_ptz_pose pose_sample;
-	to_pose_sample(pan_pose, tilt_pose, zoom_pose, pose_sample);
-	
-	
-	struct fit_calib_stereo_pixel pixel_sample;
-	to_pixel_sample(pixel, pixel_sample); 
-	
-	if (index < 0) {
-		samples_.samples.push_back(make_pair(pose_sample, pixel_sample));
-	} else {
-		samples_.samples[index] = make_pair(pose_sample, pixel_sample);
-	}
-	return 0;
-}
 
-int fit_calib::set_sample(struct fit_calib_ptz_pose &pose_sample, struct fit_calib_stereo_pixel &pixel_sample, int index)
-{
-	int sample_count = get_sample_count();
-	if (index >= sample_count)
-		return -1;
-	
-	if (index < 0) {
-		samples_.samples.push_back(make_pair(pose_sample, pixel_sample));
-	} else {
-		samples_.samples[index] = make_pair(pose_sample, pixel_sample);
-	}
-	return 0;
-}
-
-int fit_calib::get_sample(int pan_pose, int tilt_pose, int zoom_pose, struct stereo_pixel_point &pixel, int index)
-{
-	int sample_count = get_sample_count();
-	if ((index < 0) || (index >= sample_count))
-		return -1;
-	
-	struct fit_calib_ptz_pose &pose_sample = samples_.samples[index].first;
-	from_pose_sample(pose_sample, pan_pose, tilt_pose, zoom_pose);
-	
-	
-	struct fit_calib_stereo_pixel &pixel_sample = samples_.samples[index].second;
-	from_pixel_sample(pixel_sample, pixel);
-	
-	return 0;
-}
-
-int fit_calib::get_sample(struct fit_calib_ptz_pose &pose_sample, struct fit_calib_stereo_pixel &pixel_sample, int index)
-{
-	int sample_count = get_sample_count();
-	if ((index < 0) || (index >= sample_count))
-		return -1;
-	
-	
-	pose_sample = samples_.samples[index].first;
-	pixel_sample = samples_.samples[index].second;
-	return 0;
-}
 
 void fit_calib::clear_samples()
 {
-	samples_.samples.clear();
+	for (int i = 0; i < FIT_CALIB_PTZ_MAX_CHANNEL; i++)
+	{
+		samples_[i].clear();
+	}	
 }
- 
-int fit_calib::get_sample_count()
+
+int fit_calib::set_samples_size(int value)
 {
-	return samples_.samples.size();
+	for (int i = 0; i < FIT_CALIB_PTZ_MAX_CHANNEL; i++)
+	{
+		samples_[i].resize(value);
+	}
+}
+
+int fit_calib::get_samples_size()
+{
+	return samples_[0].size();
+}
+
+int fit_calib::compute()
+{
+	int ret;
+	for (int i = 0; i < FIT_CALIB_PTZ_MAX_CHANNEL; i++)
+	{
+		ret = compute(samples_[i], degree_[i]);
+		if (ret < 0)
+			return -1
+	}	
+	
+	return 0;
+}
+
+void fit_calib::to_ptz(struct stereo_pixel_point &pixel, int &pan, int &tilt, int &zoom)
+{
+	struct fit_calib_stereo_pixel stereo_pixel = {0};
+	to_stereo_pixel(pixel, stereo_pixel);
+	pan = (int)fits_[FIT_CALIB_PTZ_PAN].calc_fit(stereo_pixel.val[FIT_CALIB_PTZ_PAN]);
+	tilt = (int)fits_[FIT_CALIB_PTZ_TILT].calc_fit(stereo_pixel.val[FIT_CALIB_PTZ_TILT]);
+	zoom = (int)fits_[FIT_CALIB_PTZ_ZOOM].calc_fit(stereo_pixel.val[FIT_CALIB_PTZ_ZOOM]);
 }
 
 
-void fit_calib::to_pose_sample(int pan_pose, int tilt_pose, int zoom_pose, struct fit_calib_ptz_pose &pose_sample)
+int fit_calib::set_paras(string &value)
 {
-	pose_sample.val[FIT_CALIB_PTZ_PAN] = (float)pan_pose;
-	pose_sample.val[FIT_CALIB_PTZ_TILT] = (float)tilt_pose;
-	pose_sample.val[FIT_CALIB_PTZ_ZOOM] = (float)zoom_pose;
+	try {
+		Json::Reader reader;
+		Json::Value jroot;
+		Json::Value jpans;
+		Json::Value jtilts;
+		Json::Value jzooms;
+		 
+		if (!reader.parse(value, jroot))
+			return -1;
+		
+		if (jroot["pans"].empty())
+			return -1; 
+		
+		if (jroot["tilts"].empty())
+			return -1;
+		
+		if (jroot["zooms"].empty())
+			return -1;
+		
+		jpans = jroot["pans"];
+		jtilts = jroot["tilts"];
+		jzooms = jroot["zooms"];
+		
+		if (jpans.size() != (degree_[FIT_CALIB_PTZ_PAN] + 1))
+			return -1;
+		
+		if (jtilts.size() != (degree_[FIT_CALIB_PTZ_TILT] + 1))
+			return -1;
+		
+		if (jzooms.size() != (degree_[FIT_CALIB_PTZ_ZOOM] + 1))
+			return -1;
+		vector<double> para;
+		para.resize(jpans.size())
+		for (int i = 0; i < jpans.size(); i++)
+		{
+			para[i] = jpans[i].asDouble();
+		}	
+		fits_[FIT_CALIB_PTZ_PAN].set_paras(para);
+		
+		para.resize(jtilts.size())
+		for (int i = 0; i < jtilts.size(); i++)
+		{
+			para[i] = jtilts[i].asDouble();
+		}	
+		fits_[FIT_CALIB_PTZ_TILT].set_paras(para);
+		
+		para.resize(jzooms.size())
+		for (int i = 0; i < jzooms.size(); i++)
+		{
+			para[i] = jzooms[i].asDouble();
+		}	
+		fits_[FIT_CALIB_PTZ_ZOOM].set_paras(para);
+		
+	} catch(std::exception &ex)
+    {
+        printf( "jsoncpp struct error: %s.\n", ex.what());
+        return -1;
+	} 
+	return 0;
 }
 
-void fit_calib::to_pixel_sample(struct stereo_pixel_point &pixel, struct fit_calib_stereo_pixel &pixel_sample)
+int fit_calib::get_paras(string &value)
 {
-	pixel_sample.val[FIT_CALIB_GRAPH_COORD][FIT_CALIB_PTZ_PAN] = pixel.x;
-	pixel_sample.val[FIT_CALIB_GRAPH_COORD][FIT_CALIB_PTZ_TILT] = pixel.y;
-	pixel_sample.val[FIT_CALIB_GRAPH_COORD][FIT_CALIB_PTZ_ZOOM] = pixel.d;
-	
-	pixel_sample.val[FIT_CALIB_CAMEAR_COORD][FIT_CALIB_PTZ_PAN] = pixel.xcm;
-	pixel_sample.val[FIT_CALIB_CAMEAR_COORD][FIT_CALIB_PTZ_TILT] = pixel.ycm;
-	pixel_sample.val[FIT_CALIB_CAMEAR_COORD][FIT_CALIB_PTZ_ZOOM] = pixel.zcm;
-	
-	pixel_sample.val[FIT_CALIB_ROOM_COORD][FIT_CALIB_PTZ_PAN] = pixel.xtcm;
-	pixel_sample.val[FIT_CALIB_ROOM_COORD][FIT_CALIB_PTZ_TILT] = pixel.ytcm;
-	pixel_sample.val[FIT_CALIB_ROOM_COORD][FIT_CALIB_PTZ_ZOOM] = pixel.ztcm;
-	
-	pixel_sample.val[FIT_CALIB_BALL_COORD][FIT_CALIB_PTZ_PAN] = pixel.xa;
-	pixel_sample.val[FIT_CALIB_BALL_COORD][FIT_CALIB_PTZ_TILT] = pixel.ya;
-	pixel_sample.val[FIT_CALIB_BALL_COORD][FIT_CALIB_PTZ_ZOOM] = pixel.r;
+	try {
+		Json::Value jroot;
+		Json::Value jpans;
+		Json::Value jtilts;
+		Json::Value jzooms;
+		
+		vector<double> pan = paras_[FIT_CALIB_PTZ_PAN].get_paras();
+		for (int i = 0; i < pan.size(); i++)
+		{
+			Json::Value jpan;
+			jpan["pan"] = pan[i];
+			jpans.append(jpan);
+		}	
+		
+		vector<double> tilt = paras_[FIT_CALIB_PTZ_TILT].get_paras();
+		for (int i = 0; i < tilt.size(); i++)
+		{
+			Json::Value jtilt;
+			jtilt["tilt"] = tilt[i];
+			jtilts.append(jtilt);
+		}	
+		
+		vector<double> zoom = paras_[FIT_CALIB_PTZ_ZOOM].get_paras();
+		for (int i = 0; i < zoom.size(); i++)
+		{
+			Json::Value jzoom;
+			jzoom["zoom"] = zoom[i];
+			jzooms.append(jzoom);
+		}	
+		
+		jroot["pans"] = jpans;
+		jroot["tilts"] = jtilts;
+		jroot["zooms"] = jzooms;
+	//	value = jroot.toStyledString();
+		Json::StreamWriterBuilder builder;
+		builder["indentation"] = "";
+		value = Json::writeString(builder, jroot);
+	//	cout << value << endl;
+	}
+	catch(std::exception &ex)
+    {
+        printf( "jsoncpp struct error: %s.\n", ex.what());
+        return -1;
+	}
+	return 0;
 }
 
-void fit_calib::from_pose_sample(struct fit_calib_ptz_pose &pose_sample, int &pan_pose, int &tilt_pose, int &zoom_pose)
+void fit_calib::to_stereo_pixel(struct stereo_pixel_point &pixel, struct fit_calib_stereo_pixel &stereo_pixel)
 {
-	pan_pose = (int)pose_sample.val[FIT_CALIB_PTZ_PAN];
-	tilt_pose = (int)pose_sample.val[FIT_CALIB_PTZ_TILT];
-	zoom_pose = (int)pose_sample.val[FIT_CALIB_PTZ_ZOOM];
-}
-
-void fit_calib::from_pixel_sample(struct fit_calib_stereo_pixel &pixel_sample, struct stereo_pixel_point &pixel)
-{
-	pixel.x = pixel_sample.val[FIT_CALIB_GRAPH_COORD][FIT_CALIB_PTZ_PAN];
-	pixel.y = pixel_sample.val[FIT_CALIB_GRAPH_COORD][FIT_CALIB_PTZ_TILT];
-	pixel.d = pixel_sample.val[FIT_CALIB_GRAPH_COORD][FIT_CALIB_PTZ_ZOOM];
-	
-	pixel.xcm = pixel_sample.val[FIT_CALIB_CAMEAR_COORD][FIT_CALIB_PTZ_PAN];
-	pixel.ycm = pixel_sample.val[FIT_CALIB_CAMEAR_COORD][FIT_CALIB_PTZ_TILT];
-	pixel.zcm = pixel_sample.val[FIT_CALIB_CAMEAR_COORD][FIT_CALIB_PTZ_ZOOM];
-	
-	pixel.xtcm = pixel_sample.val[FIT_CALIB_ROOM_COORD][FIT_CALIB_PTZ_PAN];
-	pixel.ytcm = pixel_sample.val[FIT_CALIB_ROOM_COORD][FIT_CALIB_PTZ_TILT];
-	pixel.ztcm = pixel_sample.val[FIT_CALIB_ROOM_COORD][FIT_CALIB_PTZ_ZOOM];
-	
-	pixel.xa = pixel_sample.val[FIT_CALIB_BALL_COORD][FIT_CALIB_PTZ_PAN];
-	pixel.ya = pixel_sample.val[FIT_CALIB_BALL_COORD][FIT_CALIB_PTZ_TILT];
-	pixel.r = pixel_sample.val[FIT_CALIB_BALL_COORD][FIT_CALIB_PTZ_ZOOM];
+	switch(coord_)
+	{
+		case FIT_CALIB_GRAPH_COORD:
+		{
+			stereo_pixel.val[FIT_CALIB_PTZ_PAN] = (float)pixel.x;
+			stereo_pixel.val[FIT_CALIB_PTZ_TILT] = (float)pixel.y;
+			stereo_pixel.val[FIT_CALIB_PTZ_ZOOM] = (float)pixel.d;
+		}break;
+		case FIT_CALIB_CAMEAR_COORD:
+		{
+			stereo_pixel.val[FIT_CALIB_PTZ_PAN] = (float)pixel.xcm;
+			stereo_pixel.val[FIT_CALIB_PTZ_TILT] = (float)pixel.ycm;
+			stereo_pixel.val[FIT_CALIB_PTZ_ZOOM] = (float)pixel.zcm;
+		}break;
+		case FIT_CALIB_ROOM_COORD:
+		{
+			stereo_pixel.val[FIT_CALIB_PTZ_PAN] = (float)pixel.xtcm;
+			stereo_pixel.val[FIT_CALIB_PTZ_TILT] = (float)pixel.ytcm;
+			stereo_pixel.val[FIT_CALIB_PTZ_ZOOM] = (float)pixel.ztcm;
+		}break;
+		case FIT_CALIB_BALL_COORD:
+		{
+			stereo_pixel.val[FIT_CALIB_PTZ_PAN] = (float)pixel.xa;
+			stereo_pixel.val[FIT_CALIB_PTZ_TILT] = (float)pixel.ya;
+			stereo_pixel.val[FIT_CALIB_PTZ_ZOOM] = (float)pixel.r;
+		}break;
+		default:
+			break;
+	}
 }
 
 
