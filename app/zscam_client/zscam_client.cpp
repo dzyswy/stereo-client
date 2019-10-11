@@ -62,7 +62,7 @@ zscam_client::zscam_client(QWidget *parent)
 	draw_poly_mask_mode_ = 0;
 	show_cursor_mode_ = 0;
 	show_detect_box_mask_ = SHOW_DEPTH_COORD_INFO_EN;
-	test_track_mode_ = 0;
+	fit_calib_en_mode_ = 0;
 	
 	show_mot_ = 1;
 	show_sot_ = 0;
@@ -80,11 +80,11 @@ zscam_client::zscam_client(QWidget *parent)
 	screenshot_count_ = 0;
 	record_frame_count_ = 0;
 	
-	open_ = 0;
+	cam_open_ = 0;
 	run_thread_ = NULL;
 	
 	ptz_open_ = 0;
-	ptz_track_run_ = 0;
+	ptz_track_mode_ = 0;
 	
 	
 	camera_ = new stereo_camera("zynq_stereo_camera", 45789, 5, 0);
@@ -145,7 +145,7 @@ void zscam_client::on_pushButton_open_camera_clicked()
 	string ip = ui.comboBox_ip->currentText().toStdString();
 	int index = ui.comboBox_stream_number->currentIndex();
 
-	if (!open_)
+	if (!cam_open_)
 	{
 		ret = camera_->open_device(ip.c_str(), 7070, 9090, index);
 		if (ret < 0) {
@@ -155,7 +155,7 @@ void zscam_client::on_pushButton_open_camera_clicked()
 		
 		
 		
-		open_ = 1;
+		cam_open_ = 1;
 		run_thread_ = new std::thread([this] () {stream_process();});
 		init_ui();
 		ui.pushButton_open_camera->setText(QString::fromLocal8Bit("¹Ø±Õ"));
@@ -163,7 +163,7 @@ void zscam_client::on_pushButton_open_camera_clicked()
 	}	
 	else
 	{
-		open_ = 0; 
+		cam_open_ = 0; 
 		if (run_thread_)
 		{
 			run_thread_->join();
@@ -183,7 +183,7 @@ void zscam_client::stream_process()
 	struct stereo_gyro_angle gyro_angle;
 	
 	cout << "create client stream thread!\n";
-	while(open_)
+	while(cam_open_)
 	{
 		if (!camera_->is_opened()) {
 			std::this_thread::sleep_for (std::chrono::seconds(1));
@@ -200,7 +200,7 @@ void zscam_client::stream_process()
 		camera_->get_gyro_angle(gyro_angle);
 		
 		xfilter_->compute(detect_boxes, number_state_, focus_box_, statble_state_);
-		if (ptz_track_run_)
+		if (ptz_track_mode_)
 		{
 			if (statble_state_)
 			{
@@ -314,7 +314,7 @@ void zscam_client::do_fresh_frame()
 	
 	show_mouse_press_point(&scale_pixmap, mouse_prex_, mouse_prey_);
 	
-	if (show_fit_calib_sample_mode_)
+	if (fit_calib_en_mode_)
 		show_fit_calib_all_samples(&scale_pixmap, Qt::white);
 	
 	ui.label_video->setPixmap(scale_pixmap);
@@ -375,7 +375,7 @@ void zscam_client::do_video_label_mouse_pressed(int x, int y)
 	mouse_prex_ = x;
 	mouse_prey_ = y;
 	
-	if (!open_)
+	if (!cam_open_)
 		return;
 	
 	float w = ui.label_video->width();
@@ -395,18 +395,37 @@ void zscam_client::do_video_label_mouse_pressed(int x, int y)
 	if ((ret < 0) || (point.d <= 0))
 		return;	
 	
-	printf("xcm=%d, ycm=%d, zcm=%d\n", point.xcm, point.ycm, point.zcm);
+	struct stereo_detect_box detect_box;
+	camera_->detect_pixel_to_box(point, detect_box);
+	string str = gen_detect_box_str(detect_box, show_detect_box_mask_);
+	ui.plainTextEdit_all_boxes->appendPlainText(QString::fromStdString(str)); 	
 	
-	if (test_track_mode_)
+	if (!track_mode_)
 	{
-		
-		 
-		struct stereo_detect_box detect_box;
-		camera_->detect_pixel_to_box(point, detect_box);
 		xtrack_->set_detect_box(detect_box);
+	}	
+	
+	if (fit_calib_en_mode_)
+	{
+		int sample_index = ui.comboBox_sample_index->currentIndex();
 		
-		string str = gen_detect_box_str(detect_box, show_detect_box_mask_);
-		ui.plainTextEdit_all_boxes->appendPlainText(QString::fromStdString(str)); 
+		sample_points_[sample_index] = make_pair(x, y);
+		
+		int pan_pose = 0, tilt_pose = 0, zoom_pose = 0;
+		xptz_->get_pantilt_position(&pan_pose, &tilt_pose);
+		xptz_->get_zoom_position(&zoom_pose);
+		
+		xfit_->set_sample(pan_pose, tilt_pose, zoom_pose, detect_box, sample_index);
+		
+		ret = xfit_->get_sample(ptz_pose_, detect_pose_, sample_index);
+		if (ret < 0)
+		{
+			memset(&ptz_pose_, 0, sizeof(ptz_pose_));
+			memset(&detect_pose_, 0, sizeof(detect_pose_));
+		}	
+		
+		show_fit_calib_sample();
+		
 	}	 
 }
 
@@ -418,7 +437,7 @@ void zscam_client::init_ui()
 	float fvalue;
 	string svalue;
 	
-	if (!open_)
+	if (!cam_open_)
 		return;
 	 
 	ret = camera_->get_value("cx", fvalue);
@@ -907,137 +926,92 @@ void zscam_client::on_pushButton_open_ptz_clicked()
 	}
 }
 
-
-void zscam_client::on_pushButton_ptz_track_run_clicked()
+ 
+void zscam_client::on_comboBox_ptz_track_mode_currentIndexChanged(int index)
 {
-	int ret;
-	if (!ptz_track_run_)
-	{
-		int ptz_track_mode = ui.comboBox_ptz_track_mode->currentIndex() + 1;
-		int ptz_track_coord = ui.comboBox_ptz_track_coord->currentIndex();
-		int ptz_track_mask = 0;
+	ptz_track_mode_ = index;
+	xtrack_->set_track_mode(index);
 		
-		if (ui.checkBox_ptz_track_pan_mask->checkState() == Qt::Checked)
-			ptz_track_mask |= PTZ_TRACK_PTZ_PAN_MASK;
-		if (ui.checkBox_ptz_track_tilt_mask->checkState() == Qt::Checked)
-			ptz_track_mask |= PTZ_TRACK_PTZ_TILT_MASK;
-		if (ui.checkBox_ptz_track_zoom_mask->checkState() == Qt::Checked)
-			ptz_track_mask |= PTZ_TRACK_PTZ_ZOOM_MASK;
-		
-		xtrack_->set_track_mode(ptz_track_mode);
-		xtrack_->set_track_mask(ptz_track_mask);
-		xtrack_->set_track_coord(ptz_track_coord);
-		ret = xtrack_->run();
-		if (ret < 0) {
-			QMessageBox::warning(this, QString::fromLocal8Bit("´íÎó"), QString::fromLocal8Bit("Æô¶¯¸ú×ÙÊ§°Ü"));			
-			return;
-		}
-		
-		ptz_track_run_ = 1;
-		ui.pushButton_open_ptz->setText(QString::fromLocal8Bit("Í£Ö¹¸ú×Ù"));
-	}	
+	if (ui.checkBox_ptz_track_pan_mask->checkState() == Qt::Checked)
+		ptz_track_mask_ |= PTZ_TRACK_PTZ_PAN_MASK;
 	else
-	{
-		xtrack_->stop();
-		ptz_track_run_ = 0;
-		ui.pushButton_open_ptz->setText(QString::fromLocal8Bit("¿ªÊ¼¸ú×Ù"));
-	}	
+		ptz_track_mask_ &= ~PTZ_TRACK_PTZ_PAN_MASK;	
+	if (ui.checkBox_ptz_track_tilt_mask->checkState() == Qt::Checked)
+		ptz_track_mask_ |= PTZ_TRACK_PTZ_TILT_MASK;
+	else
+		ptz_track_mask_ &= ~PTZ_TRACK_PTZ_TILT_MASK;
+	if (ui.checkBox_ptz_track_zoom_mask->checkState() == Qt::Checked)
+		ptz_track_mask_ |= PTZ_TRACK_PTZ_ZOOM_MASK;
+	else
+		ptz_track_mask_ &= ~PTZ_TRACK_PTZ_ZOOM_MASK;
+	xtrack_->set_track_mask(ptz_track_mask_);
 }
 
-void zscam_client::on_spinBox_sample_count_valueChanged(int value)
+
+void zscam_client::on_checkBox_fit_calib_en_stateChanged(int arg1)
 {
+	if ((!ptz_open_) || (!cam_open_))
+		return;
+		
+	switch (arg1)
+	{
+		case Qt::Unchecked:
+		{
+			fit_calib_en_mode_ = 0;
+			ui.groupBox_fit_calib->setEnabled(false);
+		}break;
+		
+		
+		case Qt::Checked:
+		{
+			fit_calib_en_mode_ = 1;
+			ui.groupBox_fit_calib->setEnabled(true);
+			ui.spinBox_sample_size->setValue(9);
+			ui.comboBox_sample_index->setCurrentIndex(0);
+		}break;
+		
+		
+	}
+}
+
+void zscam_client::on_comboBox_fit_mode_currentIndexChanged(int index)
+{
+	xfit_->set_fit_mode(index);
+}
+
+void zscam_client::on_spinBox_sample_size_valueChanged(int value)
+{
+	int sample_size = value;
+	
+	xfit_->set_sample_size(sample_size);
+	
 	ui.comboBox_sample_index->clear();
-	for (int i = 0; i < value; i++)
+	for (int i = 0; i < sample_size; i++)
 	{
 		QString index = QString::fromStdString(std::to_string(i));
 		ui.comboBox_sample_index->addItem(index);
-	}	
-	ui.comboBox_sample_index->addItem(QString::fromStdString(std::to_string(-1)));
-	ui.comboBox_sample_index->setCurrentIndex(value);
+	}	 
+	ui.comboBox_sample_index->setCurrentIndex(0);
 }
 
 
 void zscam_client::on_comboBox_sample_index_currentIndexChanged(int index)
 {
-	int ret = xfit_->get_sample(pose_sample_, pixel_sample_, index);
+	int ret = xfit_->get_sample(ptz_pose_, detect_pose_, index);
 	if (ret < 0) {
-		return;
-	}
+		memset(&ptz_pose_, 0, sizeof(ptz_pose_));
+		memset(&detect_pose_, 0, sizeof(detect_pose_));
+	} 
 	
 	show_fit_calib_sample();
-}
-
-void zscam_client::on_comboBox_sample_coord_currentIndexChanged(int index)
-{
-	show_fit_calib_sample();
-}
- 
-void zscam_client::on_pushButton_get_sample_clicked()
-{
-	int ret; 
-	int pan_pose, tilt_pose, zoom_pose;
-	struct stereo_pixel_point pixel;
-	
-	ret = xptz_->get_pantilt_position(&pan_pose, &tilt_pose);
-	if (ret < 0) {
-		printf("Failed to get pan tilt position!\n");
-		return;
-	}
-	ret = xptz_->get_zoom_position(&zoom_pose);
-	if (ret < 0) {
-		printf("Failed to get zoom position!\n");
-		return;
-	}
-	
-	ret = camera_->get_pixel_point(mouse_prex_, mouse_prey_, pixel);
-	if (ret < 0) {
-		printf("Failed to get stereo pixel point\n");
-		return;
-	}
-		
-	
-	xfit_->to_pose_sample(pan_pose, tilt_pose, zoom_pose, pose_sample_);
-	xfit_->to_pixel_sample(pixel, pixel_sample_);
-	
-	show_fit_calib_sample();
-}
-
-void zscam_client::on_pushButton_set_sample_clicked()
-{
-	int ret;
-	
-	int index = ui.comboBox_sample_index->currentIndex();
-	
-	ret = xfit_->set_sample(pose_sample_, pixel_sample_, index);
-	if (ret < 0) {
-		return;
-	}
-}
-
-void zscam_client::on_pushButton_run_sample_clicked()
-{
-	int ret; 
-	int pan_pose, tilt_pose, zoom_pose;
-	
-	xfit_->from_pose_sample(pose_sample_, pan_pose, tilt_pose, zoom_pose);
-	
-	ret = xptz_->set_pantilt_absolute_position(pan_pose, tilt_pose, xptz_->get_max_pan_speed(), xptz_->get_max_tilt_speed());
-	if (ret < 0) {
-		return;
-	}
-	
-	ret = xptz_->set_zoom_absolute_position(zoom_pose, xptz_->get_max_zoom_speed());
-	if (ret < 0) {
-		return;
-	}
-
 }
 
 void zscam_client::on_pushButton_fit_calib_clicked()
 {
 	int ret;
-	ret = xfit_->gen_para();
+	ret = xfit_->compute();
 	if (ret < 0) {
+		QMessageBox::warning(this, QString::fromLocal8Bit("´íÎó"), QString::fromLocal8Bit("ÔÆÌ¨Ð£ÕýÊ§°Ü"));			
 		return;
 	}
 }
@@ -1055,27 +1029,24 @@ void zscam_client::show_pid_para()
 
 
 void zscam_client::show_fit_calib_sample()
-{
-	int coord = ui.comboBox_sample_coord->currentIndex();
-	
-	ui.doubleSpinBox_sample_pose0->setValue((double)pose_sample_.val[0]);
-	ui.doubleSpinBox_sample_pose1->setValue((double)pose_sample_.val[1]);
-	ui.doubleSpinBox_sample_pose2->setValue((double)pose_sample_.val[2]);
+{ 
+	ui.doubleSpinBox_sample_pose0->setValue((double)ptz_pose_.val[0]);
+	ui.doubleSpinBox_sample_pose1->setValue((double)ptz_pose_.val[1]);
+	ui.doubleSpinBox_sample_pose2->setValue((double)ptz_pose_.val[2]);
 	 
-	ui.doubleSpinBox_sample_pixel0->setValue((double)pixel_sample_.val[coord][0]);
-	ui.doubleSpinBox_sample_pixel1->setValue((double)pixel_sample_.val[coord][1]);
-	ui.doubleSpinBox_sample_pixel2->setValue((double)pixel_sample_.val[coord][2]);
+	ui.doubleSpinBox_sample_pixel0->setValue((double)detect_pose_.val[0]);
+	ui.doubleSpinBox_sample_pixel1->setValue((double)detect_pose_.val[1]);
+	ui.doubleSpinBox_sample_pixel2->setValue((double)detect_pose_.val[2]);
 }
 
 void zscam_client::show_fit_calib_all_samples(QPixmap *dst, QColor color)
 {
 	int len = 30;
-	QPainter painter(dst);
-	struct fit_calib_samples& samples = xfit_->get_samples();
-	for (int i = 0; i < samples.samples.size(); i++) 
+	QPainter painter(dst); 
+	for (int i = 0; i < sample_points_.size(); i++) 
 	{
-		int x = samples.samples[i].second.val[FIT_CALIB_GRAPH_COORD][0];
-		int y = samples.samples[i].second.val[FIT_CALIB_GRAPH_COORD][1]; 
+		int x = sample_points_[i].first;
+		int y = sample_points_[i].second; 
 		
 		painter.setPen(QPen(color, 1.5, Qt::SolidLine));
 		painter.drawLine(x - len / 2, y, x + len / 2, y);
@@ -1130,15 +1101,14 @@ int zscam_client::load_config(const char *config_name)
 	value = atoi(svalue.c_str());
 	xfilter_->set_min_stable_count(value);
 	ui.spinBox_min_stable_count->setValue(value);
-
-	svalue = ini.GetValue("ptz_track", "samples", "");
-	struct fit_calib_samples sample; 
-	ret = sample.from_string(svalue);
-	if (ret == 0) {
-		xfit_->set_samples(sample);
-		
-		ui.spinBox_sample_count->setValue(sample.samples.size());
-	}
+ 
+	svalue = ini.GetValue("ptz_track", "fit_mode", "0");
+	value = atoi(svalue.c_str());
+	xfit_->set_fit_mode(value);
+	ui.comboBox_fit_mode->setCurrentIndex(value);
+	
+	svalue = ini.GetValue("ptz_track", "fit_paras", "");
+	xfit_->set_paras(svalue);
 	
 	svalue = ini.GetValue("ptz_track", "pids", "");
 	ret = xtrack_->pid_paras_from_string(svalue);
@@ -1150,12 +1120,7 @@ int zscam_client::load_config(const char *config_name)
 	value = atoi(svalue.c_str());
 	xtrack_->set_track_mode(value);
 	ui.comboBox_ptz_track_mode->setCurrentIndex(value);
-	
-	svalue = ini.GetValue("ptz_track", "track_coord", "0");
-	value = atoi(svalue.c_str());
-	xtrack_->set_track_coord(value);
-	ui.comboBox_ptz_track_coord->setCurrentIndex(value);
-	
+
 	svalue = ini.GetValue("ptz_track", "track_mask", "0");
 	value = atoi(svalue.c_str());
 	xtrack_->set_track_mask(value);
@@ -1212,10 +1177,10 @@ int zscam_client::save_config(const char *config_name)
 	ini.SetValue("ptz_track", "stable_distance", to_string(xfilter_->get_stable_distance()).c_str());
 	ini.SetValue("ptz_track", "min_stable_count", to_string(xfilter_->get_min_stable_count()).c_str());
 	
-	struct fit_calib_samples& samples = xfit_->get_samples();
-	ret = samples.to_string(svalue);
+	ini.SetValue("ptz_track", "fit_mode", to_string(xfit_->get_fit_mode()).c_str());
+	ret = xfit_->get_paras(svalue);
 	if (ret == 0) {
-		ini.SetValue("ptz_track", "samples", svalue.c_str()); 
+		ini.SetValue("ptz_track", "fit_paras", svalue.c_str()); 
 	}
 	
 	ret = xtrack_->pid_paras_to_string(svalue);
@@ -1224,7 +1189,6 @@ int zscam_client::save_config(const char *config_name)
 	}
 	
 	ini.SetValue("ptz_track", "track_mode", to_string(xtrack_->get_track_mode()).c_str());
-	ini.SetValue("ptz_track", "track_coord", to_string(xtrack_->get_track_coord()).c_str());
 	ini.SetValue("ptz_track", "track_mask", to_string(xtrack_->get_track_mask()).c_str());
 	ini.SetValue("ptz_track", "lock_time", to_string(xtrack_->get_lock_time()).c_str());
 	 

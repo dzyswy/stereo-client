@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1142</width>
-    <height>612</height>
+    <width>1154</width>
+    <height>615</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -256,20 +256,20 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>350</width>
+          <width>400</width>
           <height>0</height>
          </size>
         </property>
         <property name="currentIndex">
-         <number>3</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="page">
          <property name="geometry">
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>334</width>
-           <height>906</height>
+           <width>384</width>
+           <height>961</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -287,7 +287,7 @@
          <attribute name="label">
           <string>双目摄像机</string>
          </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout">
+         <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
            <widget class="QGroupBox" name="groupBox_3">
             <property name="sizePolicy">
@@ -299,8 +299,8 @@
             <property name="title">
              <string>设备</string>
             </property>
-            <layout class="QGridLayout" name="gridLayout_6">
-             <item row="0" column="0" colspan="2">
+            <layout class="QVBoxLayout" name="verticalLayout">
+             <item>
               <layout class="QHBoxLayout" name="horizontalLayout_7">
                <item>
                 <widget class="QComboBox" name="comboBox_ip">
@@ -342,7 +342,7 @@
                </item>
               </layout>
              </item>
-             <item row="1" column="0" colspan="2">
+             <item>
               <layout class="QHBoxLayout" name="horizontalLayout_6">
                <item>
                 <widget class="QLabel" name="label_27">
@@ -399,8 +399,94 @@
                  </property>
                 </widget>
                </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_18">
                <item>
-                <spacer name="horizontalSpacer_30">
+                <widget class="QLabel" name="label_33">
+                 <property name="text">
+                  <string>版本号:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="lineEdit_version">
+                 <property name="readOnly">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_15">
+               <item>
+                <widget class="QLabel" name="label_31">
+                 <property name="text">
+                  <string>序列号:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="lineEdit_serial_number">
+                 <property name="readOnly">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_10">
+               <item>
+                <spacer name="horizontalSpacer_13">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="pushButton_save_config">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>22</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>保存配置</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="pushButton_update">
+                 <property name="text">
+                  <string>升级</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="pushButton_reboot">
+                 <property name="text">
+                  <string>重启</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_14">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -497,58 +583,53 @@
            </widget>
           </item>
           <item>
-           <widget class="QGroupBox" name="groupBox_5">
-            <property name="title">
-             <string>输出模式</string>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_2">
-             <item>
-              <widget class="QLabel" name="label_5">
-               <property name="text">
-                <string>模式：</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QComboBox" name="comboBox_http_out_mode">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>60</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <item>
-                <property name="text">
-                 <string>摄像头图像</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>校正图像</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>视差图像</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
            <widget class="QGroupBox" name="groupBox_31">
             <property name="title">
              <string>算法模式</string>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_2">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <item>
+                <widget class="QLabel" name="label_5">
+                 <property name="text">
+                  <string>模式：</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="comboBox_http_out_mode">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>60</width>
+                   <height>22</height>
+                  </size>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>摄像头图像</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>校正图像</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>视差图像</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+              </layout>
+             </item>
              <item>
               <layout class="QGridLayout" name="gridLayout_24">
                <item row="0" column="0">
@@ -806,7 +887,6 @@
           </item>
          </layout>
          <zorder>groupBox_3</zorder>
-         <zorder>groupBox_5</zorder>
          <zorder>groupBox_15</zorder>
          <zorder>groupBox_30</zorder>
          <zorder>groupBox_31</zorder>
@@ -816,7 +896,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>334</width>
+           <width>384</width>
            <height>834</height>
           </rect>
          </property>
@@ -1605,8 +1685,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>334</width>
-           <height>557</height>
+           <width>400</width>
+           <height>445</height>
           </rect>
          </property>
          <property name="minimumSize">
@@ -1622,76 +1702,6 @@
           <string>系统设置</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_10">
-          <item>
-           <widget class="QGroupBox" name="groupBox_10">
-            <property name="title">
-             <string>配置</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_7">
-             <item row="0" column="0">
-              <widget class="QPushButton" name="pushButton_save_config">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>保存配置</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="groupBox_13">
-            <property name="title">
-             <string>重启</string>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_13">
-             <item>
-              <spacer name="horizontalSpacer_8">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButton_reboot">
-               <property name="text">
-                <string>重启</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_9">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </widget>
-          </item>
           <item>
            <widget class="QGroupBox" name="groupBox_11">
             <property name="title">
@@ -1906,88 +1916,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QGroupBox" name="groupBox_14">
-            <property name="title">
-             <string>升级</string>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_4">
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_18">
-               <item>
-                <widget class="QLabel" name="label_33">
-                 <property name="text">
-                  <string>版本号:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="lineEdit_version">
-                 <property name="readOnly">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_15">
-               <item>
-                <widget class="QLabel" name="label_31">
-                 <property name="text">
-                  <string>序列号:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="lineEdit_serial_number">
-                 <property name="readOnly">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_14">
-               <item>
-                <spacer name="horizontalSpacer_10">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButton_update">
-                 <property name="text">
-                  <string>升级</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_11">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
            <spacer name="verticalSpacer">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -2006,9 +1934,9 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>-191</y>
-           <width>334</width>
-           <height>641</height>
+           <y>0</y>
+           <width>384</width>
+           <height>612</height>
           </rect>
          </property>
          <property name="minimumSize">
@@ -2020,7 +1948,7 @@
          <attribute name="label">
           <string>PTZ摄像机</string>
          </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_7">
+         <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
            <widget class="QGroupBox" name="groupBox_16">
             <property name="sizePolicy">
@@ -2033,20 +1961,6 @@
              <string>设备</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_9">
-             <item row="1" column="1">
-              <widget class="QCheckBox" name="checkBox_datascreen">
-               <property name="text">
-                <string>datascreen</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QPushButton" name="pushButton_open_ptz">
-               <property name="text">
-                <string>打开</string>
-               </property>
-              </widget>
-             </item>
              <item row="0" column="0">
               <widget class="QComboBox" name="comboBox_ptz_name">
                <property name="sizePolicy">
@@ -2059,6 +1973,31 @@
                 <bool>true</bool>
                </property>
               </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QPushButton" name="pushButton_open_ptz">
+               <property name="text">
+                <string>打开</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0" colspan="2">
+              <layout class="QHBoxLayout" name="horizontalLayout_11">
+               <item>
+                <widget class="QCheckBox" name="checkBox_fit_calib_en">
+                 <property name="text">
+                  <string>使能标定</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBox_datascreen">
+                 <property name="text">
+                  <string>datascreen</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
             </layout>
            </widget>
@@ -2362,7 +2301,79 @@
            </widget>
           </item>
           <item>
-           <widget class="QGroupBox" name="groupBox_18">
+           <widget class="QGroupBox" name="groupBox_19">
+            <property name="title">
+             <string>跟踪</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_18">
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_87">
+               <property name="text">
+                <string>跟踪模式:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QComboBox" name="comboBox_ptz_track_mode">
+               <item>
+                <property name="text">
+                 <string>停止跟踪</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>连续跟踪</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>锁定跟踪</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="0" column="0" colspan="2">
+              <layout class="QHBoxLayout" name="horizontalLayout_9">
+               <item>
+                <widget class="QCheckBox" name="checkBox_ptz_track_pan_mask">
+                 <property name="text">
+                  <string>左右跟踪</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBox_ptz_track_tilt_mask">
+                 <property name="text">
+                  <string>上下跟踪</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBox_ptz_track_zoom_mask">
+                 <property name="text">
+                  <string>缩放跟踪</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_fit_calib">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="title">
              <string>联合标定</string>
             </property>
@@ -2403,13 +2414,6 @@
                </property>
               </widget>
              </item>
-             <item row="7" column="1">
-              <widget class="QPushButton" name="pushButton_clear_samples">
-               <property name="text">
-                <string>清空</string>
-               </property>
-              </widget>
-             </item>
              <item row="7" column="2">
               <widget class="QPushButton" name="pushButton_fit_calib">
                <property name="text">
@@ -2429,28 +2433,6 @@
                <property name="text">
                 <string>标定点数量：</string>
                </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QComboBox" name="comboBox_sample_number">
-               <property name="currentText">
-                <string>9</string>
-               </property>
-               <item>
-                <property name="text">
-                 <string>9</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>5</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>3</string>
-                </property>
-               </item>
               </widget>
              </item>
              <item row="6" column="2">
@@ -2484,112 +2466,20 @@
                </item>
               </widget>
              </item>
-             <item row="0" column="2">
-              <widget class="QCheckBox" name="checkBox_fit_calib_en">
-               <property name="text">
-                <string>使能标定</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="groupBox_19">
-            <property name="title">
-             <string>跟踪</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_18">
-             <item row="0" column="0" colspan="2">
-              <layout class="QHBoxLayout" name="horizontalLayout_9">
-               <item>
-                <widget class="QCheckBox" name="checkBox_ptz_track_pan_mask">
-                 <property name="text">
-                  <string>左右跟踪</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="checkBox_ptz_track_tilt_mask">
-                 <property name="text">
-                  <string>上下跟踪</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="checkBox_ptz_track_zoom_mask">
-                 <property name="text">
-                  <string>缩放跟踪</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_87">
-               <property name="text">
-                <string>跟踪模式:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0" colspan="2">
-              <layout class="QHBoxLayout" name="horizontalLayout_10">
-               <item>
-                <spacer name="horizontalSpacer_14">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButton_ptz_track_run">
-                 <property name="text">
-                  <string>开始跟踪</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_15">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
-             </item>
              <item row="1" column="1">
-              <widget class="QComboBox" name="comboBox_ptz_track_mode">
-               <item>
-                <property name="text">
-                 <string>连续跟踪</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>锁定跟踪</string>
-                </property>
-               </item>
+              <widget class="QSpinBox" name="spinBox_sample_size">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimum">
+                <number>-2500</number>
+               </property>
+               <property name="maximum">
+                <number>2500</number>
+               </property>
               </widget>
              </item>
             </layout>
@@ -2615,8 +2505,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>350</width>
-           <height>442</height>
+           <width>400</width>
+           <height>445</height>
           </rect>
          </property>
          <property name="minimumSize">

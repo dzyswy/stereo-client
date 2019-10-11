@@ -107,7 +107,7 @@ public:
 	
 	
 	stereo_camera *camera_;
-	int open_;
+	int cam_open_;
 
 	QPixmap pixmap_;
 	std::vector<struct stereo_detect_box> detect_boxes_;
@@ -163,12 +163,13 @@ public:
 	ptz_track *xtrack_;
 	
 	int ptz_open_;
-	int ptz_track_run_;
+	int ptz_track_mode_;
+	int ptz_track_mask_;
 	std::string ptz_name_;
 	
 	int fit_calib_en_mode_;
 	struct fit_calib_ptz_pose ptz_pose_;
-	struct fit_calib_stereo_pixel stereo_pixel_;
+	struct fit_calib_detect_pose detect_pose_;
 	
 	vector<pair<int, int> > sample_points_;
 
@@ -736,12 +737,11 @@ private slots:
 	
 	//ptz
 	void on_pushButton_open_ptz_clicked();
-	void on_pushButton_ptz_track_run_clicked();
+	void on_comboBox_ptz_track_mode_currentIndexChanged(int index);
 	void on_checkBox_fit_calib_en_stateChanged(int arg1);
 	void on_comboBox_fit_mode_currentIndexChanged(int index);
-	void on_comboBox_sample_size_currentIndexChanged(int index); 
+	void on_spinBox_sample_size_valueChanged(int value); 
 	void on_comboBox_sample_index_currentIndexChanged(int index);
-	void on_pushButton_clear_samples_clicked();
 	void on_pushButton_fit_calib_clicked();
 	
 

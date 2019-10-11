@@ -3,8 +3,8 @@
 
 
 #include <iostream>
-
-
+#include <vector>
+#include <string>
 
 class poly_fit
 {

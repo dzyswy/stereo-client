@@ -1,9 +1,9 @@
 #include "poly_fit.h"
+#include <cmath>
 
 
 
-
-
+using namespace std;
 
 
 poly_fit::poly_fit()

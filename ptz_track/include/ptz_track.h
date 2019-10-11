@@ -30,6 +30,7 @@
 
 enum ptz_track_track_mode_type
 {
+	PTZ_TRACK_STOP_TRACK_MODE = 0,
 	PTZ_TRACK_CONTINUOUS_TRACK_MODE = 1,
 	PTZ_TRACK_LOCK_TRACK_MODE = 2,
 };
@@ -47,26 +48,26 @@ enum ptz_track_track_lock_type
 class ptz_track
 {
 public:
-	ptz_track(ptz_ctl_visca *ptz, fit_calib *calib, float period = 100);
+	ptz_track(ptz_ctl_visca *ptz, fit_calib *fit, float period = 100);
 	~ptz_track();
 	
-	int run();
-	int stop();
+	void set_detect_box(struct stereo_detect_box &detect_box);
 	
 	int pid_paras_from_string(std::string value);
 	int pid_paras_to_string(std::string &value);
 	
-	
+protected:
+	void run();
+	void stop();
 	void track_process();
 	
 protected:
 	ptz_ctl_visca *ptz_;
-	fit_calib *calib_;
+	fit_calib *fit_;
 
 	float period_;
 	int track_mode_;
 	int track_mask_;
-	int track_coord_;
 	int lock_time_;
 	
 	int lock_state_;
@@ -86,9 +87,6 @@ protected:
 	
 public:
 
-	int set_detect_box(struct stereo_detect_box &value);
-
-
 	void set_track_mode(int value)
 	{
 		track_mode_ = value;
@@ -97,11 +95,6 @@ public:
 	void set_track_mask(int value)
 	{
 		track_mask_ = value;
-	}
-	
-	void set_track_coord(int value)
-	{
-		track_coord_ = value;
 	}
 	
 	void set_lock_time(int value)
@@ -142,11 +135,6 @@ public:
 	int get_track_mask()
 	{
 		return track_mask_;
-	}
-	
-	int get_track_coord()
-	{
-		return track_coord_;
 	}
 	
 	int get_lock_time()

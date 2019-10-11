@@ -4,8 +4,12 @@
 
 
 
-#include "poly_fit.h"
-#include "stereo_pixel_point.h"
+
+#include "stereo_detect_boxes.h"
+
+
+class poly_fit;
+
 
 //sensor -> ptz
 
@@ -38,7 +42,7 @@ struct fit_calib_ptz_pose
 	float val[FIT_CALIB_PTZ_MAX_CHANNEL];
 };
 
-struct fit_calib_stereo_pixel
+struct fit_calib_detect_pose
 {
 	float val[FIT_CALIB_PTZ_MAX_CHANNEL];
 };
@@ -49,25 +53,27 @@ class fit_calib
 {
 public:
 	fit_calib();
+	~fit_calib();
 
 	void set_fit_mode(int value);
 	int get_fit_mode();
  
-	int set_sample(int pan, int tilt, int zoom, struct stereo_pixel_point &pixel, int index);
-	int get_sample(struct fit_calib_ptz_pose &ptz_pose, struct fit_calib_stereo_pixel &stereo_pixel, int index);	
+	int set_sample(int pan, int tilt, int zoom, struct stereo_detect_box &detect_box, int index);
+	int get_sample(struct fit_calib_ptz_pose &ptz_pose, struct fit_calib_detect_pose &detect_pose, int index);	
+	
+	void set_sample_size(int value);
+	int get_sample_size();
 	void clear_samples();
-	void set_samples_size(int value);
-	int get_samples_size();
 	
 	int compute();
-	void to_ptz(struct stereo_pixel_point &pixel, int &pan, int &tilt, int &zoom);
+	void to_ptz_pose(struct stereo_detect_box &detect_box, struct fit_calib_ptz_pose &ptz_pose);
 	
-	int set_paras(string &value);
-	int get_paras(string &value);
+	int set_paras(std::string &value);
+	int get_paras(std::string &value);
 	
 	
 protected:	 
-	void to_stereo_pixel(struct stereo_pixel_point &pixel, struct fit_calib_stereo_pixel &stereo_pixel);
+	void to_detect_pose(struct stereo_detect_box &detect_box, struct fit_calib_detect_pose &detect_pose);
 
 protected:
 	int fit_mode_;
@@ -75,14 +81,10 @@ protected:
 	int degree_[FIT_CALIB_PTZ_MAX_CHANNEL];
 	 
 	std::vector<std::pair<float, float> > samples_[FIT_CALIB_PTZ_MAX_CHANNEL];
-	poly_fit fits_[FIT_CALIB_PTZ_MAX_CHANNEL];
+	poly_fit *fits_[FIT_CALIB_PTZ_MAX_CHANNEL];
 	
 	
-public:
-	int get_coord()
-	{
-		return coord_;
-	}
+
 };
 
 

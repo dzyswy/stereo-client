@@ -30,23 +30,20 @@ int gettimeofday(struct timeval *tp, void *tzp)
 }
 #endif*/
 
-ptz_track::ptz_track(ptz_ctl_visca *ptz, fit_calib *calib, float period)
+ptz_track::ptz_track(ptz_ctl_visca *ptz, fit_calib *fit, float period)
 {
 	ptz_ = ptz;
-	calib_ = calib;
+	fit_ = fit;
 	period_ = period;
 	
-	track_mode_ = 0;
-	track_mask_ = PTZ_TRACK_PTZ_ALL_MASK;
-	track_coord_ = FIT_CALIB_BALL_COORD;
-	lock_time_ = 10;
-	
+	track_mode_ = PTZ_TRACK_STOP_TRACK_MODE;
+	track_mask_ = PTZ_TRACK_PTZ_ALL_MASK; 
 	lock_state_ = PTZ_TRACK_TRACK_UNLOCKED;
+	lock_time_ = 10; 
 	
 	memset(&focus_pose_, 0, sizeof(focus_pose_));
 	
-	going = 0;
-	run_thread_ = NULL;
+	run();
 }
 
 ptz_track::~ptz_track()
@@ -55,14 +52,13 @@ ptz_track::~ptz_track()
 }
 
 
-int ptz_track::run()
+void ptz_track::run()
 {
 	going = 1;
-	run_thread_ = new std::thread([this] () {track_process();});
-	return 0;
+	run_thread_ = new std::thread([this] () {track_process();}); 
 }
 
-int ptz_track::stop()
+void ptz_track::stop()
 {
 	going = 0;
 	if (run_thread_)
@@ -72,44 +68,22 @@ int ptz_track::stop()
 		run_thread_ = NULL;
 	}
 	ptz_->set_pantilt_stop();
-	ptz_->set_zoom_stop();
-	return 0;
+	ptz_->set_zoom_stop(); 
 }
 
-int ptz_track::set_detect_box(struct stereo_detect_box &value)
+void ptz_track::set_detect_box(struct stereo_detect_box &detect_box)
 {
-	int ret;
-	
 	std::unique_lock<std::mutex> lock(mux_);
 	
-	struct fit_calib_stereo_pixel focus_pixel;
-	focus_pixel.val[FIT_CALIB_GRAPH_COORD][FIT_CALIB_PTZ_PAN] = value.x;
-	focus_pixel.val[FIT_CALIB_GRAPH_COORD][FIT_CALIB_PTZ_TILT] = value.y;
-	focus_pixel.val[FIT_CALIB_GRAPH_COORD][FIT_CALIB_PTZ_ZOOM] = value.d;
-	
-	focus_pixel.val[FIT_CALIB_CAMEAR_COORD][FIT_CALIB_PTZ_PAN] = value.xcm;
-	focus_pixel.val[FIT_CALIB_CAMEAR_COORD][FIT_CALIB_PTZ_TILT] = value.ycm;
-	focus_pixel.val[FIT_CALIB_CAMEAR_COORD][FIT_CALIB_PTZ_ZOOM] = value.zcm;
-	
-	focus_pixel.val[FIT_CALIB_ROOM_COORD][FIT_CALIB_PTZ_PAN] = value.xtcm;
-	focus_pixel.val[FIT_CALIB_ROOM_COORD][FIT_CALIB_PTZ_TILT] = value.ytcm;
-	focus_pixel.val[FIT_CALIB_ROOM_COORD][FIT_CALIB_PTZ_ZOOM] = value.ztcm;
-	
-	focus_pixel.val[FIT_CALIB_BALL_COORD][FIT_CALIB_PTZ_PAN] = value.xa;
-	focus_pixel.val[FIT_CALIB_BALL_COORD][FIT_CALIB_PTZ_TILT] = value.ya;
-	focus_pixel.val[FIT_CALIB_BALL_COORD][FIT_CALIB_PTZ_ZOOM] = value.r;
- 
-	ret = calib_->pixel_to_pose(focus_pixel, focus_pose_, track_coord_);
-	if (ret < 0)
-		return -1;
-	
-	return 0;
+	fit_->to_ptz_pose(detect_box, focus_pose_);
+
 }
+
+
 
 void ptz_track::track_process()
 {
-	int ret;
-	int track_mode_ = 0;
+	int ret; 
 	while(going)
 	{
 		struct timeval tv[2];
@@ -121,31 +95,31 @@ void ptz_track::track_process()
 			focus_pose = focus_pose_;
 		}
 		
-		if (!ptz_->is_opened())
+		if ((!track_mode_) || (!ptz_->is_opened()))
 		{
 			std::this_thread::sleep_for(std::chrono::seconds(1));
 			continue;
 		}	
 		
 		
-		int ptz_pose[FIT_CALIB_PTZ_MAX_CHANNEL]; 
-		ret = ptz_->get_pantilt_position(&ptz_pose[FIT_CALIB_PTZ_PAN], &ptz_pose[FIT_CALIB_PTZ_TILT]);
+		int current_pose[FIT_CALIB_PTZ_MAX_CHANNEL]; 
+		ret = ptz_->get_pantilt_position(&current_pose[FIT_CALIB_PTZ_PAN], &current_pose[FIT_CALIB_PTZ_TILT]);
 		if (ret < 0) {
 			printf("Failed to get pan tilt position!\n");
-			std::this_thread::sleep_for(std::chrono::seconds(3));
+			std::this_thread::sleep_for(std::chrono::seconds(1));
 			continue;
 		}
-		ret = ptz_->get_zoom_position(&ptz_pose[FIT_CALIB_PTZ_ZOOM]);
+		ret = ptz_->get_zoom_position(&current_pose[FIT_CALIB_PTZ_ZOOM]);
 		if (ret < 0) {
 			printf("Failed to get zoom position!\n");
-			std::this_thread::sleep_for(std::chrono::seconds(3));
+			std::this_thread::sleep_for(std::chrono::seconds(1));
 			continue;
 		}
 		
 		float ptz_diff[FIT_CALIB_PTZ_MAX_CHANNEL];
 		for (int i = 0; i < FIT_CALIB_PTZ_MAX_CHANNEL; i++)
 		{
-			ptz_diff[i] = focus_pose.val[i] - (float)ptz_pose[i];
+			ptz_diff[i] = focus_pose.val[i] - (float)current_pose[i];
 		}	
 		
 		bool pan_mask = (track_mask_ & PTZ_TRACK_PTZ_PAN_MASK) ? true : false;
@@ -250,8 +224,8 @@ void ptz_track::track_process()
 				{  
 					if (move_pan || move_tilt)
 					{
-						int pan_position = move_pan ? focus_pose.val[FIT_CALIB_PTZ_PAN] : ptz_pose[FIT_CALIB_PTZ_PAN];
-						int tilt_position = move_tilt ? focus_pose.val[FIT_CALIB_PTZ_TILT] : ptz_pose[FIT_CALIB_PTZ_TILT];
+						int pan_position = move_pan ? focus_pose.val[FIT_CALIB_PTZ_PAN] : current_pose[FIT_CALIB_PTZ_PAN];
+						int tilt_position = move_tilt ? focus_pose.val[FIT_CALIB_PTZ_TILT] : current_pose[FIT_CALIB_PTZ_TILT];
 						ptz_->set_pantilt_absolute_position(pan_position, tilt_position, ptz_->get_max_pan_speed(), ptz_->get_max_tilt_speed());
 					}	
 					
