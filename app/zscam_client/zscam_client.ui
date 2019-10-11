@@ -2006,9 +2006,9 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>-224</y>
+           <y>-191</y>
            <width>334</width>
-           <height>670</height>
+           <height>641</height>
           </rect>
          </property>
          <property name="minimumSize">
@@ -2367,140 +2367,47 @@
              <string>联合标定</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_11">
-             <item row="2" column="2">
-              <widget class="QComboBox" name="comboBox_sample_coord">
-               <item>
-                <property name="text">
-                 <string>图像坐标系</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>相机坐标系</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>教室坐标系</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>球坐标系</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_25">
-               <property name="text">
-                <string>当前标定点：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_42">
-               <property name="text">
-                <string>安装模式：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="2">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_sample_pixel0"/>
-             </item>
-             <item row="1" column="1">
+             <item row="2" column="1">
               <widget class="QComboBox" name="comboBox_sample_index">
                <property name="currentText">
                 <string/>
                </property>
               </widget>
              </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="label_34">
-               <property name="text">
-                <string>上下：</string>
-               </property>
-              </widget>
+             <item row="5" column="1">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_sample_pose1"/>
              </item>
-             <item row="0" column="2">
-              <widget class="QCheckBox" name="checkBox_fit_calib_en">
-               <property name="text">
-                <string>使能标定</string>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="1">
-              <widget class="QPushButton" name="pushButton_set_sample">
-               <property name="text">
-                <string>采集</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_14">
-               <property name="text">
-                <string>标定点数量：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1">
+             <item row="4" column="1">
               <widget class="QDoubleSpinBox" name="doubleSpinBox_sample_pose0"/>
              </item>
-             <item row="3" column="0">
+             <item row="5" column="2">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_sample_pixel1"/>
+             </item>
+             <item row="4" column="2">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_sample_pixel0"/>
+             </item>
+             <item row="6" column="1">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_sample_pose2"/>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_25">
+               <property name="text">
+                <string>当前标定点：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
               <widget class="QLabel" name="label_32">
                <property name="text">
                 <string>水平：</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_sample_pose1"/>
-             </item>
-             <item row="4" column="2">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_sample_pixel1"/>
-             </item>
-             <item row="0" column="1">
-              <widget class="QSpinBox" name="spinBox_sample_count"/>
-             </item>
-             <item row="5" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_sample_pose2"/>
-             </item>
-             <item row="5" column="0">
-              <widget class="QLabel" name="label_35">
+             <item row="7" column="1">
+              <widget class="QPushButton" name="pushButton_clear_samples">
                <property name="text">
-                <string>左右：</string>
+                <string>清空</string>
                </property>
-              </widget>
-             </item>
-             <item row="6" column="2">
-              <widget class="QPushButton" name="pushButton_run_sample">
-               <property name="text">
-                <string>执行</string>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="2">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_sample_pixel2"/>
-             </item>
-             <item row="1" column="2">
-              <widget class="QCheckBox" name="checkBox_test_track">
-               <property name="text">
-                <string>测试</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QComboBox" name="comboBox_fit_mode">
-               <item>
-                <property name="text">
-                 <string>重合模式</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>同轴模式</string>
-                </property>
-               </item>
               </widget>
              </item>
              <item row="7" column="2">
@@ -2510,10 +2417,77 @@
                </property>
               </widget>
              </item>
-             <item row="7" column="1">
-              <widget class="QPushButton" name="pushButton_clear_samples">
+             <item row="6" column="0">
+              <widget class="QLabel" name="label_35">
                <property name="text">
-                <string>清空</string>
+                <string>左右：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_14">
+               <property name="text">
+                <string>标定点数量：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QComboBox" name="comboBox_sample_number">
+               <property name="currentText">
+                <string>9</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>9</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>5</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>3</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="6" column="2">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_sample_pixel2"/>
+             </item>
+             <item row="5" column="0">
+              <widget class="QLabel" name="label_34">
+               <property name="text">
+                <string>上下：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_42">
+               <property name="text">
+                <string>安装模式：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="comboBox_fit_mode">
+               <item>
+                <property name="text">
+                 <string>重合模式</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>分离模式</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QCheckBox" name="checkBox_fit_calib_en">
+               <property name="text">
+                <string>使能标定</string>
                </property>
               </widget>
              </item>

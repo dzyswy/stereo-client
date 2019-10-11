@@ -4,7 +4,7 @@
 
 
 
-#include "fit_calib_samples.h"
+#include "poly_fit.h"
 #include "stereo_pixel_point.h"
 
 //sensor -> ptz

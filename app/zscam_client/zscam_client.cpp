@@ -1,4 +1,4 @@
-ï»¿#include "zscam_client.h"
+#include "zscam_client.h"
 
 #include <iostream>
 #include <functional>
@@ -149,7 +149,7 @@ void zscam_client::on_pushButton_open_camera_clicked()
 	{
 		ret = camera_->open_device(ip.c_str(), 7070, 9090, index);
 		if (ret < 0) {
-			QMessageBox::warning(this, QString::fromLocal8Bit("é”™è¯¯"), QString::fromLocal8Bit("æ‰“å¼€å¤±è´¥ï¼Œè¯·æ£€æŸ¥è®¾å¤‡æ˜¯å¦ä¸Šç”µæˆ–IPå¡«å†™æ˜¯å¦æ­£ç¡®"));			
+			QMessageBox::warning(this, QString::fromLocal8Bit("´íÎó"), QString::fromLocal8Bit("´ò¿ªÊ§°Ü£¬Çë¼ì²éÉè±¸ÊÇ·ñÉÏµç»òIPÌîÐ´ÊÇ·ñÕýÈ·"));			
 			return;
 		}
 		
@@ -158,7 +158,7 @@ void zscam_client::on_pushButton_open_camera_clicked()
 		open_ = 1;
 		run_thread_ = new std::thread([this] () {stream_process();});
 		init_ui();
-		ui.pushButton_open_camera->setText(QString::fromLocal8Bit("å…³é—­"));
+		ui.pushButton_open_camera->setText(QString::fromLocal8Bit("¹Ø±Õ"));
 		
 	}	
 	else
@@ -171,7 +171,7 @@ void zscam_client::on_pushButton_open_camera_clicked()
 			run_thread_ = NULL;
 		}
 		camera_->close_device();
-		ui.pushButton_open_camera->setText(QString::fromLocal8Bit("è¿žæŽ¥"));
+		ui.pushButton_open_camera->setText(QString::fromLocal8Bit("Á¬½Ó"));
 	}	
 	
 }
@@ -363,7 +363,7 @@ void zscam_client::do_timer_slow_timeout()
 	if (save_avi_ == 2)
 	{
 		save_avi_ = 0;
-		ui.pushButton_record->setText(QString::fromLocal8Bit("å½•åˆ¶"));
+		ui.pushButton_record->setText(QString::fromLocal8Bit("Â¼ÖÆ"));
 	}	
 	
 }
@@ -631,9 +631,9 @@ void zscam_client::init_ui()
 	if (ret == 0) {
 		detect_mode_ = value;
 		if (detect_mode_ == 0) {
-			ui.pushButton_detect_mode->setText(QString::fromLocal8Bit("å¼€å§‹æ£€æµ‹"));
+			ui.pushButton_detect_mode->setText(QString::fromLocal8Bit("¿ªÊ¼¼ì²â"));
 		} else {
-			ui.pushButton_detect_mode->setText(QString::fromLocal8Bit("åœæ­¢æ£€æµ‹"));
+			ui.pushButton_detect_mode->setText(QString::fromLocal8Bit("Í£Ö¹¼ì²â"));
 		}
 	}
 
@@ -853,7 +853,7 @@ void zscam_client::show_poly_mask_points(QPixmap *dst, vector<pair<float, float>
 void zscam_client::on_pushButton_update_clicked()
 {
 	int ret;
-	string src_name = QFileDialog::getOpenFileName(0, QString::fromLocal8Bit("é€‰æ‹©æ–‡ä»¶"), QCoreApplication::applicationDirPath(), QString::fromLocal8Bit("æ‰€æœ‰æ–‡ä»¶(*)")).toStdString();
+	string src_name = QFileDialog::getOpenFileName(0, QString::fromLocal8Bit("Ñ¡ÔñÎÄ¼þ"), QCoreApplication::applicationDirPath(), QString::fromLocal8Bit("ËùÓÐÎÄ¼þ(*)")).toStdString();
 	
 	string ip = ui.comboBox_ip->currentText().toStdString();
 	string ftp_host = ip;
@@ -862,7 +862,7 @@ void zscam_client::on_pushButton_update_clicked()
  
 	ret = xftp.connect_device();
 	if (ret < 0) {
-		QMessageBox::warning(this, QString::fromLocal8Bit("é”™è¯¯"), QString::fromLocal8Bit("è¿žæŽ¥åŒç›®å¤±è´¥"));
+		QMessageBox::warning(this, QString::fromLocal8Bit("´íÎó"), QString::fromLocal8Bit("Á¬½ÓË«Ä¿Ê§°Ü"));
 		return;
 	}
 		 
@@ -873,10 +873,10 @@ void zscam_client::on_pushButton_update_clicked()
 	
 	int isOk = dialog.get_success();
 	if (!isOk) {
-		QMessageBox::warning(this, QString::fromLocal8Bit("é”™è¯¯"), QString::fromLocal8Bit("ä¸Šä¼ å‡çº§åŒ…å¤±è´¥"));
+		QMessageBox::warning(this, QString::fromLocal8Bit("´íÎó"), QString::fromLocal8Bit("ÉÏ´«Éý¼¶°üÊ§°Ü"));
 		return;
 	}
-	QMessageBox::information(this, QString::fromLocal8Bit("æˆåŠŸ"), QString::fromLocal8Bit("å‡çº§æˆåŠŸï¼Œè¯·é‡å¯è®¾å¤‡"));
+	QMessageBox::information(this, QString::fromLocal8Bit("³É¹¦"), QString::fromLocal8Bit("Éý¼¶³É¹¦£¬ÇëÖØÆôÉè±¸"));
 
 }
 
@@ -890,20 +890,20 @@ void zscam_client::on_pushButton_open_ptz_clicked()
 	{
 		ret = xptz_->open_device(ptz_name.c_str());
 		if (ret < 0) {
-			QMessageBox::warning(this, QString::fromLocal8Bit("é”™è¯¯"), QString::fromLocal8Bit("æ‰“å¼€å¤±è´¥"));			
+			QMessageBox::warning(this, QString::fromLocal8Bit("´íÎó"), QString::fromLocal8Bit("´ò¿ªÊ§°Ü"));			
 			return;
 		}
 		
 		ptz_open_ = 1;
 	//	init_ui();
-		ui.pushButton_open_ptz->setText(QString::fromLocal8Bit("å…³é—­"));
+		ui.pushButton_open_ptz->setText(QString::fromLocal8Bit("¹Ø±Õ"));
 		
 	}	
 	else
 	{
 		ptz_open_ = 0;
 		xptz_->close_device();
-		ui.pushButton_open_ptz->setText(QString::fromLocal8Bit("è¿žæŽ¥"));
+		ui.pushButton_open_ptz->setText(QString::fromLocal8Bit("Á¬½Ó"));
 	}
 }
 
@@ -929,18 +929,18 @@ void zscam_client::on_pushButton_ptz_track_run_clicked()
 		xtrack_->set_track_coord(ptz_track_coord);
 		ret = xtrack_->run();
 		if (ret < 0) {
-			QMessageBox::warning(this, QString::fromLocal8Bit("é”™è¯¯"), QString::fromLocal8Bit("å¯åŠ¨è·Ÿè¸ªå¤±è´¥"));			
+			QMessageBox::warning(this, QString::fromLocal8Bit("´íÎó"), QString::fromLocal8Bit("Æô¶¯¸ú×ÙÊ§°Ü"));			
 			return;
 		}
 		
 		ptz_track_run_ = 1;
-		ui.pushButton_open_ptz->setText(QString::fromLocal8Bit("åœæ­¢è·Ÿè¸ª"));
+		ui.pushButton_open_ptz->setText(QString::fromLocal8Bit("Í£Ö¹¸ú×Ù"));
 	}	
 	else
 	{
 		xtrack_->stop();
 		ptz_track_run_ = 0;
-		ui.pushButton_open_ptz->setText(QString::fromLocal8Bit("å¼€å§‹è·Ÿè¸ª"));
+		ui.pushButton_open_ptz->setText(QString::fromLocal8Bit("¿ªÊ¼¸ú×Ù"));
 	}	
 }
 
@@ -1236,7 +1236,6 @@ int zscam_client::save_config(const char *config_name)
 	
 	return 0;
 }
-
 
 
 

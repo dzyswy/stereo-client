@@ -102,23 +102,13 @@ public:
 	int width;
 	int height;
 	int going;
+	
+	QTimer *timer_slow_; 
+	
+	
 	stereo_camera *camera_;
-	QTimer *timer_slow_;
-	media_record xrecord;
-	
-	stereo_filter *xfilter_;
-	ptz_ctl_visca *xptz_;
-	fit_calib *xfit_;
-	ptz_track *xtrack_;
-	
-	
-	
 	int open_;
-	int ptz_open_;
-	int ptz_track_run_;
-	std::string ptz_name_;
-	
-	
+
 	QPixmap pixmap_;
 	std::vector<struct stereo_detect_box> detect_boxes_;
 	struct stereo_gyro_angle gyro_angle_;
@@ -161,16 +151,26 @@ public:
 	int show_poly_mask_mode_;
 	vector<pair<float, float> > poly_mask_points_[2];
 	
+	
+	stereo_filter *xfilter_;
 	int number_state_;
 	struct stereo_detect_box focus_box_; 
 	int statble_state_;
-
-	int show_fit_calib_sample_mode_;
-	int test_track_mode_;
-	struct fit_calib_ptz_pose pose_sample_;
-	struct fit_calib_stereo_pixel pixel_sample_;
+	 
 	
+	ptz_ctl_visca *xptz_;
+	fit_calib *xfit_;
+	ptz_track *xtrack_;
 	
+	int ptz_open_;
+	int ptz_track_run_;
+	std::string ptz_name_;
+	
+	int fit_calib_en_mode_;
+	struct fit_calib_ptz_pose ptz_pose_;
+	struct fit_calib_stereo_pixel stereo_pixel_;
+	
+	vector<pair<int, int> > sample_points_;
 
 signals:
 	void fresh_frame_signal();	
@@ -737,45 +737,14 @@ private slots:
 	//ptz
 	void on_pushButton_open_ptz_clicked();
 	void on_pushButton_ptz_track_run_clicked();
-	void on_spinBox_sample_count_valueChanged(int value); 
-	void on_comboBox_sample_coord_currentIndexChanged(int index);
+	void on_checkBox_fit_calib_en_stateChanged(int arg1);
+	void on_comboBox_fit_mode_currentIndexChanged(int index);
+	void on_comboBox_sample_size_currentIndexChanged(int index); 
 	void on_comboBox_sample_index_currentIndexChanged(int index);
-	void on_pushButton_get_sample_clicked();
-	void on_pushButton_set_sample_clicked();
-	void on_pushButton_run_sample_clicked();
+	void on_pushButton_clear_samples_clicked();
 	void on_pushButton_fit_calib_clicked();
-	void on_checkBox_fit_calib_en_stateChanged(int arg1)
-	{
-		if (!ptz_open_)
-			return;
-		
-		switch (arg1)
-		{
-		case Qt::Unchecked:
-			show_fit_calib_sample_mode_ = 0;
-			break;
-		case Qt::Checked:
-			show_fit_calib_sample_mode_ = 1;
-			break;
-		}
-	}
-	void on_checkBox_test_track_stateChanged(int arg1)
-	{
-		if (!ptz_open_)
-			return;
-		
-		switch (arg1)
-		{
-		case Qt::Unchecked:
-			test_track_mode_ = 0;
-			break;
-		case Qt::Checked:
-			test_track_mode_ = 1;
-			break;
-		}
-	}
 	
-	
+
 	/*
 	void on_checkBox_datascreen_stateChanged(int arg1)
 	{
