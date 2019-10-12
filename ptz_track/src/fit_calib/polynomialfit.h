@@ -27,8 +27,8 @@ public:
     virtual bool setSample(double *x ,
                            double *y ,
                            int count ,
-                           bool enableWeight  ,
-                           double *w );
+                           bool enableWeight = false ,
+                           double *w = NULL);
 
     virtual float getResult(int y); // 获取计算的结果
     virtual bool process();

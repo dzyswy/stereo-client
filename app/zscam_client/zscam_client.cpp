@@ -407,25 +407,14 @@ void zscam_client::do_video_label_mouse_pressed(int x, int y)
 	
 	if (fit_calib_en_mode_)
 	{
-		int sample_index = ui.comboBox_sample_index->currentIndex();
-		
-		sample_points_[sample_index] = make_pair(x, y);
-		
 		int pan_pose = 0, tilt_pose = 0, zoom_pose = 0;
 		xptz_->get_pantilt_position(&pan_pose, &tilt_pose);
 		xptz_->get_zoom_position(&zoom_pose);
 		
-		xfit_->set_sample(pan_pose, tilt_pose, zoom_pose, detect_box, sample_index);
-		
-		ret = xfit_->get_sample(ptz_pose_, detect_pose_, sample_index);
-		if (ret < 0)
-		{
-			memset(&ptz_pose_, 0, sizeof(ptz_pose_));
-			memset(&detect_pose_, 0, sizeof(detect_pose_));
-		}	
+		xfit_->sample_ptz_pose(pan_pose, tilt_pose, zoom_pose, ptz_pose_);
+		xfit_->sample_detect_pose(detect_box, detect_pose_);
 		
 		show_fit_calib_sample();
-		
 	}	 
 }
 

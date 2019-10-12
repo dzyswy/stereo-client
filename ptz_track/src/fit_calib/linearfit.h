@@ -46,8 +46,8 @@ public:
     bool setSample(double *x,
                   double *y,
                   int count ,
-                  bool enableWeight ,
-                  double *w ); // 设置样本
+                  bool enableWeight = false,
+                  double *w = NULL); // 设置样本
     bool process(); // 处理，添加拟合优度的计算
 
 protected:
@@ -70,8 +70,8 @@ public:
     bool setSample(double *x,
                   double *y,
                   int count ,
-                  bool enableWeight ,
-                  double *w ); // 设置样本
+                  bool enableWeight = false,
+                  double *w = NULL); // 设置样本
 
 
     double func(double x);
@@ -89,8 +89,8 @@ public:
     bool setSample(double *x,
                   double *y,
                   int count ,
-                  bool enableWeight ,
-                  double *w ); // 设置样本
+                  bool enableWeight = false,
+                  double *w = NULL); // 设置样本
 
     double func(double x);
     float getResult(int y); // 系数从左到右分别对应0、1、2...n
@@ -107,8 +107,8 @@ public:
     bool setSample(double *x,
                   double *y,
                   int count ,
-                  bool enableWeight ,
-                  double *w ); // 设置样本
+                  bool enableWeight = false,
+                  double *w = NULL); // 设置样本
 
     double func(double x);
     float getResult(int y); // 系数从左到右分别对应0、1、2...n

@@ -170,8 +170,7 @@ public:
 	int fit_calib_en_mode_;
 	struct fit_calib_ptz_pose ptz_pose_;
 	struct fit_calib_detect_pose detect_pose_;
-	
-	vector<pair<int, int> > sample_points_;
+	std::vector<pair<struct fit_calib_ptz_pose, struct stereo_detect_box> > fit_samples_;
 
 signals:
 	void fresh_frame_signal();	

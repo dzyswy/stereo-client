@@ -62,73 +62,27 @@ int fit_calib::get_fit_mode()
 }
 
 
-int fit_calib::set_sample(int pan, int tilt, int zoom, struct stereo_detect_box &detect_box, int index)
-{
-	int sample_size = get_sample_size();
-	if ((index < 0) || (index >= sample_size))
-		return -1;
-	
-	struct fit_calib_ptz_pose ptz_pose = {0};
-	struct fit_calib_detect_pose detect_pose = {0};
-	
-	ptz_pose.val[FIT_CALIB_PTZ_PAN] = pan;
-	ptz_pose.val[FIT_CALIB_PTZ_TILT] = tilt;
-	ptz_pose.val[FIT_CALIB_PTZ_ZOOM] = zoom;
-	
-	to_detect_pose(detect_box, detect_pose);
-	
-	for (int i = 0; i < FIT_CALIB_PTZ_MAX_CHANNEL; i++)
-	{
-		samples_[i][index] = make_pair(ptz_pose.val[i], detect_pose.val[i]);
-	}	
-	 
-	return 0;
-}
-
-int fit_calib::get_sample(struct fit_calib_ptz_pose &ptz_pose, struct fit_calib_detect_pose &detect_pose, int index)
-{
-	int sample_size = get_sample_size();
-	if ((index < 0) || (index >= sample_size))
-		return -1;
-	
-	for (int i = 0; i < FIT_CALIB_PTZ_MAX_CHANNEL; i++)
-	{
-		ptz_pose.val[i] = samples_[i][index].first;
-		detect_pose.val[i] = samples_[i][index].second; 
-	}	 
-	
-	return 0;
-}	
-
-
-
-void fit_calib::clear_samples()
-{
-	for (int i = 0; i < FIT_CALIB_PTZ_MAX_CHANNEL; i++)
-	{
-		samples_[i].clear();
-	}	
-}
-
-void fit_calib::set_sample_size(int value)
-{
-	for (int i = 0; i < FIT_CALIB_PTZ_MAX_CHANNEL; i++)
-	{
-		samples_[i].resize(value);
-	}
-}
-
-int fit_calib::get_sample_size()
-{
-	return samples_[0].size();
-}
-
-int fit_calib::compute()
+int fit_calib::compute(std::vector<pair<struct fit_calib_ptz_pose, struct fit_calib_detect_pose> > &samples)
 {
 	int ret;
+	
+	if (samples.size() < 3)
+		return -1;
+	
+	vector<pair<float, float> > samps[FIT_CALIB_PTZ_MAX_CHANNEL];
+	for (int i = 0; i < samples.size(); i++)
+	{
+		struct fit_calib_ptz_pose &ptz_pose = samples[i].first;
+		struct fit_calib_detect_pose &detect_pose = samples[i].second;
+		for (int j = 0; j < FIT_CALIB_PTZ_MAX_CHANNEL; j++)
+		{
+			samps[j].push_back(make_pair(ptz_pose.val[j], detect_pose.val[j]));
+		}	
+	}	
+
 	for (int i = 0; i < FIT_CALIB_PTZ_MAX_CHANNEL; i++)
 	{
-		ret = fits_[i]->compute(samples_[i], degree_[i]);
+		ret = fits_[i]->compute(samps[i], degree_[i]);
 		if (ret < 0)
 			return -1;
 	}	
@@ -136,21 +90,34 @@ int fit_calib::compute()
 	return 0;
 }
 
-void fit_calib::to_ptz_pose(struct stereo_detect_box &detect_box, struct fit_calib_ptz_pose &ptz_pose)
+void fit_calib::calc_ptz_pose(struct stereo_detect_box &detect_box, struct fit_calib_ptz_pose &ptz_pose)
 {
 	struct fit_calib_detect_pose detect_pose = {0};
-	to_detect_pose(detect_box, detect_pose);
+	sample_detect_pose(detect_box, detect_pose);
 	for (int i = 0; i < FIT_CALIB_PTZ_MAX_CHANNEL; i++)
 	{
 		ptz_pose.val[i] = (int)fits_[i]->calc_fit(detect_pose.val[i]);
 	}	
 }
 
-void fit_calib::to_detect_pose(struct stereo_detect_box &detect_box, struct fit_calib_detect_pose &detect_pose)
+void fit_calib::sample_ptz_pose(int pan, int tilt, int zoom, struct fit_calib_ptz_pose &ptz_pose)
+{
+	ptz_pose.val[FIT_CALIB_PTZ_PAN] = pan;
+	ptz_pose.val[FIT_CALIB_PTZ_TILT] = tilt;
+	ptz_pose.val[FIT_CALIB_PTZ_ZOOM] = zoom;
+}
+
+void fit_calib::sample_detect_pose(struct stereo_detect_box &detect_box, struct fit_calib_detect_pose &detect_pose)
 {
 	switch(coord_)
 	{
 		case FIT_CALIB_GRAPH_COORD:
+		{
+			detect_pose.val[FIT_CALIB_PTZ_PAN] = (float)detect_box.box_x;
+			detect_pose.val[FIT_CALIB_PTZ_TILT] = (float)detect_box.box_y;
+			detect_pose.val[FIT_CALIB_PTZ_ZOOM] = (float)detect_box.box_w;
+		}break; 
+		case FIT_CALIB_DEPTH_COORD:
 		{
 			detect_pose.val[FIT_CALIB_PTZ_PAN] = (float)detect_box.x;
 			detect_pose.val[FIT_CALIB_PTZ_TILT] = (float)detect_box.y;

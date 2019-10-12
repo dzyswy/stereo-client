@@ -21,6 +21,8 @@ protected:
 public:
 	void set_paras(std::vector<double> &value)
 	{
+		if (value.size() < 2)
+			return;
 		paras_ = value;
 	}
 	
