@@ -7,7 +7,7 @@
 class pid_inc
 {
 public:
-	pid_inc();
+	pid_inc(int debug = 0);
 	float compute(float err);
 	void pid_reset(float err)
 	{
@@ -64,6 +64,7 @@ public:
 	}
 	
 private:
+	int debug_;
 	float kp;
 	float ki;
 	float kd;

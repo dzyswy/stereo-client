@@ -82,6 +82,8 @@ public:
 	
 	
 private:
+	int open_camera(string ip, int index);
+	int close_camera();
 	void stream_process();
 	void show_detect_boxes(QPixmap *dst, vector<struct stereo_detect_box> &target_boxes);
 	void show_detect_box(QPixmap *dst, struct stereo_detect_box &detect_box, QColor color, Qt::PenStyle style = Qt::SolidLine, float line = 2);
@@ -155,7 +157,7 @@ public:
 	stereo_filter *xfilter_;
 	int number_state_;
 	struct stereo_detect_box focus_box_; 
-	int statble_state_;
+	int stable_state_;
 	 
 	
 	ptz_ctl_visca *xptz_;
@@ -168,9 +170,12 @@ public:
 	std::string ptz_name_;
 	
 	int fit_calib_en_mode_;
+	int sample_x_;
+	int sample_y_;
 	struct fit_calib_ptz_pose ptz_pose_;
 	struct fit_calib_detect_pose detect_pose_;
-	std::vector<pair<struct fit_calib_ptz_pose, struct stereo_detect_box> > fit_samples_;
+	std::vector<pair<struct fit_calib_ptz_pose, struct fit_calib_detect_pose> > fit_samples_;
+	std::vector<pair<float, float> > sample_points_;
 
 signals:
 	void fresh_frame_signal();	
@@ -739,17 +744,14 @@ private slots:
 	void on_comboBox_ptz_track_mode_currentIndexChanged(int index);
 	void on_checkBox_fit_calib_en_stateChanged(int arg1);
 	void on_comboBox_fit_mode_currentIndexChanged(int index);
-	void on_spinBox_sample_size_valueChanged(int value); 
-	void on_comboBox_sample_index_currentIndexChanged(int index);
-	void on_pushButton_fit_calib_clicked();
+	void on_pushButton_fit_clear_sample_clicked();
+	void on_pushButton_fit_add_sample_clicked();
+	void on_pushButton_fit_compute_clicked();
 	
 
-	/*
+
 	void on_checkBox_datascreen_stateChanged(int arg1)
 	{
-		if (!ptz_open_)
-			return;
-		
 		switch (arg1)
 		{
 		case Qt::Unchecked:
@@ -759,7 +761,7 @@ private slots:
 			xptz_->set_datascreen_on();
 			break;
 		}
-	}*/
+	}
 	
 	void on_toolButton_UL_pressed()
 	{
@@ -904,32 +906,45 @@ private slots:
 		xfilter_->set_min_stable_count(value);
 	}
 	
-	
-	
-	void on_pushButton_set_pid_clicked()
+	void on_comboBox_pid_channel_currentIndexChanged(int index)
+	{
+		int channel = index;
+		ui.doubleSpinBox_pid_kp->setValue((double)xtrack_->get_kp(channel));
+		ui.doubleSpinBox_pid_ki->setValue((double)xtrack_->get_ki(channel));
+		ui.doubleSpinBox_pid_kd->setValue((double)xtrack_->get_kd(channel));
+		ui.doubleSpinBox_pid_dead_zone->setValue((double)xtrack_->get_dead_zone(channel));
+		ui.doubleSpinBox_pid_max_limit->setValue((double)xtrack_->get_max_limit(channel));
+	}
+ 
+	void on_doubleSpinBox_pid_kp_valueChanged(double value)
 	{
 		int channel = ui.comboBox_pid_channel->currentIndex();
-		float kp = (float)ui.doubleSpinBox_pid_kp->value();
-		float ki = (float)ui.doubleSpinBox_pid_ki->value();
-		float kd = (float)ui.doubleSpinBox_pid_kd->value();
-		float dead_zone = (float)ui.doubleSpinBox_pid_dead_zone->value();
-		float max_limit = (float)ui.doubleSpinBox_pid_max_limit->value();
-		
-		xtrack_->set_kp(channel, kp);
-		xtrack_->set_ki(channel, ki);
-		xtrack_->set_kd(channel, kd);
-		xtrack_->set_dead_zone(channel, dead_zone);
-		xtrack_->set_max_limit(channel, max_limit); 
+		xtrack_->set_kp(channel, (float)value);
 	}
 	
-	 
-	void on_spinBox_track_lock_time_valueChanged(int value)
+	void on_doubleSpinBox_pid_ki_valueChanged(double value)
 	{
-		xtrack_->set_lock_time(value);
+		int channel = ui.comboBox_pid_channel->currentIndex();
+		xtrack_->set_ki(channel, (float)value);
 	}
 	
+	void on_doubleSpinBox_pid_kd_valueChanged(double value)
+	{
+		int channel = ui.comboBox_pid_channel->currentIndex();
+		xtrack_->set_kd(channel, (float)value);
+	}
 	
-
+	void on_doubleSpinBox_pid_dead_zone_valueChanged(double value)
+	{
+		int channel = ui.comboBox_pid_channel->currentIndex();
+		xtrack_->set_dead_zone(channel, (float)value);
+	}
+	
+	void on_doubleSpinBox_pid_max_limit_valueChanged(double value)
+	{
+		int channel = ui.comboBox_pid_channel->currentIndex();
+		xtrack_->set_max_limit(channel, (float)value);
+	}
 };
 
 #endif // ZSCAM_CLIENT_H

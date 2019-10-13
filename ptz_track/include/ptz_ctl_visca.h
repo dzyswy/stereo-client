@@ -28,6 +28,9 @@ public:
 	
 	int open_device(const char *dev_name);
 	int close_device();
+	
+	int set_datascreen_off();
+	int set_datascreen_on();
 	 
 	int set_pantilt_left(int pan_speed = -1, int tilt_speed = -1);
 	int set_pantilt_right(int pan_speed = -1, int tilt_speed = -1);
@@ -61,6 +64,66 @@ public:
 	void set_zoom_speed(int value)
 	{
 		zoom_speed_ = (value < min_zoom_speed_) ? min_zoom_speed_ : ((value > max_zoom_speed_) ? max_zoom_speed_ : value);
+	}
+	
+	int set_min_pan_speed(int value)
+	{
+		min_pan_speed_ = value;
+	}
+	
+	int set_max_pan_speed(int value)
+	{
+		max_pan_speed_ = value;
+	}
+	
+	int set_min_tilt_speed(int value)
+	{
+		min_tilt_speed_ = value;
+	}
+	
+	int set_max_tilt_speed(int value)
+	{
+		max_tilt_speed_ = value;
+	}
+	
+	int set_min_zoom_speed(int value)
+	{
+		min_zoom_speed_ = value;
+	}
+	
+	int set_max_zoom_speed(int value)
+	{
+		max_zoom_speed_ = value;
+	}
+	
+	int set_min_pan_position(int value)
+	{
+		min_pan_position_ = value;
+	}
+	
+	int set_max_pan_position(int value)
+	{
+		max_pan_position_ = value;
+	}
+	
+	int set_min_tilt_position(int value)
+	{
+		min_tilt_position_ = value;
+	}
+	
+	int set_max_tilt_position(int value)
+	{
+		max_tilt_position_ = value;
+	}
+	
+	int set_min_zoom_position(int value)
+	{
+		min_zoom_position_ = value;
+	}
+	
+	int set_max_zoom_position(int value)
+	{
+		max_zoom_position_ = value;
 	}
 	
 	int is_opened()
@@ -114,6 +177,36 @@ public:
 		return max_zoom_speed_;
 	}
 	
+	int get_min_pan_position()
+	{
+		return min_pan_position_;
+	}
+	
+	int get_max_pan_position()
+	{
+		return max_pan_position_;
+	}
+	
+	int get_min_tilt_position()
+	{
+		return min_tilt_position_;
+	}
+	
+	int get_max_tilt_position()
+	{
+		return max_tilt_position_;
+	}
+	
+	int get_min_zoom_position()
+	{
+		return min_zoom_position_;
+	}
+	
+	int get_max_zoom_position()
+	{
+		return max_zoom_position_;
+	}
+	
 	
 	int get_pantilt_position(int *pan_position, int *tilt_position);
 	int get_zoom_position(int *zoom_position);
@@ -153,7 +246,12 @@ protected:
 	int min_zoom_speed_;
 	int max_zoom_speed_;
 	
-	
+	int min_pan_position_;
+	int max_pan_position_;
+	int min_tilt_position_;
+	int max_tilt_position_;
+	int min_zoom_position_;
+	int max_zoom_position_;
 };
 
 

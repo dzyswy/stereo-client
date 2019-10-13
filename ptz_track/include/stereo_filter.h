@@ -27,7 +27,7 @@ class stereo_filter
 public:
 	stereo_filter(stereo_camera *camera);
 	
-	void compute(std::vector<struct stereo_detect_box> &detect_boxes, int &number_state, struct stereo_detect_box &focus_box, int &statble_state);
+	void compute(std::vector<struct stereo_detect_box> &detect_boxes, int &number_state, struct stereo_detect_box &focus_box, int &stable_state);
 	void clear_filter();
 
 	
@@ -49,7 +49,7 @@ protected:
 	
 	struct stereo_detect_box pre_focus_box_;
 	struct stereo_detect_box focus_boxes_[STEREO_FILTER_MAX_FOCUS_BOX_NUM];
-	int statble_count_;
+	int stable_count_;
 	
 	
 public:

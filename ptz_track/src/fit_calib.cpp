@@ -13,11 +13,12 @@
 using namespace std;
 
 
-fit_calib::fit_calib()
+fit_calib::fit_calib(int debug)
 {
+	debug_ = debug;
 	for (int i = 0; i < FIT_CALIB_PTZ_MAX_CHANNEL; i++)
 	{
-		fits_[i] = new poly_fit;
+		fits_[i] = new poly_fit(1);
 	}	
 	
 	fit_mode_ = FIT_CALIB_CLOSE_TO_MODE;
@@ -43,7 +44,7 @@ void fit_calib::set_fit_mode(int value)
 			coord_ = FIT_CALIB_BALL_COORD;
 			degree_[FIT_CALIB_PTZ_PAN] = 1;
 			degree_[FIT_CALIB_PTZ_TILT] = 1;
-			degree_[FIT_CALIB_PTZ_ZOOM] = 3;
+			degree_[FIT_CALIB_PTZ_ZOOM] = 1;
 			
 		}break;
 		case FIT_CALIB_IN_LINE_MODE:
@@ -62,9 +63,11 @@ int fit_calib::get_fit_mode()
 }
 
 
-int fit_calib::compute(std::vector<pair<struct fit_calib_ptz_pose, struct fit_calib_detect_pose> > &samples)
+int fit_calib::compute(std::vector<std::pair<struct fit_calib_ptz_pose, struct fit_calib_detect_pose> > &samples)
 {
 	int ret;
+	
+	printf("sample size: %d\n", samples.size());
 	
 	if (samples.size() < 3)
 		return -1;
@@ -76,15 +79,18 @@ int fit_calib::compute(std::vector<pair<struct fit_calib_ptz_pose, struct fit_ca
 		struct fit_calib_detect_pose &detect_pose = samples[i].second;
 		for (int j = 0; j < FIT_CALIB_PTZ_MAX_CHANNEL; j++)
 		{
-			samps[j].push_back(make_pair(ptz_pose.val[j], detect_pose.val[j]));
+			samps[j].push_back(make_pair(detect_pose.val[j], ptz_pose.val[j]));
 		}	
 	}	
 
 	for (int i = 0; i < FIT_CALIB_PTZ_MAX_CHANNEL; i++)
 	{
 		ret = fits_[i]->compute(samps[i], degree_[i]);
-		if (ret < 0)
+		if (ret < 0) {
+			printf("fit compute error!\n");
 			return -1;
+		}
+			
 	}	
 	
 	return 0;
@@ -96,7 +102,13 @@ void fit_calib::calc_ptz_pose(struct stereo_detect_box &detect_box, struct fit_c
 	sample_detect_pose(detect_box, detect_pose);
 	for (int i = 0; i < FIT_CALIB_PTZ_MAX_CHANNEL; i++)
 	{
-		ptz_pose.val[i] = (int)fits_[i]->calc_fit(detect_pose.val[i]);
+		ptz_pose.val[i] = fits_[i]->calc_fit(detect_pose.val[i]);
+	}	
+	
+	if (debug_)
+	{
+		printf("(%f %f %f) -> (%f %f %f)\n", detect_pose.val[0], detect_pose.val[1], detect_pose.val[2], 
+											ptz_pose.val[0], ptz_pose.val[1], ptz_pose.val[2]);
 	}	
 }
 
@@ -183,21 +195,24 @@ int fit_calib::set_paras(string &value)
 		para.resize(jpans.size());
 		for (int i = 0; i < jpans.size(); i++)
 		{
-			para[i] = jpans[i].asDouble();
+			Json::Value jpan = jpans[i];
+			para[i] = jpan["pan"].asDouble();
 		}	
 		fits_[FIT_CALIB_PTZ_PAN]->set_paras(para);
 		
 		para.resize(jtilts.size());
 		for (int i = 0; i < jtilts.size(); i++)
 		{
-			para[i] = jtilts[i].asDouble();
+			Json::Value jtilt = jtilts[i];
+			para[i] = jtilt["tilt"].asDouble();
 		}	
 		fits_[FIT_CALIB_PTZ_TILT]->set_paras(para);
 		
 		para.resize(jzooms.size());
 		for (int i = 0; i < jzooms.size(); i++)
 		{
-			para[i] = jzooms[i].asDouble();
+			Json::Value jzoom = jzooms[i];
+			para[i] = jzoom["zoom"].asDouble();
 		}	
 		fits_[FIT_CALIB_PTZ_ZOOM]->set_paras(para);
 		

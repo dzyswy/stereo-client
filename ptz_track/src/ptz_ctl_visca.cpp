@@ -26,6 +26,13 @@ ptz_ctl_visca::ptz_ctl_visca()
 	min_zoom_speed_ = 0;
 	max_zoom_speed_ = 7;
 	
+	min_pan_position_ = -2448;
+	max_pan_position_ = 2448;
+	min_tilt_position_ = -432;
+	max_tilt_position_ = 1296;
+	min_zoom_position_ = 0;
+	max_zoom_position_ = 16384;
+	
 	interface_ = new _VISCA_interface;
 	camera_ = new _VISCA_camera;
 }
@@ -69,12 +76,35 @@ int ptz_ctl_visca::open_device(const char *dev_name)
 int ptz_ctl_visca::close_device() 
 {
 	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
+	
 	VISCA_close_serial(interface_);
 	open_ = 0;
 	return 0;
 } 
 	
+int ptz_ctl_visca::set_datascreen_off()
+{
+	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
 	
+	if (VISCA_set_datascreen_off(interface_, camera_) != VISCA_SUCCESS)
+		return -1;
+	return 0;
+}
+
+int ptz_ctl_visca::set_datascreen_on()
+{
+	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
+	
+	if (VISCA_set_datascreen_on(interface_, camera_) != VISCA_SUCCESS)
+		return -1;
+	return 0;
+}	
 
 	
 int ptz_ctl_visca::set_pantilt_left(int pan_speed, int tilt_speed) 
@@ -308,8 +338,8 @@ int ptz_ctl_visca::get_zoom_position(int *zoom_position)
 	if (!open_)
 		return -1;
 	
-	uint16_t zoomPosition;
-	if (VISCA_get_zoom_value(interface_, camera_, (uint16_t *)zoomPosition) != VISCA_SUCCESS)
+	uint16_t zoomPosition = 0;
+	if (VISCA_get_zoom_value(interface_, camera_, (uint16_t *)&zoomPosition) != VISCA_SUCCESS)
 		return -1;
 	*zoom_position = zoomPosition;
 	return 0;

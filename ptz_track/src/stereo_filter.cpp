@@ -18,7 +18,7 @@ stereo_filter::stereo_filter(stereo_camera *camera)
 	clear_filter(); 
 }
 
-void stereo_filter::compute(std::vector<struct stereo_detect_box> &detect_boxes, int &number_state, struct stereo_detect_box &focus_box, int &statble_state)
+void stereo_filter::compute(std::vector<struct stereo_detect_box> &detect_boxes, int &number_state, struct stereo_detect_box &focus_box, int &stable_state)
 { 
 	int detect_count = detect_boxes.size();
 	if (detect_count == 0) {
@@ -171,16 +171,16 @@ void stereo_filter::compute(std::vector<struct stereo_detect_box> &detect_boxes,
 		 
 		if (dist < stable_distance_)
 		{
-			statble_count_++;
+			stable_count_++;
 		}	
 		else
 		{
-			statble_count_ = 0;
+			stable_count_ = 0;
 		}
 		
 	}	
 	
-	statble_state = (statble_count_ >= min_stable_count_) ? 1 : 0;	
+	stable_state = (stable_count_ >= min_stable_count_) ? 1 : 0;	
 	
 	
 	frame_count_++;	 
@@ -197,7 +197,7 @@ void stereo_filter::clear_filter()
 	memset(&number_count_, 0, sizeof(number_count_));
  
 	memset(&pre_focus_box_, 0, sizeof(pre_focus_box_));
-	statble_count_ = 0;
+	stable_count_ = 0;
 	
 	memset(&focus_boxes_[0], 0, sizeof(focus_boxes_));
 }

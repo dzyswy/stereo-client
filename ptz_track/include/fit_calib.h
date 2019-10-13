@@ -53,7 +53,7 @@ struct fit_calib_detect_pose
 class fit_calib
 {
 public:
-	fit_calib();
+	fit_calib(int debug = 0);
 	~fit_calib();
 
 	void set_fit_mode(int value);
@@ -61,7 +61,7 @@ public:
  
 
 	
-	int compute(std::vector<pair<struct fit_calib_ptz_pose, struct fit_calib_detect_pose> > &samples);
+	int compute(std::vector<std::pair<struct fit_calib_ptz_pose, struct fit_calib_detect_pose> > &samples);
 	void calc_ptz_pose(struct stereo_detect_box &detect_box, struct fit_calib_ptz_pose &ptz_pose);
 	
 	int set_paras(std::string &value);
@@ -71,9 +71,11 @@ public:
 	void sample_detect_pose(struct stereo_detect_box &detect_box, struct fit_calib_detect_pose &detect_pose);
 
 protected:
+	int debug_;
 	int fit_mode_;
 	int coord_;
 	int degree_[FIT_CALIB_PTZ_MAX_CHANNEL];
+	
 	  
 	poly_fit *fits_[FIT_CALIB_PTZ_MAX_CHANNEL];
 	
