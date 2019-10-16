@@ -62,10 +62,23 @@ make -j8
 ./bin/zscam_client    
 
 
+1.3.3 交叉编译     
 
+仅供参考，需要修改*.cmake文件。   
 
+1.3.3.1 32位ARM   
+mkdir build-zynq    
+cd build-zynq     
+cmake -DCMAKE_TOOLCHAIN_FILE=../mpsoc.cmake -DCMAKE_INSTALL_PREFIX=../../out ..     
+make -j4    
+make install   
 
-
+1.3.3.2 64位ARM     
+mkdir build-mpsoc    
+cd build-mpsoc    
+cmake -DCMAKE_TOOLCHAIN_FILE=../zscam.cmake -DCMAKE_INSTALL_PREFIX=../../out ..    
+make -j4   
+make install    
 
 
 
