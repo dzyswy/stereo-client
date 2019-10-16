@@ -78,8 +78,21 @@ mkdir build-mpsoc
 cd build-mpsoc    
 cmake -DCMAKE_TOOLCHAIN_FILE=../zscam.cmake -DCMAKE_INSTALL_PREFIX=../../out ..    
 make -j4   
-make install    
+make install   
 
+
+1.3.3.4 3531编译
+export PATH=/opt/hisi-linux/x86-arm/arm-hisiv300-linux/bin:$PATH
+cmake -DCMAKE_TOOLCHAIN_FILE=../3531.cmake -DCMAKE_INSTALL_PREFIX=../../out ..    
+make -j4   
+make install  
+
+注意：    
+出现报错：    
+error while loading shared libraries: libz.so.1: cannot open shared object     
+
+解决方法：
+sudo apt-get install lib32ncurses5 lib32z1
 
 
 
