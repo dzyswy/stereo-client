@@ -82,7 +82,6 @@ make install
 
 
 1.3.3.4 3531编译
-export PATH=/opt/hisi-linux/x86-arm/arm-hisiv300-linux/bin:$PATH
 cmake -DCMAKE_TOOLCHAIN_FILE=../3531.cmake -DCMAKE_INSTALL_PREFIX=../../out ..    
 make -j4   
 make install  
