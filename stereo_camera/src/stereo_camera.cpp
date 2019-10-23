@@ -1,31 +1,29 @@
 #include "stereo_camera.h"
-
-#include "discovery_receiver.h"
-#include "command_client.h"
-#include "stream_receiver.h"
+#include "rpc_client.h"
+#include "stream_client.h"
+#include "json_detect_boxes.h"
+#include "json_gyro_angle.h"
+#include "json_pixel_point.h"
+#include "json_float_pairs.h"
 
 using namespace std;
 
-stereo_camera::stereo_camera(const char *device_name, int port, int poll_time, int debug)
+
+
+
+
+stereo_camera::stereo_camera(int debug)
 {
 	open_ = 0;
-	xfind = new discovery_receiver(device_name, port, poll_time);
-	xcmd_ = new command_client;
-	xstream_ = new stream_receiver(debug);
+	xcmd_ = new rpc_client;
+	xstream_ = new stream_client(debug);
 }
 
 
 stereo_camera::~stereo_camera()
 {
-	close_device();
-	delete xcmd_;
 	delete xstream_;
-	delete xfind;
-}
-
-void stereo_camera::get_device_nodes(std::vector<std::string> &device_nodes)
-{
-	xfind->get_device_nodes(device_nodes);
+	delete xcmd_;
 }
 
 
@@ -93,7 +91,13 @@ int stereo_camera::set_poly_mask(std::vector<std::pair<float, float> > &value, i
 	if (!open_)
 		return -1;
 	
-	return xcmd_->set_poly_mask(value, timeout);
+	json_float_pairs temp(value);
+	string val = "";
+	ret = temp.to_string(val);
+	if (ret < 0)
+		return -1;
+	
+	return xcmd_->set_value("poly_mask", val, timeout);
 }
 
 
@@ -126,11 +130,24 @@ int stereo_camera::get_value(const char *cmd, std::string &value, int timeout)
 
 int stereo_camera::get_poly_mask(std::vector<std::pair<float, float> > &value, int timeout)
 {
+	int ret;
 	std::unique_lock<std::mutex> lock(mux_);
 	if (!open_)
 		return -1;
 	
-	return xcmd_->get_poly_mask(value, timeout);
+	string val = "";
+	ret = xcmd_->get_value("poly_mask", val, timeout);
+	if (ret < 0)
+		return -1;
+	
+	json_float_pairs temp;
+	ret = temp.from_string(val);
+	if (ret < 0)
+		return -1;
+	
+	value = temp.to_struct();
+	
+	return 0;
 }
 
 int stereo_camera::do_action(const char *para, int timeout)
@@ -144,11 +161,27 @@ int stereo_camera::do_action(const char *para, int timeout)
  
 int stereo_camera::get_pixel_point(int x, int y, struct stereo_pixel_point &value, int timeout)
 {
+	int ret;
+	
 	std::unique_lock<std::mutex> lock(mux_);
 	if (!open_)
 		return -1;
+	stringstream os;
+	os << x << "," << y;
+	string val = os.str();
+	string result = "";
+	ret = xcmd_->get_value("pixel_point", val, result, timeout);
+	if (ret < 0)
+		return -1;
 	
-	return xcmd_->get_pixel_point(x, y, value, timeout);
+	json_pixel_point temp;
+	ret = temp.from_string(result);
+	if (ret < 0)
+		return -1;
+	
+	value = temp.to_struct();
+	
+	return 0;
 }
 
 
@@ -162,14 +195,39 @@ void stereo_camera::get_frame(std::vector<unsigned char> &image)
 	xstream_->get_frame(image);
 }
 
-void stereo_camera::get_detect_boxes(std::vector<struct stereo_detect_box> &detect_boxes)
+int stereo_camera::get_detect_boxes(std::vector<struct stereo_detect_box> &detect_boxes)
 {
-	xstream_->get_detect_boxes(detect_boxes);
+	int ret;
+	string result = "";
+	ret = xstream_->get_header("detect_boxes", result);
+	if (ret < 0)
+		return -1;
+	
+	
+	json_detect_boxes temp;
+	ret = temp.from_string(result);
+	if (ret < 0)
+		return -1;
+	
+	detect_boxes = temp.to_struct();
+	return 0;
 }
 
-void stereo_camera::get_gyro_angle(struct stereo_gyro_angle &gyro_angle)
+int stereo_camera::get_gyro_angle(struct stereo_gyro_angle &gyro_angle)
 {
-	xstream_->get_gyro_angle(gyro_angle);
+	int ret;
+	string result = "";
+	ret = xstream_->get_header("gyro_angle", result);
+	if (ret < 0)
+		return -1;
+	
+	json_gyro_angle temp;
+	ret = temp.from_string(result);
+	if (ret < 0)
+		return -1;
+	
+	gyro_angle = temp.to_struct();
+	return 0;
 }
 
 int stereo_camera::get_reconnect_count()
@@ -211,16 +269,6 @@ void stereo_camera::detect_pixel_to_box(struct stereo_pixel_point &detect_pixel,
 	detect_box.ya = detect_pixel.ya;
 	detect_box.r = detect_pixel.r;
 }
-
-
-
-
-
-
-
-
-
-
 
 
 

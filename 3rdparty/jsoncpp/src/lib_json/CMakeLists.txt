@@ -77,6 +77,7 @@ set_target_properties( jsoncpp_lib PROPERTIES OUTPUT_NAME jsoncpp
                         DEBUG_OUTPUT_NAME jsoncpp${DEBUG_LIBNAME_SUFFIX} )
 set_target_properties( jsoncpp_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
+
 # Set library's runtime search path on OSX
 if(APPLE)
     set_target_properties( jsoncpp_lib PROPERTIES INSTALL_RPATH "@loader_path/." )
@@ -132,10 +133,10 @@ target_compile_features(jsoncpp_lib PUBLIC
         cxx_variadic_templates # Variadic templates, as defined in N2242.
 )
 
-install( TARGETS jsoncpp_lib ${INSTALL_EXPORT}
-          RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+#install( TARGETS jsoncpp_lib ${INSTALL_EXPORT}
+#          RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+#          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 if(NOT CMAKE_VERSION VERSION_LESS 2.8.11)
     target_include_directories( jsoncpp_lib PUBLIC

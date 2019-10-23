@@ -155,26 +155,26 @@ if(JSONCPP_WITH_WARNING_AS_ERROR)
     UseCompilationWarningAsError()
 endif()
 
-if(JSONCPP_WITH_PKGCONFIG_SUPPORT)
-    configure_file(
-        "pkg-config/jsoncpp.pc.in"
-        "pkg-config/jsoncpp.pc"
-        @ONLY)
-    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/pkg-config/jsoncpp.pc"
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
-endif()
+#if(JSONCPP_WITH_PKGCONFIG_SUPPORT)
+#    configure_file(
+#        "pkg-config/jsoncpp.pc.in"
+#        "pkg-config/jsoncpp.pc"
+#        @ONLY)
+#    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/pkg-config/jsoncpp.pc"
+#        DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+#endif()
 
-if(JSONCPP_WITH_CMAKE_PACKAGE)
-        include (CMakePackageConfigHelpers)
-        install(EXPORT jsoncpp
-                DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/jsoncpp
-                FILE        jsoncppConfig.cmake)
-        write_basic_package_version_file ("${CMAKE_CURRENT_BINARY_DIR}/jsoncppConfigVersion.cmake"
-                VERSION ${PROJECT_VERSION}
-                COMPATIBILITY SameMajorVersion)
-        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/jsoncppConfigVersion.cmake
-                DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/jsoncpp)
-endif()
+#if(JSONCPP_WITH_CMAKE_PACKAGE)
+#        include (CMakePackageConfigHelpers)
+#        install(EXPORT jsoncpp
+#                DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/jsoncpp
+#                FILE        jsoncppConfig.cmake)
+#        write_basic_package_version_file ("${CMAKE_CURRENT_BINARY_DIR}/jsoncppConfigVersion.cmake"
+#                VERSION ${PROJECT_VERSION}
+#                COMPATIBILITY SameMajorVersion)
+#        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/jsoncppConfigVersion.cmake
+#                DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/jsoncpp)
+#endif()
 
 if(JSONCPP_WITH_TESTS)
   enable_testing()
@@ -185,5 +185,5 @@ endif()
 add_subdirectory( src )
 
 #install the includes
-add_subdirectory( include )
+#add_subdirectory( include )
 

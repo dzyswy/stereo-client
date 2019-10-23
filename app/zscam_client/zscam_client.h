@@ -27,10 +27,8 @@
 
 
 #include "ui_zscam_client.h"
+#include "search_camera.h"
 #include "stereo_camera.h"
-#include "stereo_detect_boxes.h"
-#include "stereo_gyro_angle.h"
-#include "stereo_pixel_point.h"
 #include "media_record.h"
 #include "stereo_filter.h"
 #include "ptz_ctl_visca.h"
@@ -107,7 +105,7 @@ public:
 	
 	QTimer *timer_slow_; 
 	
-	
+	search_camera *search_;
 	stereo_camera *camera_;
 	int cam_open_;
 

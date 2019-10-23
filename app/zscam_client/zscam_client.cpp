@@ -87,7 +87,8 @@ zscam_client::zscam_client(QWidget *parent)
 	ptz_track_mode_ = 0;
 	ptz_track_mask_ = PTZ_TRACK_PTZ_ALL_MASK;
 	
-	camera_ = new stereo_camera("zynq_stereo_camera", 45789, 5, 0);
+	search_ = new search_camera("zynq_stereo_camera", 45789, 5);
+	camera_ = new stereo_camera(0);
 	
 	xfilter_ = new stereo_filter(camera_);
 	xptz_ = new ptz_ctl_visca;
@@ -337,7 +338,7 @@ void zscam_client::do_fresh_frame()
 void zscam_client::do_timer_slow_timeout()
 {
 	vector<string> device_nodes;
-	camera_->get_device_nodes(device_nodes);
+	search_->get_device_nodes(device_nodes);
 	
 	for (int i = 0; i < device_nodes.size(); i++)
 	{

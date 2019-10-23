@@ -6,22 +6,26 @@ endif()
 
 ADD_DEFINITIONS(-DASIO_STANDALONE)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/rpclib/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}) 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/jsoncpp/include)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/asio/include)
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/stereo_camera)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/broadcast_client)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/rpc_client)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/stream_client)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/json_struct)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/media_record)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/ftp_client)
 
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} FILE_SRCS)
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/stereo_camera FILE_SRCS)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/broadcast_client FILE_SRCS)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/rpc_client FILE_SRCS)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/stream_client FILE_SRCS)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/json_struct FILE_SRCS)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/media_record FILE_SRCS)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/ftp_client FILE_SRCS)
 
  
-SET(LIBS ${LIBS} jsoncpp)
-SET(LIBS ${LIBS} rpc)
+SET(LIBS ${LIBS} jsoncpp) 
 
 
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${FILE_SRCS})
