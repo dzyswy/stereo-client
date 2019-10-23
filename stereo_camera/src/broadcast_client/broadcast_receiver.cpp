@@ -66,7 +66,7 @@ void broadcast_receiver::do_receive()
 					std::string value;
 					
 					//Content-type: image/jpeg
-					char *p = strchr(header.c_str(), ':');
+					const char *p = strchr(header.c_str(), ':');
 					if (p == NULL)
 						continue;
 					long len_key = (long)p - (long)header.c_str();//exclude :
