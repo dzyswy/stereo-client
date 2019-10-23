@@ -114,7 +114,7 @@ void stream_client::stream_process()
 
 			{
 				std::unique_lock<std::mutex> lock(mux_);		
-				impl->get_frame(image_);
+				impl->get_image(image_);
 				headers_ = impl->get_headers();
 				cond_.notify_all();
 				if (!going)

@@ -1,5 +1,5 @@
 #include "search_camera.h"
-
+#include "broadcast_client.h"
 
 
 using namespace std;

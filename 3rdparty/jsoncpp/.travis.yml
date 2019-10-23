@@ -1,65 +1,42 @@
-# Build matrix / environment variables are explained on:
+# Build matrix / environment variable are explained on:
 # http://about.travis-ci.org/docs/user/build-configuration/
-# This file can be validated on: http://www.yamllint.com/
-# Or using the Ruby based travel command line tool:
-# gem install travis --no-rdoc --no-ri
-# travis lint .travis.yml
-language: cpp
-sudo: false
+# This file can be validated on:
+# http://lint.travis-ci.org/
+# See also
+# http://stackoverflow.com/questions/22111549/travis-ci-with-clang-3-4-and-c11/30925448#30925448
+# to allow C++11, though we are not yet building with -std=c++11
+
+install:
+# /usr/bin/gcc is 4.6 always, but gcc-X.Y is available.
+#- if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+- if [ "$CXX" = "g++" ]; then export CXX="g++-4.6" CC="gcc-4.6"; fi
+# /usr/bin/clang is our version already, and clang-X.Y does not exist.
+#- if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.0" CC="clang-3.0"; fi
+- echo ${PATH}
+- ls /usr/local
+- export PATH=/usr/bin:${PATH}
+- echo ${CXX}
+- ${CXX} --version
 addons:
-  homebrew:
-    packages:
-    - meson
-    - ninja
-    update: false # do not update homebrew by default
   apt:
     sources:
     - ubuntu-toolchain-r-test
-    - llvm-toolchain-xenial-8
     packages:
-    - clang-8
+    - gcc-4.6
+    - g++-4.6
+    - clang
     - valgrind
-matrix:
-  allow_failures:
-    - os: osx
-  include:
-    - name: Mac clang meson static release testing
-      os: osx
-      osx_image: xcode10.2
-      compiler: clang
-      env:
-         CXX="clang++"
-         CC="clang"
-         LIB_TYPE=static
-         BUILD_TYPE=release
-      script: ./.travis_scripts/meson_builder.sh
-    - name: Linux xenial clang meson static release testing
-      os: linux
-      dist: xenial
-      compiler: clang
-      env:
-         CXX="clang++"
-         CC="clang"
-         LIB_TYPE=static
-         BUILD_TYPE=release
-      # before_install and install steps only needed for linux meson builds
-      before_install:
-          - source ./.travis_scripts/travis.before_install.${TRAVIS_OS_NAME}.sh
-      install:
-           - source ./.travis_scripts/travis.install.${TRAVIS_OS_NAME}.sh
-      script: ./.travis_scripts/meson_builder.sh
-    - name: Linux xenial gcc cmake coverage
-      os: linux
-      dist: xenial
-      compiler: gcc
-      env:
-        CXX=g++
-        CC=gcc
-        DO_Coverage=ON
-        BUILD_TOOL="Unix Makefiles"
-        BUILD_TYPE=Debug
-        LIB_TYPE=shared
-        DESTDIR=/tmp/cmake_json_cpp
-      script: ./.travis_scripts/cmake_builder.sh
+os:
+  - linux
+language: cpp
+compiler:
+  - gcc
+  - clang
+script: ./travis.sh
+env:
+  matrix:
+    - SHARED_LIB=ON  STATIC_LIB=ON CMAKE_PKG=ON  BUILD_TYPE=release VERBOSE_MAKE=false
+    - SHARED_LIB=OFF STATIC_LIB=ON CMAKE_PKG=OFF BUILD_TYPE=debug   VERBOSE_MAKE=true VERBOSE
 notifications:
   email: false
+sudo: false

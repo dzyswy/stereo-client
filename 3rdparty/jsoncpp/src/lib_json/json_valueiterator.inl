@@ -1,4 +1,4 @@
-// Copyright 2007-2010 Baptiste Lepilleur and The JsonCpp Authors
+// Copyright 2007-2010 Baptiste Lepilleur
 // Distributed under MIT license, or public domain if desired and
 // recognized in your jurisdiction.
 // See file LICENSE for detail or copy at http://jsoncpp.sourceforge.net/LICENSE
@@ -15,17 +15,25 @@ namespace Json {
 // //////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////
 
-ValueIteratorBase::ValueIteratorBase() : current_() {}
+ValueIteratorBase::ValueIteratorBase()
+    : current_(), isNull_(true) {
+}
 
 ValueIteratorBase::ValueIteratorBase(
     const Value::ObjectValues::iterator& current)
     : current_(current), isNull_(false) {}
 
-Value& ValueIteratorBase::deref() const { return current_->second; }
+Value& ValueIteratorBase::deref() const {
+  return current_->second;
+}
 
-void ValueIteratorBase::increment() { ++current_; }
+void ValueIteratorBase::increment() {
+  ++current_;
+}
 
-void ValueIteratorBase::decrement() { --current_; }
+void ValueIteratorBase::decrement() {
+  --current_;
+}
 
 ValueIteratorBase::difference_type
 ValueIteratorBase::computeDistance(const SelfType& other) const {
@@ -84,13 +92,12 @@ UInt ValueIteratorBase::index() const {
   return Value::UInt(-1);
 }
 
-String ValueIteratorBase::name() const {
+std::string ValueIteratorBase::name() const {
   char const* keey;
   char const* end;
   keey = memberName(&end);
-  if (!keey)
-    return String();
-  return String(keey, end);
+  if (!keey) return std::string();
+  return std::string(keey, end);
 }
 
 char const* ValueIteratorBase::memberName() const {
@@ -101,8 +108,8 @@ char const* ValueIteratorBase::memberName() const {
 char const* ValueIteratorBase::memberName(char const** end) const {
   const char* cname = (*current_).first.data();
   if (!cname) {
-    *end = nullptr;
-    return nullptr;
+    *end = NULL;
+    return NULL;
   }
   *end = cname + (*current_).first.length();
   return cname;
@@ -116,14 +123,11 @@ char const* ValueIteratorBase::memberName(char const** end) const {
 // //////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////
 
-ValueConstIterator::ValueConstIterator() = default;
+ValueConstIterator::ValueConstIterator() {}
 
 ValueConstIterator::ValueConstIterator(
     const Value::ObjectValues::iterator& current)
     : ValueIteratorBase(current) {}
-
-ValueConstIterator::ValueConstIterator(ValueIterator const& other)
-    : ValueIteratorBase(other) {}
 
 ValueConstIterator& ValueConstIterator::
 operator=(const ValueIteratorBase& other) {
@@ -139,17 +143,16 @@ operator=(const ValueIteratorBase& other) {
 // //////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////
 
-ValueIterator::ValueIterator() = default;
+ValueIterator::ValueIterator() {}
 
 ValueIterator::ValueIterator(const Value::ObjectValues::iterator& current)
     : ValueIteratorBase(current) {}
 
 ValueIterator::ValueIterator(const ValueConstIterator& other)
-    : ValueIteratorBase(other) {
-  throwRuntimeError("ConstIterator to Iterator should never be allowed.");
-}
+    : ValueIteratorBase(other) {}
 
-ValueIterator::ValueIterator(const ValueIterator& other) = default;
+ValueIterator::ValueIterator(const ValueIterator& other)
+    : ValueIteratorBase(other) {}
 
 ValueIterator& ValueIterator::operator=(const SelfType& other) {
   copy(other);

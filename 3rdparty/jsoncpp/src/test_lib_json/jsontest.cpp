@@ -1,11 +1,11 @@
-// Copyright 2007-2010 Baptiste Lepilleur and The JsonCpp Authors
+// Copyright 2007-2010 Baptiste Lepilleur
 // Distributed under MIT license, or public domain if desired and
 // recognized in your jurisdiction.
 // See file LICENSE for detail or copy at http://jsoncpp.sourceforge.net/LICENSE
 
 #define _CRT_SECURE_NO_WARNINGS 1 // Prevents deprecation warning with MSVC
 #include "jsontest.h"
-#include <cstdio>
+#include <stdio.h>
 #include <string>
 
 #if defined(_MSC_VER)
@@ -73,14 +73,15 @@ namespace JsonTest {
 // class TestResult
 // //////////////////////////////////////////////////////////////////
 
-TestResult::TestResult() {
+TestResult::TestResult()
+    : predicateId_(1), lastUsedPredicateId_(0), messageTarget_(0) {
   // The root predicate has id 0
   rootPredicateNode_.id_ = 0;
-  rootPredicateNode_.next_ = nullptr;
+  rootPredicateNode_.next_ = 0;
   predicateStackTail_ = &rootPredicateNode_;
 }
 
-void TestResult::setTestName(const Json::String& name) { name_ = name; }
+void TestResult::setTestName(const std::string& name) { name_ = name; }
 
 TestResult&
 TestResult::addFailure(const char* file, unsigned int line, const char* expr) {
@@ -88,12 +89,12 @@ TestResult::addFailure(const char* file, unsigned int line, const char* expr) {
   /// added.
   unsigned int nestingLevel = 0;
   PredicateContext* lastNode = rootPredicateNode_.next_;
-  for (; lastNode != nullptr; lastNode = lastNode->next_) {
+  for (; lastNode != 0; lastNode = lastNode->next_) {
     if (lastNode->id_ > lastUsedPredicateId_) // new PredicateContext
     {
       lastUsedPredicateId_ = lastNode->id_;
-      addFailureInfo(lastNode->file_, lastNode->line_, lastNode->expr_,
-                     nestingLevel);
+      addFailureInfo(
+          lastNode->file_, lastNode->line_, lastNode->expr_, nestingLevel);
       // Link the PredicateContext to the failure for message target when
       // popping the PredicateContext.
       lastNode->failure_ = &(failures_.back());
@@ -123,21 +124,31 @@ void TestResult::addFailureInfo(const char* file,
 
 TestResult& TestResult::popPredicateContext() {
   PredicateContext* lastNode = &rootPredicateNode_;
-  while (lastNode->next_ != nullptr && lastNode->next_->next_ != nullptr) {
+  while (lastNode->next_ != 0 && lastNode->next_->next_ != 0) {
     lastNode = lastNode->next_;
   }
   // Set message target to popped failure
   PredicateContext* tail = lastNode->next_;
-  if (tail != nullptr && tail->failure_ != nullptr) {
+  if (tail != 0 && tail->failure_ != 0) {
     messageTarget_ = tail->failure_;
   }
   // Remove tail from list
   predicateStackTail_ = lastNode;
-  lastNode->next_ = nullptr;
+  lastNode->next_ = 0;
   return *this;
 }
 
 bool TestResult::failed() const { return !failures_.empty(); }
+
+unsigned int TestResult::getAssertionNestingLevel() const {
+  unsigned int level = 0;
+  const PredicateContext* lastNode = &rootPredicateNode_;
+  while (lastNode->next_ != 0) {
+    lastNode = lastNode->next_;
+    ++level;
+  }
+  return level;
+}
 
 void TestResult::printFailure(bool printTestName) const {
   if (failures_.empty()) {
@@ -149,10 +160,12 @@ void TestResult::printFailure(bool printTestName) const {
   }
 
   // Print in reverse to display the callstack in the right order
-  for (const auto& failure : failures_) {
-    Json::String indent(failure.nestingLevel_ * 2, ' ');
+  Failures::const_iterator itEnd = failures_.end();
+  for (Failures::const_iterator it = failures_.begin(); it != itEnd; ++it) {
+    const Failure& failure = *it;
+    std::string indent(failure.nestingLevel_ * 2, ' ');
     if (failure.file_) {
-      printf("%s%s(%u): ", indent.c_str(), failure.file_, failure.line_);
+      printf("%s%s(%d): ", indent.c_str(), failure.file_, failure.line_);
     }
     if (!failure.expr_.empty()) {
       printf("%s\n", failure.expr_.c_str());
@@ -160,19 +173,19 @@ void TestResult::printFailure(bool printTestName) const {
       printf("\n");
     }
     if (!failure.message_.empty()) {
-      Json::String reindented = indentText(failure.message_, indent + "  ");
+      std::string reindented = indentText(failure.message_, indent + "  ");
       printf("%s\n", reindented.c_str());
     }
   }
 }
 
-Json::String TestResult::indentText(const Json::String& text,
-                                    const Json::String& indent) {
-  Json::String reindented;
-  Json::String::size_type lastIndex = 0;
+std::string TestResult::indentText(const std::string& text,
+                                   const std::string& indent) {
+  std::string reindented;
+  std::string::size_type lastIndex = 0;
   while (lastIndex < text.size()) {
-    Json::String::size_type nextIndex = text.find('\n', lastIndex);
-    if (nextIndex == Json::String::npos) {
+    std::string::size_type nextIndex = text.find('\n', lastIndex);
+    if (nextIndex == std::string::npos) {
       nextIndex = text.size() - 1;
     }
     reindented += indent;
@@ -182,8 +195,8 @@ Json::String TestResult::indentText(const Json::String& text,
   return reindented;
 }
 
-TestResult& TestResult::addToLastFailure(const Json::String& message) {
-  if (messageTarget_ != nullptr) {
+TestResult& TestResult::addToLastFailure(const std::string& message) {
+  if (messageTarget_ != 0) {
     messageTarget_->message_ += message;
   }
   return *this;
@@ -204,9 +217,9 @@ TestResult& TestResult::operator<<(bool value) {
 // class TestCase
 // //////////////////////////////////////////////////////////////////
 
-TestCase::TestCase() = default;
+TestCase::TestCase() : result_(0) {}
 
-TestCase::~TestCase() = default;
+TestCase::~TestCase() {}
 
 void TestCase::run(TestResult& result) {
   result_ = &result;
@@ -216,23 +229,25 @@ void TestCase::run(TestResult& result) {
 // class Runner
 // //////////////////////////////////////////////////////////////////
 
-Runner::Runner() = default;
+Runner::Runner() {}
 
 Runner& Runner::add(TestCaseFactory factory) {
   tests_.push_back(factory);
   return *this;
 }
 
-size_t Runner::testCount() const { return tests_.size(); }
+unsigned int Runner::testCount() const {
+  return static_cast<unsigned int>(tests_.size());
+}
 
-Json::String Runner::testNameAt(size_t index) const {
+std::string Runner::testNameAt(unsigned int index) const {
   TestCase* test = tests_[index]();
-  Json::String name = test->testName();
+  std::string name = test->testName();
   delete test;
   return name;
 }
 
-void Runner::runTestAt(size_t index, TestResult& result) const {
+void Runner::runTestAt(unsigned int index, TestResult& result) const {
   TestCase* test = tests_[index]();
   result.setTestName(test->testName());
   printf("Testing %s: ", test->testName());
@@ -242,7 +257,8 @@ void Runner::runTestAt(size_t index, TestResult& result) const {
 #endif // if JSON_USE_EXCEPTION
     test->run(result);
 #if JSON_USE_EXCEPTION
-  } catch (const std::exception& e) {
+  }
+  catch (const std::exception& e) {
     result.addFailure(__FILE__, __LINE__, "Unexpected exception caught:")
         << e.what();
   }
@@ -254,9 +270,9 @@ void Runner::runTestAt(size_t index, TestResult& result) const {
 }
 
 bool Runner::runAllTest(bool printSummary) const {
-  size_t const count = testCount();
+  unsigned int count = testCount();
   std::deque<TestResult> failures;
-  for (size_t index = 0; index < count; ++index) {
+  for (unsigned int index = 0; index < count; ++index) {
     TestResult result;
     runTestAt(index, result);
     if (result.failed()) {
@@ -266,27 +282,31 @@ bool Runner::runAllTest(bool printSummary) const {
 
   if (failures.empty()) {
     if (printSummary) {
-      printf("All %zu tests passed\n", count);
+      printf("All %d tests passed\n", count);
     }
     return true;
   } else {
-    for (auto& result : failures) {
+    for (unsigned int index = 0; index < failures.size(); ++index) {
+      TestResult& result = failures[index];
       result.printFailure(count > 1);
     }
 
     if (printSummary) {
-      size_t const failedCount = failures.size();
-      size_t const passedCount = count - failedCount;
-      printf("%zu/%zu tests passed (%zu failure(s))\n", passedCount, count,
+      unsigned int failedCount = static_cast<unsigned int>(failures.size());
+      unsigned int passedCount = count - failedCount;
+      printf("%d/%d tests passed (%d failure(s))\n",
+             passedCount,
+             count,
              failedCount);
     }
     return false;
   }
 }
 
-bool Runner::testIndex(const Json::String& testName, size_t& indexOut) const {
-  const size_t count = testCount();
-  for (size_t index = 0; index < count; ++index) {
+bool Runner::testIndex(const std::string& testName,
+                       unsigned int& indexOut) const {
+  unsigned int count = testCount();
+  for (unsigned int index = 0; index < count; ++index) {
     if (testNameAt(index) == testName) {
       indexOut = index;
       return true;
@@ -296,17 +316,17 @@ bool Runner::testIndex(const Json::String& testName, size_t& indexOut) const {
 }
 
 void Runner::listTests() const {
-  const size_t count = testCount();
-  for (size_t index = 0; index < count; ++index) {
+  unsigned int count = testCount();
+  for (unsigned int index = 0; index < count; ++index) {
     printf("%s\n", testNameAt(index).c_str());
   }
 }
 
 int Runner::runCommandLine(int argc, const char* argv[]) const {
-  // typedef std::deque<String> TestNames;
+  // typedef std::deque<std::string> TestNames;
   Runner subrunner;
   for (int index = 1; index < argc; ++index) {
-    Json::String opt = argv[index];
+    std::string opt = argv[index];
     if (opt == "--list-tests") {
       listTests();
       return 0;
@@ -315,7 +335,7 @@ int Runner::runCommandLine(int argc, const char* argv[]) const {
     } else if (opt == "--test") {
       ++index;
       if (index < argc) {
-        size_t testNameIndex;
+        unsigned int testNameIndex;
         if (testIndex(argv[index], testNameIndex)) {
           subrunner.add(tests_[testNameIndex]);
         } else {
@@ -378,7 +398,7 @@ void Runner::preventDialogOnCrash() {
   _CrtSetReportHook(&msvcrtSilentReportHook);
 #endif // if defined(_MSC_VER)
 
-// @todo investigate this handler (for buffer overflow)
+// @todo investiguate this handler (for buffer overflow)
 // _set_security_error_handler
 
 #if defined(_WIN32)
@@ -406,21 +426,9 @@ void Runner::printUsage(const char* appName) {
 // Assertion functions
 // //////////////////////////////////////////////////////////////////
 
-Json::String ToJsonString(const char* toConvert) {
-  return Json::String(toConvert);
-}
-
-Json::String ToJsonString(Json::String in) { return in; }
-
-#if JSONCPP_USING_SECURE_MEMORY
-Json::String ToJsonString(std::string in) {
-  return Json::String(in.data(), in.data() + in.length());
-}
-#endif
-
 TestResult& checkStringEqual(TestResult& result,
-                             const Json::String& expected,
-                             const Json::String& actual,
+                             const std::string& expected,
+                             const std::string& actual,
                              const char* file,
                              unsigned int line,
                              const char* expr) {

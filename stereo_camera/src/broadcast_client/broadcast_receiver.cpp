@@ -1,4 +1,4 @@
-#include "discovery_receiver.h"
+#include "broadcast_receiver.h"
 
 
 
@@ -113,7 +113,7 @@ void broadcast_receiver::do_timer()
 	timer_.async_wait([this](std::error_code ec) {
 			if (!ec) 
 			{ 
-				erase_timeout_device_node()
+				erase_timeout_device_node();
 			}
 			do_timer();
 		});

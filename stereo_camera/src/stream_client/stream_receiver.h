@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <vector>
+#include <map>
 #include <list>
 #include <mutex>
 #include <thread>
@@ -42,7 +43,7 @@ protected:
 	void do_connect(ip::tcp::endpoint &ep);
 	void do_write();
 	void do_read();
-	void do_boundary(int flag);
+	void do_boundary(int flag, int frame_size = 0);
 	void do_headers();
 	void do_content(int frame_size);
 	

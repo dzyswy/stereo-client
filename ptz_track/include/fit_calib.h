@@ -5,7 +5,7 @@
 
 
 
-#include "stereo_detect_boxes.h"
+#include "stereo_struct.h"
 
 
 class poly_fit;

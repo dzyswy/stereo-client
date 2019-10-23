@@ -1,5 +1,5 @@
-#include "broadcast_client"
-#include "discovery_receiver.h"
+#include "broadcast_client.h"
+#include "broadcast_receiver.h"
 
 
 
@@ -13,7 +13,7 @@ using namespace std;
 
 broadcast_client::broadcast_client(const char *device_name, int port, int poll_time)
 {
-	impl_ = new discovery_receiver(device_name, port, poll_time);
+	impl_ = new broadcast_receiver(device_name, port, poll_time);
 }
 
 broadcast_client::~broadcast_client()
@@ -27,15 +27,15 @@ void broadcast_client::get_device_nodes(std::map<std::string, std::map<std::stri
 	bdc_nodes.clear();
 	impl_->get_device_nodes(bdc_nodes);
 	
-	std::vector<std::map<std::string, std::string> > nodes;
+	std::map<std::string, std::map<std::string, std::string> > nodes;
 	for (auto it = bdc_nodes.begin(); it != bdc_nodes.end(); ++it)
 	{
-		string &ip = it->first;
+		string ip = it->first;
 		std::map<std::string, std::string> &headers = it->second.headers;
 		
 		nodes.insert(make_pair(ip, headers)); 
 	}	
-	device_nodes = headers;
+	device_nodes = nodes;
 }
 
 

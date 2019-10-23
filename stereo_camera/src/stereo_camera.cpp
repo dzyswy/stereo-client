@@ -87,6 +87,7 @@ int stereo_camera::set_value(const char *cmd, std::string value, int timeout)
 
 int stereo_camera::set_poly_mask(std::vector<std::pair<float, float> > &value, int timeout)
 {
+	int ret;
 	std::unique_lock<std::mutex> lock(mux_);
 	if (!open_)
 		return -1;
@@ -190,9 +191,9 @@ int stereo_camera::query_frame(int timeout)
 	return xstream_->query_frame(timeout);
 }
 
-void stereo_camera::get_frame(std::vector<unsigned char> &image)
+void stereo_camera::get_image(std::vector<unsigned char> &image)
 {
-	xstream_->get_frame(image);
+	xstream_->get_image(image);
 }
 
 int stereo_camera::get_detect_boxes(std::vector<struct stereo_detect_box> &detect_boxes)

@@ -1,18 +1,13 @@
-#!/usr/bin/env python
-
-"""Amalgamate json-cpp library sources into a single source and header file.
+"""Amalgate json-cpp library sources into a single source and header file.
 
 Works with python2.6+ and python3.4+.
 
 Example of invocation (must be invoked from json-cpp top directory):
-python amalgamate.py
+python amalgate.py
 """
 import os
 import os.path
 import sys
-
-INCLUDE_PATH = "include/json"
-SRC_PATH = "src/lib_json"
 
 class AmalgamationFile:
     def __init__(self, top_dir):
@@ -55,62 +50,61 @@ class AmalgamationFile:
 def amalgamate_source(source_top_dir=None,
                        target_source_path=None,
                        header_include_path=None):
-    """Produces amalgamated source.
+    """Produces amalgated source.
        Parameters:
            source_top_dir: top-directory
            target_source_path: output .cpp path
            header_include_path: generated header path relative to target_source_path.
     """
-    print("Amalgamating header...")
+    print("Amalgating header...")
     header = AmalgamationFile(source_top_dir)
-    header.add_text("/// Json-cpp amalgamated header (http://jsoncpp.sourceforge.net/).")
+    header.add_text("/// Json-cpp amalgated header (http://jsoncpp.sourceforge.net/).")
     header.add_text('/// It is intended to be used with #include "%s"' % header_include_path)
     header.add_file("LICENSE", wrap_in_comment=True)
-    header.add_text("#ifndef JSON_AMALGAMATED_H_INCLUDED")
-    header.add_text("# define JSON_AMALGAMATED_H_INCLUDED")
-    header.add_text("/// If defined, indicates that the source file is amalgamated")
+    header.add_text("#ifndef JSON_AMALGATED_H_INCLUDED")
+    header.add_text("# define JSON_AMALGATED_H_INCLUDED")
+    header.add_text("/// If defined, indicates that the source file is amalgated")
     header.add_text("/// to prevent private header inclusion.")
     header.add_text("#define JSON_IS_AMALGAMATION")
-    header.add_file(os.path.join(INCLUDE_PATH, "version.h"))
-    header.add_file(os.path.join(INCLUDE_PATH, "allocator.h"))
-    header.add_file(os.path.join(INCLUDE_PATH, "config.h"))
-    header.add_file(os.path.join(INCLUDE_PATH, "forwards.h"))
-    header.add_file(os.path.join(INCLUDE_PATH, "features.h"))
-    header.add_file(os.path.join(INCLUDE_PATH, "value.h"))
-    header.add_file(os.path.join(INCLUDE_PATH, "reader.h"))
-    header.add_file(os.path.join(INCLUDE_PATH, "writer.h"))
-    header.add_file(os.path.join(INCLUDE_PATH, "assertions.h"))
-    header.add_text("#endif //ifndef JSON_AMALGAMATED_H_INCLUDED")
+    header.add_file("include/json/version.h")
+    header.add_file("include/json/config.h")
+    header.add_file("include/json/forwards.h")
+    header.add_file("include/json/features.h")
+    header.add_file("include/json/value.h")
+    header.add_file("include/json/reader.h")
+    header.add_file("include/json/writer.h")
+    header.add_file("include/json/assertions.h")
+    header.add_text("#endif //ifndef JSON_AMALGATED_H_INCLUDED")
 
     target_header_path = os.path.join(os.path.dirname(target_source_path), header_include_path)
-    print("Writing amalgamated header to %r" % target_header_path)
+    print("Writing amalgated header to %r" % target_header_path)
     header.write_to(target_header_path)
 
     base, ext = os.path.splitext(header_include_path)
     forward_header_include_path = base + "-forwards" + ext
-    print("Amalgamating forward header...")
+    print("Amalgating forward header...")
     header = AmalgamationFile(source_top_dir)
-    header.add_text("/// Json-cpp amalgamated forward header (http://jsoncpp.sourceforge.net/).")
+    header.add_text("/// Json-cpp amalgated forward header (http://jsoncpp.sourceforge.net/).")
     header.add_text('/// It is intended to be used with #include "%s"' % forward_header_include_path)
     header.add_text("/// This header provides forward declaration for all JsonCpp types.")
     header.add_file("LICENSE", wrap_in_comment=True)
-    header.add_text("#ifndef JSON_FORWARD_AMALGAMATED_H_INCLUDED")
-    header.add_text("# define JSON_FORWARD_AMALGAMATED_H_INCLUDED")
-    header.add_text("/// If defined, indicates that the source file is amalgamated")
+    header.add_text("#ifndef JSON_FORWARD_AMALGATED_H_INCLUDED")
+    header.add_text("# define JSON_FORWARD_AMALGATED_H_INCLUDED")
+    header.add_text("/// If defined, indicates that the source file is amalgated")
     header.add_text("/// to prevent private header inclusion.")
     header.add_text("#define JSON_IS_AMALGAMATION")
-    header.add_file(os.path.join(INCLUDE_PATH, "config.h"))
-    header.add_file(os.path.join(INCLUDE_PATH, "forwards.h"))
-    header.add_text("#endif //ifndef JSON_FORWARD_AMALGAMATED_H_INCLUDED")
+    header.add_file("include/json/config.h")
+    header.add_file("include/json/forwards.h")
+    header.add_text("#endif //ifndef JSON_FORWARD_AMALGATED_H_INCLUDED")
 
     target_forward_header_path = os.path.join(os.path.dirname(target_source_path),
                                                forward_header_include_path)
-    print("Writing amalgamated forward header to %r" % target_forward_header_path)
+    print("Writing amalgated forward header to %r" % target_forward_header_path)
     header.write_to(target_forward_header_path)
 
-    print("Amalgamating source...")
+    print("Amalgating source...")
     source = AmalgamationFile(source_top_dir)
-    source.add_text("/// Json-cpp amalgamated source (http://jsoncpp.sourceforge.net/).")
+    source.add_text("/// Json-cpp amalgated source (http://jsoncpp.sourceforge.net/).")
     source.add_text('/// It is intended to be used with #include "%s"' % header_include_path)
     source.add_file("LICENSE", wrap_in_comment=True)
     source.add_text("")
@@ -121,18 +115,19 @@ def amalgamate_source(source_top_dir=None,
 #endif
 """)
     source.add_text("")
-    source.add_file(os.path.join(SRC_PATH, "json_tool.h"))
-    source.add_file(os.path.join(SRC_PATH, "json_reader.cpp"))
-    source.add_file(os.path.join(SRC_PATH, "json_valueiterator.inl"))
-    source.add_file(os.path.join(SRC_PATH, "json_value.cpp"))
-    source.add_file(os.path.join(SRC_PATH, "json_writer.cpp"))
+    lib_json = "src/lib_json"
+    source.add_file(os.path.join(lib_json, "json_tool.h"))
+    source.add_file(os.path.join(lib_json, "json_reader.cpp"))
+    source.add_file(os.path.join(lib_json, "json_valueiterator.inl"))
+    source.add_file(os.path.join(lib_json, "json_value.cpp"))
+    source.add_file(os.path.join(lib_json, "json_writer.cpp"))
 
-    print("Writing amalgamated source to %r" % target_source_path)
+    print("Writing amalgated source to %r" % target_source_path)
     source.write_to(target_source_path)
 
 def main():
     usage = """%prog [options]
-Generate a single amalgamated source and header file from the sources.
+Generate a single amalgated source and header file from the sources.
 """
     from optparse import OptionParser
     parser = OptionParser(usage=usage)
@@ -140,7 +135,7 @@ Generate a single amalgamated source and header file from the sources.
     parser.add_option("-s", "--source", dest="target_source_path", action="store", default="dist/jsoncpp.cpp",
         help="""Output .cpp source path. [Default: %default]""")
     parser.add_option("-i", "--include", dest="header_include_path", action="store", default="json/json.h",
-        help="""Header include path. Used to include the header from the amalgamated source file. [Default: %default]""")
+        help="""Header include path. Used to include the header from the amalgated source file. [Default: %default]""")
     parser.add_option("-t", "--top-dir", dest="top_dir", action="store", default=os.getcwd(),
         help="""Source top-directory. [Default: %default]""")
     parser.enable_interspersed_args()
@@ -153,7 +148,7 @@ Generate a single amalgamated source and header file from the sources.
         sys.stderr.write(msg + "\n")
         sys.exit(1)
     else:
-        print("Source successfully amalgamated")
+        print("Source succesfully amalagated")
 
 if __name__ == "__main__":
     main()

@@ -91,7 +91,7 @@ public:
 	int do_action(const char *para, int timeout = 5000);
 	
 	int query_frame(int timeout = 5);
-	void get_frame(std::vector<unsigned char> &image);
+	void get_image(std::vector<unsigned char> &image);
 	int get_detect_boxes(std::vector<struct stereo_detect_box> &detect_boxes);
 	int get_gyro_angle(struct stereo_gyro_angle &gyro_angle);
 	int get_reconnect_count();

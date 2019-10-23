@@ -22,7 +22,7 @@ std::vector<struct stereo_detect_box> json_detect_boxes::to_struct()
 
 int json_detect_boxes::from_string(std::string &value)
 {
-	vector<struct stereo_detect_box> _detect_boxes;
+	vector<struct stereo_detect_box> detect_boxes;
 	
 	try {
 		Json::Reader reader;
@@ -36,33 +36,30 @@ int json_detect_boxes::from_string(std::string &value)
 		
 		if (jroot["detect_boxes"].empty())
 			return -1; 
-		
-		int _count = jroot["detect_boxes"].size();
-		if (_count)
-			_detect_boxes.resize(_count);
-		else
-			_detect_boxes.clear();
+
 		jdetect_boxes = jroot["detect_boxes"];
-		for (int i = 0; i < _count; i++)
+		for (int i = 0; i < jdetect_boxes.size(); i++)
 		{
 			jdetect_box = jdetect_boxes[i];
-			_detect_box.id = jdetect_box["id"].asInt();
-			_detect_box.box_x = jdetect_box["box_x"].asInt();
-			_detect_box.box_y = jdetect_box["box_y"].asInt();
-			_detect_box.box_w = jdetect_box["box_w"].asInt();
-			_detect_box.box_h = jdetect_box["box_h"].asInt();
-			_detect_box.x = jdetect_box["x"].asInt();
-			_detect_box.y = jdetect_box["y"].asInt();
-			_detect_box.d = jdetect_box["d"].asInt();
-			_detect_box.xcm = jdetect_box["xcm"].asInt();
-			_detect_box.ycm = jdetect_box["ycm"].asInt();
-			_detect_box.zcm = jdetect_box["zcm"].asInt();
-			_detect_box.xtcm = jdetect_box["xtcm"].asInt();
-			_detect_box.ytcm = jdetect_box["ytcm"].asInt();
-			_detect_box.ztcm = jdetect_box["ztcm"].asInt();
-			_detect_box.xa = jdetect_box["xa"].asFloat();
-			_detect_box.ya = jdetect_box["ya"].asFloat();
-			_detect_box.r = jdetect_box["r"].asFloat();
+			struct stereo_detect_box detect_box;
+			detect_box.id = jdetect_box["id"].asInt();
+			detect_box.box_x = jdetect_box["box_x"].asInt();
+			detect_box.box_y = jdetect_box["box_y"].asInt();
+			detect_box.box_w = jdetect_box["box_w"].asInt();
+			detect_box.box_h = jdetect_box["box_h"].asInt();
+			detect_box.x = jdetect_box["x"].asInt();
+			detect_box.y = jdetect_box["y"].asInt();
+			detect_box.d = jdetect_box["d"].asInt();
+			detect_box.xcm = jdetect_box["xcm"].asInt();
+			detect_box.ycm = jdetect_box["ycm"].asInt();
+			detect_box.zcm = jdetect_box["zcm"].asInt();
+			detect_box.xtcm = jdetect_box["xtcm"].asInt();
+			detect_box.ytcm = jdetect_box["ytcm"].asInt();
+			detect_box.ztcm = jdetect_box["ztcm"].asInt();
+			detect_box.xa = jdetect_box["xa"].asFloat();
+			detect_box.ya = jdetect_box["ya"].asFloat();
+			detect_box.r = jdetect_box["r"].asFloat();
+			detect_boxes.push_back(detect_box);
 		} 
 		
 	} catch(std::exception &ex)
@@ -70,7 +67,7 @@ int json_detect_boxes::from_string(std::string &value)
         printf( "jsoncpp struct error: %s.\n", ex.what());
         return -1;
 	}
-	detect_boxes_ = _detect_boxes;
+	detect_boxes_ = detect_boxes;
 	return 0;
 }
 

@@ -126,10 +126,10 @@ void stream_receiver::do_read()
 		});
 }
 
-void stream_receiver::do_boundary(int flag)
+void stream_receiver::do_boundary(int flag, int frame_size)
 {
 	asio::async_read_until(socket_, response_, "--BOUNDARYSTRING\r\n",
-		[this] (asio::error_code ec, std::size_t n) 
+		[this, flag, frame_size] (asio::error_code ec, std::size_t n) 
 		{
 			if (!ec)
 			{
@@ -152,7 +152,7 @@ void stream_receiver::do_boundary(int flag)
 					cond_.notify_all(); 
 				}	
 				
-				if ((frame_size_ > 1024) && (response_.size() > (frame_size_ * 2)))
+				if ((frame_size > 1024) && (response_.size() > (frame_size * 2)))
 				{
 					response_.consume(response_.size());
 				}	
@@ -245,7 +245,7 @@ void stream_receiver::do_content(int frame_size)
 					image_.resize(frame_size);
 					response_.sgetn((char *)&image_[0], frame_size);
 				}	
-				do_boundary(1);
+				do_boundary(1, frame_size);
 			}	
 		});
 }

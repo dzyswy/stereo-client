@@ -211,7 +211,7 @@ void zscam_client::stream_process()
 			std::this_thread::sleep_for (std::chrono::seconds(1));
 			continue;
 		}
-		camera_->get_frame(frame_buffer);
+		camera_->get_image(frame_buffer);
 		camera_->get_detect_boxes(detect_boxes);
 		camera_->get_gyro_angle(gyro_angle);
 		
