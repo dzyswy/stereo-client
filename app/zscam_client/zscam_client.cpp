@@ -87,7 +87,7 @@ zscam_client::zscam_client(QWidget *parent)
 	ptz_track_mode_ = 0;
 	ptz_track_mask_ = PTZ_TRACK_PTZ_ALL_MASK;
 	
-	search_ = new search_camera("zynq_stereo_camera", 45789, 5);
+	search_ = new search_camera("zynq_stereo_camera", 45789, 5, 1);
 	camera_ = new stereo_camera(0);
 	
 	xfilter_ = new stereo_filter(camera_);

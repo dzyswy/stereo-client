@@ -11,9 +11,9 @@ using namespace std;
 
 
 
-broadcast_client::broadcast_client(const char *device_name, int port, int poll_time)
+broadcast_client::broadcast_client(const char *device_name, int port, int poll_time, int debug)
 {
-	impl_ = new broadcast_receiver(device_name, port, poll_time);
+	impl_ = new broadcast_receiver(device_name, port, poll_time, debug);
 }
 
 broadcast_client::~broadcast_client()

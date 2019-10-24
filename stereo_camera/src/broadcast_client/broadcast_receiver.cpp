@@ -7,13 +7,15 @@ using namespace std;
 
 
 
-broadcast_receiver::broadcast_receiver(const char *device_name, int port, int poll_time) : 
+broadcast_receiver::broadcast_receiver(const char *device_name, int port, int poll_time, int debug) : 
 	socket_(io_context_),
 	timer_(io_context_)
 {
+	debug_ = debug;
 	device_name_ = device_name;
 	poll_time_ = poll_time;
 	
+	cout << "broadcast_receiver: " << device_name_ << " " << port << " " << poll_time << endl;
 
 	udp::endpoint listen_endpoint(address_v4::from_string("0.0.0.0"), port);
     socket_.open(listen_endpoint.protocol());
@@ -61,7 +63,9 @@ void broadcast_receiver::do_receive()
 				headers.clear();
 				while (std::getline(rs, header))
 				{
-				//	cout << header;
+					if (header == "\r")
+						break;
+					
 					std::string key;
 					std::string value;
 					
@@ -75,30 +79,32 @@ void broadcast_receiver::do_receive()
 					value = header.substr(len_key + 2, len_val);
 					
 					headers.insert(make_pair(key, value));
+					
+					if (debug_) {
+						cout << header << endl;
+						cout << "key: " << key << endl;
+						cout << "value: " << value << endl;
+					}
 				}
 				
 				string device_name = "";
-				ret = get_header(headers, "device", device_name);
-				if (ret == 0)
+				get_header(headers, "device", device_name);
+				string max_age_s = "";
+				get_header(headers, "max-age", max_age_s);
+				int max_age = atoi(max_age_s.c_str());
+				if (max_age < poll_time_)
+					max_age = poll_time_ * 2;
+				
+				cout << device_name << " : " << device_name_ << " : " << max_age_s << endl;
+				
+			//	if (strcmp(device_name.c_str(), device_name_.c_str()) == 0)
 				{
-					if (strcmp(device_name.c_str(), device_name_.c_str()) == 0)
-					{ 
-						string max_age_s = "";
-						ret = get_header(headers, "max-age", max_age_s);
-						if (ret == 0)
-						{
-							int max_age = atoi(max_age_s.c_str());
-							if (max_age < poll_time_)
-								max_age = poll_time_ * 2;
-							string dev_ip = sender_endpoint_.address().to_string();
-							time_t timeout = time(NULL) + max_age;
-							
-							set_device_node(dev_ip, timeout, headers);
-						}	
-					}	
+					string dev_ip = sender_endpoint_.address().to_string();
+					time_t timeout = time(NULL) + max_age;
+					
+					set_device_node(dev_ip, timeout, headers);
 				}	
-		
-
+			
 				do_receive();
 			}	
 		});
@@ -128,6 +134,8 @@ void broadcast_receiver::erase_timeout_device_node()
 		time_t now_time = time(NULL);
 		if (now_time > it->second.timeout)
 		{
+			
+			cout << "delete node: " << it->first << endl;
 			it->second.headers.clear();
 			device_nodes_.erase(it++);
 		}	
@@ -141,6 +149,11 @@ void broadcast_receiver::set_device_node(std::string ip, time_t timeout, std::ma
 	struct bdc_dev_node value = {0};
 	value.timeout = timeout;
 	value.headers = headers;
+	
+	if (debug_)
+	{
+		cout << "find node: " << ip << " timeout:" << timeout << endl;
+	}	
 	
 	std::unique_lock<std::mutex> lock(mux_);
 	typename std::map<std::string, struct bdc_dev_node>::iterator it;
@@ -158,9 +171,18 @@ int broadcast_receiver::get_header(std::map<std::string, std::string> &headers, 
 	std::unique_lock<std::mutex> lock(mux_);
 	typename std::map<std::string, std::string>::iterator it;
 	it = headers.find(key);
-	if (it == headers.end())
+	if (it == headers.end()) {
+		if (debug_) {
+			cout << "broadcast_receiver::get_header no key: " << key << endl;
+		}
 		return -1;
+	}
+	 
 	value = it->second;
+	if (debug_) {
+		cout << "broadcast_receiver::get_header key=" << key << " value=" << value << endl;
+	}
+	
 	return 0;
 }
 

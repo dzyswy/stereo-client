@@ -33,7 +33,7 @@ struct zscam_node
 class search_camera
 {
 public:
-	search_camera(const char *device_name, int port, int poll_time);
+	search_camera(const char *device_name, int port, int poll_time, int debug = 0);
 	~search_camera();
 	
 	void get_device_nodes(std::vector<std::string> &device_nodes);

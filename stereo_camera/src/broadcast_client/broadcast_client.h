@@ -26,7 +26,7 @@ class broadcast_receiver;
 class broadcast_client
 {
 public:
-	broadcast_client(const char *device_name, int port, int poll_time);
+	broadcast_client(const char *device_name, int port, int poll_time, int debug = 0);
 	~broadcast_client();
 	void get_device_nodes(std::map<std::string, std::map<std::string, std::string> > &device_nodes);
 

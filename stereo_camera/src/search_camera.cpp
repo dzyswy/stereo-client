@@ -6,9 +6,9 @@ using namespace std;
 
 
 
-search_camera::search_camera(const char *device_name, int port, int poll_time)
+search_camera::search_camera(const char *device_name, int port, int poll_time, int debug)
 {
-	client_ = new broadcast_client(device_name, port, poll_time);
+	client_ = new broadcast_client(device_name, port, poll_time, debug);
 }
 
 search_camera::~search_camera()

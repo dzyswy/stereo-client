@@ -31,7 +31,7 @@ struct bdc_dev_node
 class broadcast_receiver
 {
 public:
-	broadcast_receiver(const char *device_name, int port, int poll_time);
+	broadcast_receiver(const char *device_name, int port, int poll_time, int debug = 0);
 	~broadcast_receiver();
 	
 	void get_device_nodes(std::map<std::string, struct bdc_dev_node> &device_nodes);
@@ -53,9 +53,10 @@ protected:
 	asio::ip::udp::endpoint sender_endpoint_;
 	asio::steady_timer timer_;
 	
-	enum { max_length = 1024 };
+	enum { max_length = 10240 };
 	char data_[max_length];
 	
+	int debug_;
 	std::string device_name_;
 	int poll_time_;
 	
