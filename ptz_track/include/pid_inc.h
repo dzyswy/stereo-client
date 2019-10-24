@@ -2,7 +2,17 @@
 #define __PID_INC_H
 
 
-
+#include <iostream>
+#include <sstream>
+#include <string.h>
+#include <stdio.h>
+#include <vector>
+#include <map>
+#include <list>
+#include <mutex>
+#include <thread>
+#include <condition_variable>
+#include <ctime>
 
 class pid_inc
 {

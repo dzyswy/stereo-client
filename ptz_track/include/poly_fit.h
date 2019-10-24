@@ -3,8 +3,16 @@
 
 
 #include <iostream>
+#include <sstream>
+#include <string.h>
+#include <stdio.h>
 #include <vector>
-#include <string>
+#include <map>
+#include <list>
+#include <mutex>
+#include <thread>
+#include <condition_variable>
+#include <ctime>
 
 class poly_fit
 {

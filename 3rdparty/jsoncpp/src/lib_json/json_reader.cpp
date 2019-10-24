@@ -32,7 +32,7 @@
 #elif defined(__ANDROID__)
 #define snprintf snprintf
 #elif __cplusplus >= 201103L
-#define snprintf std::snprintf
+#define snprintf snprintf
 #endif
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400 // VC++ 8.0

@@ -1697,3 +1697,4 @@ int ftplib::RawRead(void* buf, int max, ftphandle* handle)
 {
 	return FtpRead(buf, max, handle);
 }
+

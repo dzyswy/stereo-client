@@ -205,7 +205,7 @@ void ptz_track::compute(struct fit_calib_ptz_pose &focus_pose, struct fit_calib_
 	struct ptz_track_ptz_speed pid_speed;
 	for (int i = 0; i < FIT_CALIB_PTZ_MAX_CHANNEL; i++)
 	{
-		pid_speed.val[i] = std::round(xpid_[i]->compute(err[i]) * 10 * speed_range_[i][1]);
+		pid_speed.val[i] = round(xpid_[i]->compute(err[i]) * 10 * speed_range_[i][1]);
 	}
 	
 	if (!(track_mask_ & PTZ_TRACK_PTZ_PAN_MASK))

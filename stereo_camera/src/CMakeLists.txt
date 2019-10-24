@@ -6,6 +6,7 @@ endif()
 
 ADD_DEFINITIONS(-DASIO_STANDALONE)
 
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}) 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/jsoncpp/include)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/asio/include)
