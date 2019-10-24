@@ -26,12 +26,7 @@
 #include <arpa/inet.h>
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <ctype.h>
-#include <sys/types.h>
+
 
 #if defined(_WIN32)
 #define SETSOCKOPT_OPTVAL_TYPE (const char *)

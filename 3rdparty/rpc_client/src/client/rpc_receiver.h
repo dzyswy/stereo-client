@@ -3,9 +3,16 @@
 
 
 #include <iostream>
-#include <istream>
-#include <ostream>
-#include <string>
+#include <sstream>
+#include <string.h>
+#include <stdio.h>
+#include <vector>
+#include <map>
+#include <list>
+#include <mutex>
+#include <thread>
+#include <condition_variable>
+#include <ctime>
 #include <asio.hpp>
 
 

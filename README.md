@@ -82,7 +82,7 @@ make install
 
 
 1.3.3.4 3531编译
-cmake -DCMAKE_TOOLCHAIN_FILE=../3531.cmake -DCMAKE_INSTALL_PREFIX=../../out ..    
+cmake -DCMAKE_TOOLCHAIN_FILE=../3531.cmake -DWITH_ZSCAM_CLIENT=OFF -DCMAKE_INSTALL_PREFIX=../../out ..    
 make -j4   
 make install  
 
@@ -92,15 +92,6 @@ error while loading shared libraries: libz.so.1: cannot open shared object
 
 解决方法：
 sudo apt-get install lib32ncurses5 lib32z1
-
-
-
-
-
-
-
-
- 
 
 
 

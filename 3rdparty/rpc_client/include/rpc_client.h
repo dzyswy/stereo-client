@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
+#include <string>
 
 
 class rpc_client
@@ -27,6 +27,28 @@ public:
 	int get_value(const std::string para, std::string &value, std::string &result, int timeout = 5);
 	
 	int do_action(const std::string para, int timeout = 5);
+	
+protected:	
+	std::string to_string(int value)
+	{
+		std::stringstream os;
+		os << value;
+		return os.str();
+	}
+	
+	std::string to_string(float value)
+	{
+		std::stringstream os;
+		os << value;
+		return os.str();
+	}
+	
+	std::string to_string(double value)
+	{
+		std::stringstream os;
+		os << value;
+		return os.str();
+	}
 	
 protected:	
 	std::string ip_;

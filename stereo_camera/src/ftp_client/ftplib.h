@@ -28,6 +28,14 @@
 #define NOSSL 1
 #define NOLFS 1
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <ctype.h>
+#include <sys/types.h>
+
+
 #if defined(_WIN32)
 
 #if BUILDING_DLL

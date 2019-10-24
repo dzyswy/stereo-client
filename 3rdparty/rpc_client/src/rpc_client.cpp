@@ -18,7 +18,7 @@ int rpc_client::set_value(const std::string para, int value, int timeout)
 	stringstream os;
 	os << "set" << "&";
 	os << para << "&"; 
-	os << std::to_string(value) << "&";
+	os << to_string(value) << "&";
 	
 	string request = os.str();
 	rpc_receiver client(ip_, port_, request);
@@ -40,7 +40,7 @@ int rpc_client::set_value(const std::string para, float value, int timeout)
 	stringstream os;
 	os << "set" << "&";
 	os << para << "&";
-	os << std::to_string((double)value) << "&";
+	os << to_string((double)value) << "&";
 	
 	string request = os.str();
 	rpc_receiver client(ip_, port_, request);
