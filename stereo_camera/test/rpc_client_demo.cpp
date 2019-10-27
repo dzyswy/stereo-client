@@ -7,6 +7,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
+	/*
 	int ret;
 	if (argc != )
 	{
@@ -26,8 +27,8 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	
-	
-	
+	*/
+	return 0;
 }
 
 
