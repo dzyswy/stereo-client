@@ -7,9 +7,12 @@ using namespace std;
 
 
 
-rpc_receiver::rpc_receiver(std::string ip, int port, std::string request)
+rpc_receiver::rpc_receiver(std::string ip, int port, std::string request, int debug)
 	: socket_(io_context_)
 {
+	ret_ = -1;
+	result_ = "";
+	debug_ = debug;
 	request_s_ = request;
 	
 	std::ostream request_stream(&request_);
@@ -112,28 +115,51 @@ void rpc_receiver::do_read_headers()
 	asio::async_read_until(socket_, response_, "\r\n\r\n",
         [this] (asio::error_code ec, std::size_t n) 
 		{
+			int ret;
 			if (!ec)
 			{
 				std::istream response_stream(&response_);
+				std::map<std::string, std::string> headers;
+				headers.clear();
 				std::string header;
 				while (std::getline(response_stream, header) && header != "\r")
 				{
-					int len;
-					len = strlen("ret:");
-					if (header.substr(0, len) == "ret:") 
-					{
-						string ret_s = header.substr(len + 1, header.length() - (len + 2));
-						ret_ = atoi(ret_s.c_str());
-					}
+					if (header == "\r")
+						break;
 					
-					len = strlen("result:");
-					if (header.substr(0, len) == "result:") 
-					{
-						std::unique_lock<std::mutex> lock(mux_);
-						result_ = header.substr(len + 1, header.length() - (len + 2));
-						cond_.notify_all();
+					std::string key;
+					std::string value;
+					
+					//Content-type: image/jpeg
+					const char *p = strchr(header.c_str(), ':');
+					if (p == NULL)
+						continue;
+					long len_key = (long)p - (long)header.c_str();//exclude :
+					long len_val = header.length() - len_key - 3;//exclude :space \r
+					key = header.substr(0, len_key);
+					value = header.substr(len_key + 2, len_val);
+					
+					set_header(headers, key, value);
+					
+					if (debug_) {
+						cout << header << endl;
+						cout << "key: " << key << endl;
+						cout << "value: " << value << endl;
 					}
-				}	 
+				}	
+				
+				string ret_s = "";
+				get_header(headers, "ret", ret_s);
+				string result_s = "";
+				get_header(headers, "result", result_s);
+				
+				if (ret_s.size())
+				{
+					std::unique_lock<std::mutex> lock(mux_);
+					ret_ = atoi(ret_s.c_str());
+					result_ = result_s;
+					cond_.notify_all();
+				}	
 
 				// Write whatever content we already have to output.
 				if (response_.size() > 0)
@@ -174,7 +200,35 @@ int rpc_receiver::get_result(std::string &result, int timeout)
 
 
 
+void rpc_receiver::set_header(std::map<std::string, std::string> &headers, const std::string key, std::string &value)
+{
+	typename std::map<std::string, std::string>::iterator it;
+	it = headers.find(key);
+	if (it == headers.end()) {
+		headers.insert(make_pair(key, value));
+	} else {
+		it->second = value;
+	} 
+}
 
+int rpc_receiver::get_header(std::map<std::string, std::string> &headers, const std::string key, std::string &value)
+{ 
+	typename std::map<std::string, std::string>::iterator it;
+	it = headers.find(key);
+	if (it == headers.end()) {
+		if (debug_) {
+			cout << "broadcast_receiver::get_header no key: " << key << endl;
+		}
+		return -1;
+	}
+ 
+	value = it->second;
+	if (debug_) {
+		cout << "broadcast_receiver::get_header key=" << key << ", value=" << value << endl;
+	}
+	
+	return 0;
+}
 
 
 

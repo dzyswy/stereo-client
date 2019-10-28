@@ -87,7 +87,7 @@ zscam_client::zscam_client(QWidget *parent)
 	ptz_track_mode_ = 0;
 	ptz_track_mask_ = PTZ_TRACK_PTZ_ALL_MASK;
 	
-	search_ = new search_camera("zynq_stereo_camera", 45789, 5, 1);
+	search_ = new search_camera("zynq_stereo_camera", 45789, 5, 0);
 	camera_ = new stereo_camera(0);
 	
 	xfilter_ = new stereo_filter(camera_);
@@ -211,6 +211,10 @@ void zscam_client::stream_process()
 			std::this_thread::sleep_for (std::chrono::seconds(1));
 			continue;
 		}
+		
+		frame_buffer.clear();
+		detect_boxes.clear();
+		memset((void *)&gyro_angle, 0, sizeof(struct stereo_gyro_angle));
 		camera_->get_image(frame_buffer);
 		camera_->get_detect_boxes(detect_boxes);
 		camera_->get_gyro_angle(gyro_angle);

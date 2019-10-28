@@ -15,6 +15,7 @@
 class rpc_client
 {
 public:	
+	rpc_client(int debug = 0);
 	void set_connect(const char *ip, int port);
 	
 	int set_value(const std::string key, int value, int timeout = 5);
@@ -53,7 +54,7 @@ protected:
 protected:	
 	std::string ip_;
 	int port_;
-	
+	int debug_;
 };
 
 

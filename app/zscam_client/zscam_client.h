@@ -272,7 +272,7 @@ private slots:
 		
 	void on_pushButton_bg_init_clicked()
 	{
-		camera_->do_action("set_bg_init");
+		camera_->do_action("bg_init");
 	}
 		
 	void on_checkBox_median_mode_stateChanged(int state)

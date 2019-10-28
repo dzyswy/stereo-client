@@ -24,7 +24,7 @@ using namespace asio::ip;
 class rpc_receiver
 {
 public:
-	rpc_receiver(std::string ip, int port, std::string request);
+	rpc_receiver(std::string ip, int port, std::string request, int debug = 0);
 	~rpc_receiver();
 	int get_result(std::string &result, int timeout = 5);
 	
@@ -34,12 +34,16 @@ protected:
 	void do_read_status_line();
 	void do_read_headers();
 	
+	void set_header(std::map<std::string, std::string> &headers, const std::string key, std::string &value);
+	int get_header(std::map<std::string, std::string> &headers, const std::string key, std::string &value);
+	
 protected:
 	asio::io_context io_context_;
 	tcp::socket socket_;
 	asio::streambuf request_;
 	asio::streambuf response_;
 	
+	int debug_;
 	std::string request_s_;
 	
 	int ret_;

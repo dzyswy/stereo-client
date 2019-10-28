@@ -6,6 +6,11 @@
 
 using namespace std;
 
+rpc_client::rpc_client(int debug)
+{
+	debug_ = debug;
+}
+
 
 void rpc_client::set_connect(const char *ip, int port)
 {
@@ -31,7 +36,7 @@ int rpc_client::set_value(const std::string key, std::string value, int timeout)
 	os << value << "&";
 	
 	string request = os.str();
-	rpc_receiver client(ip_, port_, request);
+	rpc_receiver client(ip_, port_, request, debug_);
 	
 	string result = "";
 	int ret = client.get_result(result, timeout);
@@ -83,7 +88,7 @@ int rpc_client::get_value(const std::string key, const std::string &para, std::s
 	os << para << "&";
 	
 	string request = os.str();
-	rpc_receiver client(ip_, port_, request);
+	rpc_receiver client(ip_, port_, request, debug_);
 	
 	string result = "";
 	int ret = client.get_result(result, timeout);
@@ -98,12 +103,12 @@ int rpc_client::get_value(const std::string key, const std::string &para, std::s
 int rpc_client::do_action(const std::string key, int timeout)
 {
 	stringstream os;
-	os << "set" << "&";
+	os << "get" << "&";
 	os << key << "&";
 	os << "null" << "&";
 	
 	string request = os.str();
-	rpc_receiver client(ip_, port_, request);
+	rpc_receiver client(ip_, port_, request, debug_);
 	
 	string result = "";
 	int ret = client.get_result(result, timeout);

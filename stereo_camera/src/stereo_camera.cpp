@@ -15,7 +15,7 @@ using namespace std;
 stereo_camera::stereo_camera(int debug)
 {
 	open_ = 0;
-	xcmd_ = new rpc_client;
+	xcmd_ = new rpc_client(debug);
 	xstream_ = new stream_client(debug);
 }
 
@@ -25,6 +25,21 @@ stereo_camera::~stereo_camera()
 	delete xstream_;
 	delete xcmd_;
 }
+
+int stereo_camera::open_device(const char *ip, int cmd_port)
+{
+	int ret;
+	std::unique_lock<std::mutex> lock(mux_);
+	
+	if (open_)
+		return -1;
+ 
+	xcmd_->set_connect(ip, cmd_port); 
+
+	open_ = 1;
+
+	return 0;
+}	
 
 
 int stereo_camera::open_device(const char *ip, int cmd_port, int stream_port, int stream_index)
@@ -36,9 +51,8 @@ int stereo_camera::open_device(const char *ip, int cmd_port, int stream_port, in
 		return -1;
  
 	xcmd_->set_connect(ip, cmd_port);
-	ret = xstream_->connect_stream(ip, stream_port, stream_index);
-	if (ret < 0)
-		return -1;
+	xstream_->connect_stream(ip, stream_port, stream_index);
+
 	open_ = 1;
 
 	return 0;
@@ -127,6 +141,15 @@ int stereo_camera::get_value(const char *key, std::string &value, int timeout)
 		return -1;
 	
 	return xcmd_->get_value(key, value, timeout);
+}
+
+int stereo_camera::get_value(const char *key, const std::string &para, std::string &value, int timeout)
+{
+	std::unique_lock<std::mutex> lock(mux_);
+	if (!open_)
+		return -1;
+	
+	return xcmd_->get_value(key, para, value, timeout);
 }
 
 int stereo_camera::get_poly_mask(std::vector<std::pair<float, float> > &value, int timeout)

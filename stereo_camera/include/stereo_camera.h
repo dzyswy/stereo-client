@@ -71,24 +71,25 @@ public:
 	stereo_camera(int debug = 0);
 	~stereo_camera();
 
-
+	int open_device(const char *ip, int cmd_port);
 	int open_device(const char *ip, int cmd_port, int stream_port, int stream_index);
 	int close_device();
 	int is_opened();
 	
-	int set_value(const char *key, int value, int timeout = 5000);
-	int set_value(const char *key, float value, int timeout = 5000);
-	int set_value(const char *key, std::string value, int timeout = 5000);
-	int set_poly_mask(std::vector<std::pair<float, float> > &value, int timeout = 5000);
+	int set_value(const char *key, int value, int timeout = 5);
+	int set_value(const char *key, float value, int timeout = 5);
+	int set_value(const char *key, std::string value, int timeout = 5);
+	int set_poly_mask(std::vector<std::pair<float, float> > &value, int timeout = 5);
 	
-	int get_value(const char *key, int &value, int timeout = 5000);
-	int get_value(const char *key, float &value, int timeout = 5000);
-	int get_value(const char *key, std::string &value, int timeout = 5000);
-	int get_poly_mask(std::vector<std::pair<float, float> > &value, int timeout = 5000);
+	int get_value(const char *key, int &value, int timeout = 5);
+	int get_value(const char *key, float &value, int timeout = 5);
+	int get_value(const char *key, std::string &value, int timeout = 5);
+	int get_value(const char *key, const std::string &para, std::string &value, int timeout = 5);
+	int get_poly_mask(std::vector<std::pair<float, float> > &value, int timeout = 5);
 	
 	
-	int get_pixel_point(int x, int y, struct stereo_pixel_point &value, int timeout = 5000);
-	int do_action(const char *para, int timeout = 5000);
+	int get_pixel_point(int x, int y, struct stereo_pixel_point &value, int timeout = 5);
+	int do_action(const char *para, int timeout = 5);
 	
 	int query_frame(int timeout = 5);
 	void get_image(std::vector<unsigned char> &image);
