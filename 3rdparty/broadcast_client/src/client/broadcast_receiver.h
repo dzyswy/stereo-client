@@ -15,23 +15,21 @@
 #include <asio.hpp>
 #include <asio/steady_timer.hpp>
 
+#include "bdc_node.h"
+
 
 using namespace asio;
 using namespace asio::ip;
 
 
 
-struct bdc_dev_node
-{
-	time_t timeout;
-	std::map<std::string, std::string> headers;
-};
+
 
 
 class broadcast_receiver
 {
 public:
-	broadcast_receiver(const char *device_name, int port, int poll_time, int debug = 0);
+	broadcast_receiver(const char *device_name, int port, int poll_time, bdc_nodes& nodes, int debug = 0);
 	~broadcast_receiver();
 	
 	void get_device_nodes(std::map<std::string, struct bdc_dev_node> &device_nodes);
@@ -41,10 +39,9 @@ protected:
 	void add_node(std::string dev_ip, int max_age);
 	void do_timer();
 	
-	void erase_timeout_device_node();
-	void set_device_node(std::string ip, time_t timeout, std::map<std::string, std::string> &headers);
-	int get_header(std::map<std::string, std::string> &headers, const std::string key, std::string &value);
-	void clear_device_nodes();
+	 
+	void set_header(std::map<std::string, std::string> &headers, const std::string key, std::string &value);
+	int get_header(std::map<std::string, std::string> &headers, const std::string key, std::string &value); 
 	
 
 protected:	
@@ -60,8 +57,8 @@ protected:
 	std::string device_name_;
 	int poll_time_;
 	
-	std::mutex mux_;
-    std::map<std::string, struct bdc_dev_node> device_nodes_;
+	
+    bdc_nodes &device_nodes_;
 	
 	std::thread *run_thread_;	
 };

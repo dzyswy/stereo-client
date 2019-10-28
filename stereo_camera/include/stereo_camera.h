@@ -76,14 +76,14 @@ public:
 	int close_device();
 	int is_opened();
 	
-	int set_value(const char *cmd, int value, int timeout = 5000);
-	int set_value(const char *cmd, float value, int timeout = 5000);
-	int set_value(const char *cmd, std::string value, int timeout = 5000);
+	int set_value(const char *key, int value, int timeout = 5000);
+	int set_value(const char *key, float value, int timeout = 5000);
+	int set_value(const char *key, std::string value, int timeout = 5000);
 	int set_poly_mask(std::vector<std::pair<float, float> > &value, int timeout = 5000);
 	
-	int get_value(const char *cmd, int &value, int timeout = 5000);
-	int get_value(const char *cmd, float &value, int timeout = 5000);
-	int get_value(const char *cmd, std::string &value, int timeout = 5000);
+	int get_value(const char *key, int &value, int timeout = 5000);
+	int get_value(const char *key, float &value, int timeout = 5000);
+	int get_value(const char *key, std::string &value, int timeout = 5000);
 	int get_poly_mask(std::vector<std::pair<float, float> > &value, int timeout = 5000);
 	
 	
@@ -92,6 +92,7 @@ public:
 	
 	int query_frame(int timeout = 5);
 	void get_image(std::vector<unsigned char> &image);
+	int get_frame_count(int &frame_count);
 	int get_detect_boxes(std::vector<struct stereo_detect_box> &detect_boxes);
 	int get_gyro_angle(struct stereo_gyro_angle &gyro_angle);
 	int get_reconnect_count();

@@ -21,9 +21,9 @@ class broadcast_client;
 struct zscam_node
 {
 	std::string ip;
-	std::string version;
-	std::string company;
 	std::string board;
+	std::string company;
+	std::string version;
 	std::string serial_number;
 };
 

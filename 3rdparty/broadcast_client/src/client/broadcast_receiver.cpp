@@ -7,14 +7,15 @@ using namespace std;
 
 
 
-broadcast_receiver::broadcast_receiver(const char *device_name, int port, int poll_time, int debug) : 
+broadcast_receiver::broadcast_receiver(const char *device_name, int port, int poll_time, bdc_nodes& nodes, int debug) : 
 	socket_(io_context_),
-	timer_(io_context_)
+	timer_(io_context_), 
+	device_nodes_(nodes)
 {
 	debug_ = debug;
 	device_name_ = device_name;
 	poll_time_ = poll_time;
-	
+	 
 	cout << "broadcast_receiver: " << device_name_ << " " << port << " " << poll_time << endl;
 
 	udp::endpoint listen_endpoint(address_v4::from_string("0.0.0.0"), port);
@@ -36,15 +37,8 @@ broadcast_receiver::~broadcast_receiver()
 	{
 		run_thread_->join();
 		delete run_thread_;
-	}	
-	clear_device_nodes();
+	}	 
 	
-}
-
-void broadcast_receiver::get_device_nodes(std::map<std::string, struct bdc_dev_node> &device_nodes)
-{
-	std::unique_lock<std::mutex> lock(mux_);
-	device_nodes = device_nodes_;
 }
 
 void broadcast_receiver::do_receive()
@@ -57,10 +51,10 @@ void broadcast_receiver::do_receive()
 			{
 				stringstream rs;
 				rs.write(data_, length);
-				
-				std::string header;
+				 
 				std::map<std::string, std::string> headers;
 				headers.clear();
+				std::string header;
 				while (std::getline(rs, header))
 				{
 					if (header == "\r")
@@ -74,11 +68,11 @@ void broadcast_receiver::do_receive()
 					if (p == NULL)
 						continue;
 					long len_key = (long)p - (long)header.c_str();//exclude :
-					long len_val = header.length() - len_key - 2;//exclude :space
+					long len_val = header.length() - len_key - 3;//exclude :space \r
 					key = header.substr(0, len_key);
 					value = header.substr(len_key + 2, len_val);
 					
-					headers.insert(make_pair(key, value));
+					set_header(headers, key, value);
 					
 					if (debug_) {
 						cout << header << endl;
@@ -87,23 +81,18 @@ void broadcast_receiver::do_receive()
 					}
 				}
 				
-				string device_name = "";
-				get_header(headers, "device", device_name);
-				string max_age_s = "";
-				get_header(headers, "max-age", max_age_s);
-				int max_age = atoi(max_age_s.c_str());
+				string device_name = headers["device"];
+				int max_age = atoi(headers["max-age"].c_str());
 				if (max_age < poll_time_)
 					max_age = poll_time_ * 2;
 				
-				cout << device_name << " : " << device_name_ << " : " << max_age_s << endl;
 				
-			//	if (strcmp(device_name.c_str(), device_name_.c_str()) == 0)
+				if (strcmp(device_name.c_str(), device_name_.c_str()) == 0)
 				{
 					string dev_ip = sender_endpoint_.address().to_string();
-					time_t timeout = time(NULL) + max_age;
-					
-					set_device_node(dev_ip, timeout, headers);
-				}	
+					time_t deadline = time(NULL) + max_age; 
+					device_nodes_.add_node(dev_ip, deadline, headers);
+				}
 			
 				do_receive();
 			}	
@@ -119,56 +108,26 @@ void broadcast_receiver::do_timer()
 	timer_.async_wait([this](std::error_code ec) {
 			if (!ec) 
 			{ 
-				erase_timeout_device_node();
+				device_nodes_.delete_node();
 			}
 			do_timer();
 		});
 }
 
-void broadcast_receiver::erase_timeout_device_node()
+
+void broadcast_receiver::set_header(std::map<std::string, std::string> &headers, const std::string key, std::string &value)
 {
-	std::unique_lock<std::mutex> lock(mux_);
-	
-	for (auto it = device_nodes_.begin(); it != device_nodes_.end();)
-	{
-		time_t now_time = time(NULL);
-		if (now_time > it->second.timeout)
-		{
-			
-			cout << "delete node: " << it->first << endl;
-			it->second.headers.clear();
-			device_nodes_.erase(it++);
-		}	
-		else
-			it++;
-	}	
-}
- 
-void broadcast_receiver::set_device_node(std::string ip, time_t timeout, std::map<std::string, std::string> &headers)
-{
-	struct bdc_dev_node value = {0};
-	value.timeout = timeout;
-	value.headers = headers;
-	
-	if (debug_)
-	{
-		cout << "find node: " << ip << " timeout:" << timeout << endl;
-	}	
-	
-	std::unique_lock<std::mutex> lock(mux_);
-	typename std::map<std::string, struct bdc_dev_node>::iterator it;
-	it = device_nodes_.find(ip);
-	if (it == device_nodes_.end()) {
-		device_nodes_.insert(make_pair(ip, value));
+	typename std::map<std::string, std::string>::iterator it;
+	it = headers.find(key);
+	if (it == headers.end()) {
+		headers.insert(make_pair(key, value));
 	} else {
 		it->second = value;
 	} 
 }
 
-
 int broadcast_receiver::get_header(std::map<std::string, std::string> &headers, const std::string key, std::string &value)
-{
-	std::unique_lock<std::mutex> lock(mux_);
+{ 
 	typename std::map<std::string, std::string>::iterator it;
 	it = headers.find(key);
 	if (it == headers.end()) {
@@ -177,23 +136,15 @@ int broadcast_receiver::get_header(std::map<std::string, std::string> &headers, 
 		}
 		return -1;
 	}
-	 
+ 
 	value = it->second;
 	if (debug_) {
-		cout << "broadcast_receiver::get_header key=" << key << " value=" << value << endl;
+		cout << "broadcast_receiver::get_header key=" << key << ", value=" << value << endl;
 	}
 	
 	return 0;
 }
 
-void broadcast_receiver::clear_device_nodes()
-{
-	for (auto it = device_nodes_.begin(); it != device_nodes_.end(); ++it)
-	{
-		it->second.headers.clear();
-	}	
-	device_nodes_.clear();
-}
 
 
 

@@ -19,7 +19,7 @@ search_camera::~search_camera()
 
 void search_camera::get_device_nodes(std::vector<std::string> &device_nodes)
 {
-	std::map<std::string, std::map<std::string, std::string> > client_nodes;
+	std::map<std::string, bdc_node*> client_nodes;
 	client_->get_device_nodes(client_nodes);
 	
 	device_nodes.clear();
@@ -32,21 +32,22 @@ void search_camera::get_device_nodes(std::vector<std::string> &device_nodes)
 
 void search_camera::get_device_nodes(std::vector<struct zscam_node> &device_nodes)
 {
-	std::map<std::string, std::map<std::string, std::string> > client_nodes;
+	std::map<std::string, bdc_node*> client_nodes;
 	client_->get_device_nodes(client_nodes);
-	
+ 
 	device_nodes.clear();
 	for (auto it = client_nodes.begin(); it != client_nodes.end(); it++)
 	{
 		struct zscam_node node;
+		std::map<std::string, std::string> headers = it->second->get_headers();
 		node.ip = it->first;
-		get_header(it->second, "version", node.version);
-		get_header(it->second, "company", node.company);
-		get_header(it->second, "board", node.board);
-		get_header(it->second, "serial_number", node.serial_number);
+		node.board = headers["board"];
+		node.company = headers["company"];
+		node.version = headers["version"];
+		node.serial_number = headers["serial_number"];
 		device_nodes.push_back(node);
 	}	
-	
+
 }
 
 int search_camera::get_header(std::map<std::string, std::string> &headers, const std::string key, std::string &value)
