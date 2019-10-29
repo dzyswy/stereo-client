@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 		printf("only support: set get do\n");
 		return -1;
 	}
-	stereo_camera cam(1);
+	stereo_camera cam(0);
 	cam.open_device(ip.c_str(), 7070);
 	
 	switch(action)

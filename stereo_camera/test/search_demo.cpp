@@ -34,7 +34,13 @@ int main(int argc, char *argv[])
 	{
 		if (!debug)
 		{
+		#if WIN32
+			system("CLS");
+		#else
 			system("clear");
+		#endif
+			
+			
 		}	
 		
 		std::vector<struct zscam_node> device_nodes;

@@ -15,9 +15,11 @@ broadcast_receiver::broadcast_receiver(const char *device_name, int port, int po
 	debug_ = debug;
 	device_name_ = device_name;
 	poll_time_ = poll_time;
-	 
-	cout << "broadcast_receiver: " << device_name_ << " " << port << " " << poll_time << endl;
-
+	
+	if (debug_) {
+		cout << "broadcast_receiver: " << device_name_ << " " << port << " " << poll_time << endl;
+	}
+	
 	udp::endpoint listen_endpoint(address_v4::from_string("0.0.0.0"), port);
     socket_.open(listen_endpoint.protocol());
     socket_.set_option(udp::socket::reuse_address(true));
