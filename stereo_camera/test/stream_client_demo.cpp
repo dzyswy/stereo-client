@@ -5,7 +5,9 @@
 #include <chrono>        
 #include <errno.h>
 #include <signal.h>
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 using namespace std;
 
@@ -46,7 +48,7 @@ int main(int argc, char *argv[])
 	
 	media_record record;
 	
-	stereo_camera cam;
+	stereo_camera cam(1);
 	ret = cam.open_device(ip.c_str(), 7070, 9090, channel);
 	if (ret < 0)
 	{

@@ -13,8 +13,7 @@
 #include <thread>
 #include <condition_variable>
 #include <ctime>
-#include <asio.hpp>
-
+#include <asio.hpp> 
 
 
 
@@ -45,7 +44,7 @@ protected:
 	void do_read();
 	void do_boundary(int flag, int frame_size = 0);
 	void do_headers();
-	void do_content(int frame_size);
+	void do_content(int frame_size); 
 	
 protected:
 	asio::io_context io_context_;

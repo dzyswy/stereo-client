@@ -1,5 +1,5 @@
 #include "stream_receiver.h"
-
+#include <string>
 using namespace std;
 
 stream_receiver::stream_receiver(std::string ip, int port, int index, int debug) : 
@@ -188,19 +188,31 @@ void stream_receiver::do_headers()
 					if (header == "\r")
 						break;
 					
+					istringstream iss(header);
 					std::string key;
 					std::string value;
 					
-					//Content-type: image/jpeg
-					const char *p = strchr(header.c_str(), ':');
-					if (p == NULL)
+					string temp = "";
+					std::getline(iss, temp, ':');
+					if (debug_)
+					{
+						cout << "header: " << header << endl;
+						cout << "temp: " << temp << endl;
+					}
+					if (temp.size() == 0)
 						continue;
-					long len_key = (long)p - (long)header.c_str();//exclude :
-					long len_val = header.length() - len_key - 2;//exclude :space \r
-					key = header.substr(0, len_key);
-					value = header.substr(len_key + 2, len_val);
+					key = temp;
+					
+					if ((header.size() - temp.size()) < 2)
+						continue;
+					value = header.substr(temp.size() + 2, header.size() - temp.size() - 2);
 					
 					headers.insert(make_pair(key, value));
+					
+					if (debug_)
+					{ 
+						cout << "key=" << key << ", value=" << value << endl;
+					}	
 				}	
 				
 				{
@@ -249,6 +261,7 @@ void stream_receiver::do_content(int frame_size)
 			}	
 		});
 }
+
 
 
 
