@@ -910,7 +910,7 @@ void zscam_client::on_pushButton_update_clicked()
 		return;
 	}
 		 
-	ftp_dialog dialog(&xftp, src_name.c_str(), "/run/media/mmcblk1p4/update.bin");
+	ftp_dialog dialog(&xftp, src_name.c_str(), "/zscam/update/update.bin");
 	
 	
 	dialog.exec();

@@ -196,7 +196,7 @@ void stream_receiver::do_headers()
 					if (p == NULL)
 						continue;
 					long len_key = (long)p - (long)header.c_str();//exclude :
-					long len_val = header.length() - len_key - 3;//exclude :space \r
+					long len_val = header.length() - len_key - 2;//exclude :space \r
 					key = header.substr(0, len_key);
 					value = header.substr(len_key + 2, len_val);
 					
