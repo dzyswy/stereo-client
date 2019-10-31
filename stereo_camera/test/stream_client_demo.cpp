@@ -24,19 +24,20 @@ void signal_handler(int sig)
 int main(int argc, char *argv[])
 {
 	int ret;
-	if ((argc != 3) && (argc != 4)) 
+	if ((argc != 4) && (argc != 5)) 
 	{
-		printf("usage: %s ip channel\n", argv[0]);
-		printf("usage: %s ip channel picture_%%05d.jpg\n", argv[0]);
+		printf("usage: %s ip channel debug\n", argv[0]);
+		printf("usage: %s ip channel debug picture_%%05d.jpg\n", argv[0]);
 		return -1;
 	}	
 	
 	string ip = argv[1];
 	int channel = atoi(argv[2]);
+	int debug = atoi(argv[3]);
 	string pic_format = "";
 	int save_pic = 0;
-	if (argc == 4) {
-		pic_format = argv[3];
+	if (argc == 5) {
+		pic_format = argv[4];
 		if (channel < 2)
 			save_pic = 1;
 	}
@@ -48,7 +49,7 @@ int main(int argc, char *argv[])
 	
 	media_record record;
 	
-	stereo_camera cam(1);
+	stereo_camera cam(debug);
 	ret = cam.open_device(ip.c_str(), 7070, 9090, channel);
 	if (ret < 0)
 	{
@@ -111,6 +112,5 @@ int main(int argc, char *argv[])
 		printf("\n\n");
 		frame_count++;
 	}	
-	
 	return 0;
 }

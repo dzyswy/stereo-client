@@ -9,11 +9,16 @@ using namespace std;
 rpc_client::rpc_client(int debug)
 {
 	debug_ = debug;
+	ip_ = "127.0.0.1";
 }
 
 
-void rpc_client::set_connect(const char *ip, int port)
+int rpc_client::set_connect(const char *ip, int port)
 {
+	int ret;
+	ret = check_ip(ip);
+	if (ret < 0)
+		return -1;
 	ip_ = ip;
 	port_ = port;
 }
@@ -37,6 +42,7 @@ int rpc_client::set_value(const std::string key, std::string value, int timeout)
 	
 	string request = os.str();
 	rpc_receiver client(ip_, port_, request, debug_);
+	client.run();
 	
 	string result = "";
 	int ret = client.get_result(result, timeout);
@@ -89,6 +95,7 @@ int rpc_client::get_value(const std::string key, const std::string &para, std::s
 	
 	string request = os.str();
 	rpc_receiver client(ip_, port_, request, debug_);
+	client.run();
 	
 	string result = "";
 	int ret = client.get_result(result, timeout);
@@ -109,6 +116,7 @@ int rpc_client::do_action(const std::string key, int timeout)
 	
 	string request = os.str();
 	rpc_receiver client(ip_, port_, request, debug_);
+	client.run();
 	
 	string result = "";
 	int ret = client.get_result(result, timeout);
@@ -121,7 +129,20 @@ int rpc_client::do_action(const std::string key, int timeout)
 
 
 
-
+int rpc_client::check_ip(const char *value)
+{
+	int a = -1, b = -1, c = -1, d = -1;
+	if ((sscanf(value, "%d.%d.%d.%d", &a, &b, &c, &d) == 4)
+		&& ((a >= 0) && (a <= 255))
+		&& ((b >= 0) && (b <= 255))
+		&& ((c >= 0) && (c <= 255))
+		&& ((d >= 0) && (d <= 255)))
+	{
+		return 0;
+	}	
+	cout << "ip: " << string(value) << ". format is wrong, please set again!\n";
+	return -1;
+}
 
 
 

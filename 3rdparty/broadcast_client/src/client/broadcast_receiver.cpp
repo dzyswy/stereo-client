@@ -28,19 +28,34 @@ broadcast_receiver::broadcast_receiver(const char *device_name, int port, int po
 	do_receive();
 	do_timer();
 	
-	run_thread_ = new std::thread([this] () {io_context_.run();});
+	run_thread_ = NULL;
 
 }
 
 broadcast_receiver::~broadcast_receiver()
 {
+	stop();	 
+}
+
+
+void broadcast_receiver::run()
+{
+	std::unique_lock<std::mutex> lock(lock_);
+	if (run_thread_)
+		return;
+	run_thread_ = new std::thread([this] () {io_context_.run();});
+}
+
+void broadcast_receiver::stop()
+{
+	std::unique_lock<std::mutex> lock(lock_);
 	io_context_.stop();
 	if (run_thread_)
 	{
 		run_thread_->join();
 		delete run_thread_;
-	}	 
-	
+		run_thread_ = NULL;
+	}
 }
 
 void broadcast_receiver::do_receive()

@@ -11,9 +11,9 @@ int main(int argc, char *argv[])
 {
 	
 	int ret;
-	if (argc != 5)
+	if ((argc != 5) && (argc != 6))
 	{
-		printf("usage: %s ip set|get|do key para\n", argv[0]);
+		printf("usage: %s ip set|get|do key para debug\n", argv[0]);
 		printf("usage: %s 192.168.3.22 get version null\n", argv[0]);
 		return -1;
 	}
@@ -22,6 +22,9 @@ int main(int argc, char *argv[])
 	string action_s = argv[2];
 	string key = argv[3];
 	string para = argv[4];
+	int debug = 0;
+	if (argc == 6)
+		debug = atoi(argv[5]);
 	
 	int action = 0;
 	if (strcmp(action_s.c_str(), "set") == 0)
@@ -34,7 +37,7 @@ int main(int argc, char *argv[])
 		printf("only support: set get do\n");
 		return -1;
 	}
-	stereo_camera cam(1);
+	stereo_camera cam(debug);
 	cam.open_device(ip.c_str(), 7070);
 	
 	switch(action)

@@ -18,21 +18,39 @@ stream_receiver::stream_receiver(std::string ip, int port, int index, int debug)
 	ip::tcp::endpoint ep(address_v4::from_string(ip), port); 
 	do_connect(ep);
 	
-	run_thread_ = new std::thread([this] () {io_context_.run();});
+	run_thread_ = NULL;
 }
 
 stream_receiver::~stream_receiver()
 {
+	stop();
+	image_.clear();
+	headers_.clear();
+}
+
+
+void stream_receiver::run()
+{
+	std::unique_lock<std::mutex> lock(lock_);
+	if (run_thread_)
+		return;
+	run_thread_ = new std::thread([this] () {io_context_.run();printf("leave stream receiver thread!\n");});
+}
+
+void stream_receiver::stop()
+{
+	std::unique_lock<std::mutex> lock(lock_);
+	if (debug_)
+		cout << "stream_receiver::stop()" << endl;
 	socket_.close();
 	io_context_.stop();
 	if (run_thread_)
 	{
 		run_thread_->join();
 		delete run_thread_;
+		run_thread_ = NULL;
 	}
 	
-	image_.clear();
-	headers_.clear();
 }
 
 int stream_receiver::query_frame(int timeout)

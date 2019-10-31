@@ -28,32 +28,35 @@ stream_client::~stream_client()
 
 int stream_client::connect_stream(const char *ip, int port, int index)
 { 
-	{
-		std::unique_lock<std::mutex> lock(mux_);
+	int ret;
+	std::unique_lock<std::mutex> lock(lock_);
+
+	if (going)
+		return -1;
 	
-		if (going)
-			return -1;
-		
-		ip_ = ip;
-		port_ = port;
-		index_ = index;
-		
-		going = 1;
-		reconnect_count_ = 0;
-	}
+	ret = check_ip(ip);
+	if (ret < 0)
+		return -1;
 	
-	run_thread_ = new std::thread([this] () {stream_process();});
+	ip_ = ip;
+	port_ = port;
+	index_ = index;
+	 
+	
+	going = 1;
+	reconnect_count_ = 0;
+	
+	
+	run_thread_ = new std::thread([&] () {stream_process();});
 	return 0;
 }
 
 
 int stream_client::disconnect_stream()
 {
-	{
-		std::unique_lock<std::mutex> lock(mux_);
-		going = 0;
-	}
-	
+	std::unique_lock<std::mutex> lock(lock_);
+	going = 0;
+
 	if (run_thread_)
 	{
 		run_thread_->join();
@@ -101,12 +104,15 @@ void stream_client::stream_process()
 {
 	int ret;
 	cout << "create stream receiver thread\n";
-	while(1)
+	while(going)
 	{
 		stream_receiver *impl = new stream_receiver(ip_, port_, index_, debug_);
-		
-		while(1)
+		impl->run();
+		while(going)
 		{
+			if (debug_)
+				cout << "stream_client::stream_process() going: " << going << endl;
+			
 			ret = impl->query_frame(5);
 			if (ret < 0) {
 				break;
@@ -117,25 +123,33 @@ void stream_client::stream_process()
 				impl->get_image(image_);
 				headers_ = impl->get_headers();
 				cond_.notify_all();
-				if (!going)
-					break;	
 			}
-		
+			 
 		}	
 		reconnect_count_++;
-		delete impl;
+		delete impl; 
 		
-		{
-			std::unique_lock<std::mutex> lock(mux_);
-			if (!going)
-				break;
-		}
+
 		
 	}
 	cout << "leave stream receiver thread\n";
 	
 }
 
+int stream_client::check_ip(const char *value)
+{
+	int a = -1, b = -1, c = -1, d = -1;
+	if ((sscanf(value, "%d.%d.%d.%d", &a, &b, &c, &d) == 4)
+		&& ((a >= 0) && (a <= 255))
+		&& ((b >= 0) && (b <= 255))
+		&& ((c >= 0) && (c <= 255))
+		&& ((d >= 0) && (d <= 255)))
+	{
+		return 0;
+	}	
+	cout << "ip: " << string(value) << ". format is wrong, please set again!\n";
+	return -1;
+}
 
 
 

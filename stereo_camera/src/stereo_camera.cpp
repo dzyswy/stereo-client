@@ -22,6 +22,7 @@ stereo_camera::stereo_camera(int debug)
 
 stereo_camera::~stereo_camera()
 {
+	close_device();
 	delete xstream_;
 	delete xcmd_;
 }
@@ -34,8 +35,9 @@ int stereo_camera::open_device(const char *ip, int cmd_port)
 	if (open_)
 		return -1;
  
-	xcmd_->set_connect(ip, cmd_port); 
-
+	ret = xcmd_->set_connect(ip, cmd_port); 
+	if (ret < 0)
+		return -1;
 	open_ = 1;
 
 	return 0;
@@ -50,9 +52,13 @@ int stereo_camera::open_device(const char *ip, int cmd_port, int stream_port, in
 	if (open_)
 		return -1;
  
-	xcmd_->set_connect(ip, cmd_port);
-	xstream_->connect_stream(ip, stream_port, stream_index);
-
+	ret = xcmd_->set_connect(ip, cmd_port);
+	if (ret < 0)
+		return -1;
+	ret = xstream_->connect_stream(ip, stream_port, stream_index);
+	if (ret < 0)
+		return -1;
+	
 	open_ = 1;
 
 	return 0;

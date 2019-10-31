@@ -26,6 +26,8 @@ class rpc_receiver
 public:
 	rpc_receiver(std::string ip, int port, std::string request, int debug = 0);
 	~rpc_receiver();
+	void run();
+	void stop();
 	int get_result(std::string &result, int timeout = 5);
 	
 protected:
@@ -49,6 +51,7 @@ protected:
 	int ret_;
 	std::string result_;
 
+	std::mutex lock_;
 	std::mutex mux_;
 	std::condition_variable cond_;
 	std::thread *run_thread_;

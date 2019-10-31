@@ -35,6 +35,7 @@ public:
 	
 protected:
 	void stream_process();
+	int check_ip(const char *value);
 	
 private:
 	std::string ip_;
@@ -50,6 +51,7 @@ private:
 	
 
 	int going;
+	std::mutex lock_;
 	std::mutex mux_;
 	std::condition_variable cond_;
 	std::thread *run_thread_;

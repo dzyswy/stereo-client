@@ -32,6 +32,9 @@ public:
 	broadcast_receiver(const char *device_name, int port, int poll_time, bdc_nodes& nodes, int debug = 0);
 	~broadcast_receiver();
 	
+	void run();
+	void stop();
+	
 	void get_device_nodes(std::map<std::string, struct bdc_dev_node> &device_nodes);
 
 protected:	
@@ -60,6 +63,8 @@ protected:
 	
     bdc_nodes &device_nodes_;
 	
+	std::mutex lock_;
+	std::mutex mux_;
 	std::thread *run_thread_;	
 };
 

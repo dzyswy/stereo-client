@@ -32,6 +32,9 @@ class stream_receiver
 public:	
 	stream_receiver(std::string ip, int port, int index, int debug = 0);
 	~stream_receiver();
+	void run();
+	void stop();
+	
 	
 	int query_frame(int timeout = 5);
 	void get_image(std::vector<unsigned char> &image);
@@ -59,6 +62,7 @@ protected:
 	std::vector<unsigned char> image_;
 	std::map<std::string, std::string> headers_;
 	
+	std::mutex lock_;
 	std::mutex mux_;
 	std::condition_variable cond_;
 	std::thread *run_thread_;	

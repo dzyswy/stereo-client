@@ -46,6 +46,10 @@ int ftp_client::connect_device()
 	xfered_ = 0;
 	file_size_ = 0;
 	
+	ret = check_ip(host_.c_str());
+	if (ret < 0)
+		return -1;
+	
 	ret = ftp_->Connect(host_.c_str());
 	if (!ret) {
 		cout << "ftp connect error, host:" << host_ << endl;
@@ -201,6 +205,20 @@ int ftp_client::xfer_callback(off64_t xfered, void* arg)
 	return 1;
 }
 
+int ftp_client::check_ip(const char *value)
+{
+	int a = -1, b = -1, c = -1, d = -1;
+	if ((sscanf(value, "%d.%d.%d.%d", &a, &b, &c, &d) == 4)
+		&& ((a >= 0) && (a <= 255))
+		&& ((b >= 0) && (b <= 255))
+		&& ((c >= 0) && (c <= 255))
+		&& ((d >= 0) && (d <= 255)))
+	{
+		return 0;
+	}	
+	cout << "ip: " << string(value) << ". format is wrong, please set again!\n";
+	return -1;
+}
 
 
 
@@ -318,6 +336,7 @@ void split_path(const char *path, std::string &drive, std::string &dir, std::str
 	delete _ext;
 	
 }
+
 
 
 #endif

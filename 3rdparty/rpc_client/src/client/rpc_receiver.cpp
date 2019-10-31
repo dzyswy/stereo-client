@@ -26,20 +26,34 @@ rpc_receiver::rpc_receiver(std::string ip, int port, std::string request, int de
 	
 	do_connect(ep);
 	
-	run_thread_ = new std::thread([this] () {io_context_.run();});
+	run_thread_ = NULL;
 }
 
 rpc_receiver::~rpc_receiver()
 {
+	stop();
+}
+
+void rpc_receiver::run()
+{
+	std::unique_lock<std::mutex> lock(lock_);
+	if (run_thread_)
+		return;
+	run_thread_ = new std::thread([this] () {io_context_.run();});
+}
+
+void rpc_receiver::stop()
+{
+	std::unique_lock<std::mutex> lock(lock_);
 	socket_.close();
 	io_context_.stop();
 	if (run_thread_)
 	{
 		run_thread_->join();
 		delete run_thread_;
+		run_thread_ = NULL;
 	}
 }
-
 
 void rpc_receiver::do_connect(ip::tcp::endpoint &ep)
 {

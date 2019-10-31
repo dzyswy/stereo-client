@@ -39,6 +39,7 @@ public:
 	
 protected:	
 	static int xfer_callback(off64_t xfered, void* arg);
+	int check_ip(const char *value);
 	
 protected:
 	std::string host_;
