@@ -13,9 +13,20 @@ search_camera::search_camera(const char *device_name, int port, int poll_time, i
 
 search_camera::~search_camera()
 {
+	stop();
 	delete client_;
 }
 
+
+void search_camera::run()
+{
+	client_->run();
+}
+
+void search_camera::stop()
+{
+	client_->stop();
+}
 
 void search_camera::get_device_nodes(std::vector<std::string> &device_nodes)
 {

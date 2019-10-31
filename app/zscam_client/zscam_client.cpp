@@ -118,6 +118,8 @@ zscam_client::zscam_client(QWidget *parent)
 	
 	connect(timer_slow_, SIGNAL(timeout()), this, SLOT(do_timer_slow_timeout()));
 	timer_slow_->start(2500);
+	
+	search_->run();
  
 }
 

@@ -36,6 +36,8 @@ class broadcast_client
 public:
 	broadcast_client(const char *device_name, int port, int poll_time, int debug = 0);
 	~broadcast_client();
+	void run();
+	void stop();
 	void get_device_nodes(std::map<std::string, bdc_node*> &device_nodes);
 
 protected:	

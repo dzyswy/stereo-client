@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 		debug = atoi(argv[1]);
 	
 	search_camera search("zynq_stereo_camera", 45789, 3, debug);
-	
+	search.run();
 	while(going)
 	{
 		if (!debug)

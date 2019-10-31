@@ -36,6 +36,9 @@ public:
 	search_camera(const char *device_name, int port, int poll_time, int debug = 0);
 	~search_camera();
 	
+	void run();
+	void stop();
+	
 	void get_device_nodes(std::vector<std::string> &device_nodes);
 	void get_device_nodes(std::vector<struct zscam_node> &device_nodes);
 

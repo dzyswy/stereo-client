@@ -35,3 +35,6 @@ build
 /vs2017
 /Win32/Debug/ZERO_CHECK
 /build-3531
+/Win32/Release/ZERO_CHECK
+/x64/Debug/ZERO_CHECK
+/x64/Release/ZERO_CHECK
