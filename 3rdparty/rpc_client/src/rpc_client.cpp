@@ -21,6 +21,7 @@ int rpc_client::set_connect(const char *ip, int port)
 		return -1;
 	ip_ = ip;
 	port_ = port;
+	return 0;
 }
 	
 int rpc_client::set_value(const std::string key, int value, int timeout)

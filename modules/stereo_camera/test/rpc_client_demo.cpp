@@ -38,7 +38,12 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	stereo_camera cam(debug);
-	cam.open_device(ip.c_str(), 7070);
+	ret = cam.open_device(ip.c_str(), 7070);
+	if (ret < 0)
+	{
+		printf("Failed to open: %s\n", ip.c_str());
+		return -1;
+	}	
 	
 	switch(action)
 	{

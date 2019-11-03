@@ -90,6 +90,8 @@ macro(UseCompilationWarningAsError)
   endif()
 endmacro()
 
+
+
 # Include our configuration header
 INCLUDE_DIRECTORIES( ${jsoncpp_SOURCE_DIR}/include )
 

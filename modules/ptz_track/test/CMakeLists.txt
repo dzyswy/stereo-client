@@ -1,8 +1,9 @@
 file(GLOB_RECURSE TEST_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 
-#INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/sample_ini/include)
 
-SET(LIBS ${LIBS} stereo_camera) 
+
+set(LIBS ${LIBS} ptz_track) 
+
 if (UNIX)
 	set(LIBS ${LIBS} pthread)
 endif ()
@@ -20,3 +21,4 @@ foreach(SOURCE_FILE ${TEST_SRCS})
 
 
 endforeach()
+

@@ -125,8 +125,8 @@ int stereo_camera::set_poly_mask(std::vector<std::pair<float, float> > &value, i
 int stereo_camera::get_value(const char *key, int &value, int timeout)
 {
 	std::unique_lock<std::mutex> lock(mux_);
-	if (!open_)
-		return -1;
+//	if (!open_)
+//		return -1;
 	
 	return xcmd_->get_value(key, value, timeout);
 }
@@ -134,8 +134,8 @@ int stereo_camera::get_value(const char *key, int &value, int timeout)
 int stereo_camera::get_value(const char *key, float &value, int timeout)
 {
 	std::unique_lock<std::mutex> lock(mux_);
-	if (!open_)
-		return -1;
+//	if (!open_)
+//		return -1;
 	
 	return xcmd_->get_value(key, value, timeout);
 }
@@ -143,8 +143,8 @@ int stereo_camera::get_value(const char *key, float &value, int timeout)
 int stereo_camera::get_value(const char *key, std::string &value, int timeout)
 {
 	std::unique_lock<std::mutex> lock(mux_);
-	if (!open_)
-		return -1;
+//	if (!open_)
+//		return -1;
 	
 	return xcmd_->get_value(key, value, timeout);
 }
@@ -152,8 +152,8 @@ int stereo_camera::get_value(const char *key, std::string &value, int timeout)
 int stereo_camera::get_value(const char *key, const std::string &para, std::string &value, int timeout)
 {
 	std::unique_lock<std::mutex> lock(mux_);
-	if (!open_)
-		return -1;
+//	if (!open_)
+//		return -1;
 	
 	return xcmd_->get_value(key, para, value, timeout);
 }

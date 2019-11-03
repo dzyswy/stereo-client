@@ -1,25 +1,20 @@
+project(zscam_client CXX)
 
-if (POLICY CMP0071)
-  cmake_policy(SET CMP0071 NEW)
-endif()
-
-
-PROJECT(zscam_client CXX)
-
+set(CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_PREFIX_PATH $ENV{QTDIR} ${CMAKE_PREFIX_PATH})
 
 
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/sample_ini/include)
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../../stereo_camera/include)
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../../ptz_track/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/sample_ini/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../modules/stereo_camera/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../modules/ptz_track/include)
 
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} FILE_SRCS)
 
-SET(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOMOC ON)
 set(QMAKE_CXXFLAGS ${QMAKE_CXXFLAGS} -std=c++11)
 
 #find_package(OpenCV REQUIRED)
@@ -33,15 +28,15 @@ set(QMAKE_CXXFLAGS ${QMAKE_CXXFLAGS} -std=c++11)
 #endif()
 
 
-FIND_PACKAGE(Qt5Widgets)
-FIND_PACKAGE(Qt5Gui)
+find_package(Qt5Widgets)
+find_package(Qt5Gui)
 
 set(QRC_SOURCE_FILES zscam_client.qrc)
 qt5_add_resources(QRC_FILES ${QRC_SOURCE_FILES})
 
-SET(LIBS ${LIBS} sample_ini)
-SET(LIBS ${LIBS} stereo_camera)
-SET(LIBS ${LIBS} ptz_track) 
+set(LIBS ${LIBS} sample_ini)
+set(LIBS ${LIBS} stereo_camera)
+set(LIBS ${LIBS} ptz_track) 
 
 
 if (UNIX)
@@ -51,12 +46,12 @@ endif ()
  
 
 qt5_wrap_ui(UI_HEADERS zscam_client.ui ftp_dialog.ui) # update_dialog.ui
-ADD_EXECUTABLE(${PROJECT_NAME} ${FILE_SRCS} ${UI_HEADERS} ${QRC_FILES})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} 
+add_executable(${PROJECT_NAME} ${FILE_SRCS} ${UI_HEADERS} ${QRC_FILES})
+target_link_libraries(${PROJECT_NAME} 
 	${LIBS}
 	${Qt5Core_QTMAIN_LIBRARIES})
 qt5_use_modules(${PROJECT_NAME} Widgets Gui)
 
 
-INSTALL(TARGETS ${PROJECT_NAME} DESTINATION bin)
+install(TARGETS ${PROJECT_NAME} DESTINATION bin)
 

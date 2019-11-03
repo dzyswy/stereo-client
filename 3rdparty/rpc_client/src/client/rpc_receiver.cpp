@@ -27,6 +27,10 @@ rpc_receiver::rpc_receiver(std::string ip, int port, std::string request, int de
 	do_connect(ep);
 	
 	run_thread_ = NULL;
+	
+	if (debug_) {
+		cout << "request: " << request_s_ << endl;
+	}
 }
 
 rpc_receiver::~rpc_receiver()
@@ -193,8 +197,13 @@ void rpc_receiver::do_read_headers()
 int rpc_receiver::get_result(std::string &result, int timeout)
 {
 	std::unique_lock<std::mutex> lock(mux_);
-	if (cond_.wait_for(lock, std::chrono::seconds(timeout)) == std::cv_status::timeout)
+	if (cond_.wait_for(lock, std::chrono::seconds(timeout)) == std::cv_status::timeout) {
+		if (debug_) {
+			printf("rpc_receiver::get_result cond_.wait_for error!\n");
+		} 
 		return -1;
+	}
+		
 	
 	if (ret_ < 0) {
 		if (ret_ == -2) {

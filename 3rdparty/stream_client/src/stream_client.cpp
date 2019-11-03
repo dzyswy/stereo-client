@@ -47,7 +47,7 @@ int stream_client::connect_stream(const char *ip, int port, int index)
 	reconnect_count_ = 0;
 	
 	
-	run_thread_ = new std::thread([&] () {stream_process();});
+	run_thread_ = new std::thread([this] () {stream_process();});
 	return 0;
 }
 

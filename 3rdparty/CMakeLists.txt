@@ -1,0 +1,6 @@
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/broadcast_client)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/jsoncpp)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libVISCA2)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/rpc_client)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/sample_ini)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/stream_client)
