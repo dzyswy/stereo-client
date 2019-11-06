@@ -53,7 +53,7 @@ ptz_track::ptz_track(ptz_ctl_visca *ptz, float period, int debug)
 	
 	
 	track_mode_ = PTZ_TRACK_STOP_TRACK_MODE;
-	track_mask_ = PTZ_TRACK_PTZ_ALL_MASK; 
+	track_mask_ = PTZ_ALL_MASK; 
 	trig_state_ = PTZ_TRACK_TARGET_SEARCH; 
 	
 	memset(&focus_pose_, 0, sizeof(focus_pose_));
@@ -103,7 +103,7 @@ void ptz_track::set_focus_pose(int pan_pose, int tilt_pose, int zoom_pose, int n
 	focus_pose.val[PTZ_ZOOM_CHANNEL] = zoom_pose;
 	for (int i = 0; i < PTZ_MAX_CHANNEL; i++)
 	{
-		float &val = focus_pose.val[i];
+		int &val = focus_pose.val[i];
 		val = (val < position_range_[i][0]) ? position_range_[i][0] : ((val > position_range_[i][1]) ? position_range_[i][1] : val);
 	}	
 	 
@@ -204,13 +204,13 @@ void ptz_track::compute(struct stereo_ptz_pose &focus_pose, struct stereo_ptz_po
 		pid_speed.val[i] = round(xpid_[i]->compute(err[i]) * 10 * speed_range_[i][1]);
 	}
 	
-	if (!(track_mask_ & PTZ_TRACK_PTZ_PAN_MASK))
+	if (!(track_mask_ & PTZ_PAN_MASK))
 		pid_speed.val[PTZ_PAN_CHANNEL] = 0;
 	
-	if (!(track_mask_ & PTZ_TRACK_PTZ_TILT_MASK))
+	if (!(track_mask_ & PTZ_TILT_MASK))
 		pid_speed.val[PTZ_TILT_CHANNEL] = 0;
 	
-	if (!(track_mask_ & PTZ_TRACK_PTZ_ZOOM_MASK))
+	if (!(track_mask_ & PTZ_ZOOM_MASK))
 		pid_speed.val[PTZ_ZOOM_CHANNEL] = 0;
 	
 	ptz_speed = pid_speed;
@@ -243,13 +243,13 @@ void ptz_track::compute(struct stereo_ptz_pose &focus_pose, struct stereo_ptz_po
 					int tilt_position = focus_pose.val[PTZ_TILT_CHANNEL];
 					int zoom_position = focus_pose.val[PTZ_ZOOM_CHANNEL];
 					 
-					if (!(track_mask_ & PTZ_TRACK_PTZ_PAN_MASK))
+					if (!(track_mask_ & PTZ_PAN_MASK))
 						pan_position = current_pose.val[PTZ_PAN_CHANNEL];
 					
-					if (!(track_mask_ & PTZ_TRACK_PTZ_TILT_MASK))
+					if (!(track_mask_ & PTZ_TILT_MASK))
 						tilt_position = current_pose.val[PTZ_TILT_CHANNEL];
 					
-					if (!(track_mask_ & PTZ_TRACK_PTZ_ZOOM_MASK))
+					if (!(track_mask_ & PTZ_ZOOM_MASK))
 						zoom_position = current_pose.val[PTZ_ZOOM_CHANNEL];
 					
 					ptz_->set_pantilt_absolute_position(pan_position, tilt_position, ptz_->get_max_pan_speed(), ptz_->get_max_tilt_speed());

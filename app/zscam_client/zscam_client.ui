@@ -854,6 +854,13 @@
                  </property>
                 </widget>
                </item>
+               <item row="3" column="1">
+                <widget class="QCheckBox" name="checkBox_ptz_coord">
+                 <property name="text">
+                  <string>PTZ坐标系</string>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </item>
              <item row="4" column="1">
@@ -883,7 +890,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>334</width>
+           <width>320</width>
            <height>838</height>
           </rect>
          </property>
@@ -1703,8 +1710,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>350</width>
-           <height>474</height>
+           <width>210</width>
+           <height>311</height>
           </rect>
          </property>
          <property name="autoFillBackground">
@@ -1947,7 +1954,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>334</width>
+           <width>280</width>
            <height>560</height>
           </rect>
          </property>
@@ -2535,8 +2542,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>350</width>
-           <height>474</height>
+           <width>210</width>
+           <height>346</height>
           </rect>
          </property>
          <attribute name="label">

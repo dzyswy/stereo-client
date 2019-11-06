@@ -38,13 +38,6 @@
 
 
 
-#define SHOW_GRAPH_COORD_INFO_EN		(1 << 0)
-#define SHOW_DEPTH_COORD_INFO_EN		(1 << 1)
-#define SHOW_CAMERA_COORD_INFO_EN		(1 << 2)
-#define SHOW_ROOM_COORD_INFO_EN			(1 << 3)
-#define SHOW_BALL_COORD_INFO_EN			(1 << 4)
-
-
 
 
 
@@ -169,7 +162,7 @@ public:
 	
 	struct stereo_ptz_pose ptz_pose_;
 	struct stereo_detect_box detect_pose_;
-	std::vector<std::pair<struct stereo_ptz_pose, struct stereo_pixel_box> > ptz_samples_;
+	std::vector<std::pair<struct stereo_ptz_pose, struct stereo_detect_box> > ptz_samples_;
 
 signals:
 	void fresh_frame_signal();	
@@ -660,10 +653,10 @@ private slots:
 		switch (state)
 		{
 			case Qt::Unchecked:
-				show_detect_box_mask_ &= ~SHOW_GRAPH_COORD_INFO_EN;
+				show_detect_box_mask_ &= ~STEREO_GRAPH_COORD_MASK;
 				break;
 			case Qt::Checked:
-				show_detect_box_mask_ |= SHOW_GRAPH_COORD_INFO_EN;
+				show_detect_box_mask_ |= STEREO_GRAPH_COORD_MASK;
 				break;
 		}
 	}
@@ -673,10 +666,10 @@ private slots:
 		switch (state)
 		{
 			case Qt::Unchecked:
-				show_detect_box_mask_ &= ~SHOW_DEPTH_COORD_INFO_EN;
+				show_detect_box_mask_ &= ~STEREO_DEPTH_COORD_MASK;
 				break;
 			case Qt::Checked:
-				show_detect_box_mask_ |= SHOW_DEPTH_COORD_INFO_EN;
+				show_detect_box_mask_ |= STEREO_DEPTH_COORD_MASK;
 				break;
 		}
 	}
@@ -686,10 +679,10 @@ private slots:
 		switch (state)
 		{
 			case Qt::Unchecked:
-				show_detect_box_mask_ &= ~SHOW_CAMERA_COORD_INFO_EN;
+				show_detect_box_mask_ &= ~STEREO_CAMERA_COORD_MASK;
 				break;
 			case Qt::Checked:
-				show_detect_box_mask_ |= SHOW_CAMERA_COORD_INFO_EN;
+				show_detect_box_mask_ |= STEREO_CAMERA_COORD_MASK;
 				break;
 		}
 	}
@@ -699,10 +692,10 @@ private slots:
 		switch (state)
 		{
 			case Qt::Unchecked:
-				show_detect_box_mask_ &= ~SHOW_ROOM_COORD_INFO_EN;
+				show_detect_box_mask_ &= ~STEREO_ROOM_COORD_MASK;
 				break;
 			case Qt::Checked:
-				show_detect_box_mask_ |= SHOW_ROOM_COORD_INFO_EN;
+				show_detect_box_mask_ |= STEREO_ROOM_COORD_MASK;
 				break;
 		}
 	}
@@ -712,10 +705,23 @@ private slots:
 		switch (state)
 		{
 			case Qt::Unchecked:
-				show_detect_box_mask_ &= ~SHOW_BALL_COORD_INFO_EN;
+				show_detect_box_mask_ &= ~STEREO_BALL_COORD_MASK;
 				break;
 			case Qt::Checked:
-				show_detect_box_mask_ |= SHOW_BALL_COORD_INFO_EN;
+				show_detect_box_mask_ |= STEREO_BALL_COORD_MASK;
+				break;
+		}
+	}
+	
+	void on_checkBox_ptz_coord_stateChanged(int state)
+	{
+		switch (state)
+		{
+			case Qt::Unchecked:
+				show_detect_box_mask_ &= ~STEREO_PTZ_COORD_MASK;
+				break;
+			case Qt::Checked:
+				show_detect_box_mask_ |= STEREO_PTZ_COORD_MASK;
 				break;
 		}
 	}

@@ -18,5 +18,5 @@ set(LIBS ${LIBS} stereo_camera)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)
 

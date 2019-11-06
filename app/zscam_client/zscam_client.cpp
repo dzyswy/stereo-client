@@ -61,7 +61,7 @@ zscam_client::zscam_client(QWidget *parent)
 	
 	draw_poly_mask_mode_ = 0;
 	show_cursor_mode_ = 0;
-	show_detect_box_mask_ = SHOW_DEPTH_COORD_INFO_EN;
+	show_detect_box_mask_ = STEREO_DEPTH_COORD_MASK;
 	ptz_calib_mode_ = 0;
 	
 	show_mot_ = 1;
@@ -85,7 +85,7 @@ zscam_client::zscam_client(QWidget *parent)
 	
 	ptz_open_ = 0;
 	ptz_track_mode_ = 0;
-	ptz_track_mask_ = PTZ_TRACK_PTZ_ALL_MASK;
+	ptz_track_mask_ = PTZ_ALL_MASK;
 	
 	search_ = new search_camera("zynq_stereo_camera", 45789, 5, 0);
 	camera_ = new stereo_camera(0);
@@ -222,7 +222,7 @@ void zscam_client::stream_process()
 		xfilter_->compute(detect_boxes, number_state_, focus_box_, stable_state_);
 		if ((detect_mode_) && (ptz_track_mode_))
 		{
-			xtrack_->set_detect_box(focus_box_, number_state_, stable_state_);
+			xtrack_->set_focus_pose(focus_box_.pan, focus_box_.tilt, focus_box_.zoom, number_state_, stable_state_);
 		}	
 		
 		{
@@ -841,25 +841,29 @@ string zscam_client::gen_detect_box_str(struct stereo_detect_box &detect_box, in
 {
 	std::stringstream os;
 	os << "id=" << detect_box.id << " ";
-	if (mask & SHOW_GRAPH_COORD_INFO_EN) {
+	if (mask & STEREO_GRAPH_COORD_MASK) {
 		os << "box=(" << detect_box.box_x << " " << detect_box.box_y << " " << detect_box.box_w << " " << detect_box.box_h << ") ";	
 	}
 	
-	if (mask & SHOW_DEPTH_COORD_INFO_EN) {
+	if (mask & STEREO_DEPTH_COORD_MASK) {
 		os << "x=" << detect_box.x << " y=" << detect_box.y << " d=" << detect_box.d << " ";
 	}
 		
 	
-	if (mask & SHOW_CAMERA_COORD_INFO_EN) {
+	if (mask & STEREO_CAMERA_COORD_MASK) {
 		os << "xcm=" << detect_box.xcm << " ycm=" << detect_box.ycm << " zcm=" << detect_box.zcm << " ";
 	}
 	
-	if (mask & SHOW_ROOM_COORD_INFO_EN) {
+	if (mask & STEREO_ROOM_COORD_MASK) {
 		os << "xtcm=" << detect_box.xtcm << " ytcm=" << detect_box.ytcm << " ztcm=" << detect_box.ztcm << " ";
 	}
 	
-	if (mask & SHOW_BALL_COORD_INFO_EN) {
+	if (mask & STEREO_BALL_COORD_MASK) {
 		os << "xa=" << detect_box.xa << " ya=" << -detect_box.ya << " r=" << detect_box.r << " ";
+	}
+	
+	if (mask & STEREO_PTZ_COORD_MASK) {
+		os << "pan=" << detect_box.pan << " tilt=" << detect_box.tilt << " zoom=" << detect_box.zoom << " ";
 	}
 	return os.str();
 }
@@ -959,26 +963,23 @@ void zscam_client::on_comboBox_ptz_track_mode_currentIndexChanged(int index)
 	xtrack_->set_track_mode(index);
 		
 	if (ui.checkBox_ptz_track_pan_mask->checkState() == Qt::Checked)
-		ptz_track_mask_ |= PTZ_TRACK_PTZ_PAN_MASK;
+		ptz_track_mask_ |= PTZ_PAN_MASK;
 	else
-		ptz_track_mask_ &= ~PTZ_TRACK_PTZ_PAN_MASK;	
+		ptz_track_mask_ &= ~PTZ_PAN_MASK;	
 	if (ui.checkBox_ptz_track_tilt_mask->checkState() == Qt::Checked)
-		ptz_track_mask_ |= PTZ_TRACK_PTZ_TILT_MASK;
+		ptz_track_mask_ |= PTZ_TILT_MASK;
 	else
-		ptz_track_mask_ &= ~PTZ_TRACK_PTZ_TILT_MASK;
+		ptz_track_mask_ &= ~PTZ_TILT_MASK;
 	if (ui.checkBox_ptz_track_zoom_mask->checkState() == Qt::Checked)
-		ptz_track_mask_ |= PTZ_TRACK_PTZ_ZOOM_MASK;
+		ptz_track_mask_ |= PTZ_ZOOM_MASK;
 	else
-		ptz_track_mask_ &= ~PTZ_TRACK_PTZ_ZOOM_MASK;
+		ptz_track_mask_ &= ~PTZ_ZOOM_MASK;
 	xtrack_->set_track_mask(ptz_track_mask_);
 }
 
 
 void zscam_client::on_checkBox_ptz_calib_en_stateChanged(int arg1)
 {
-	if ((!ptz_open_) || (!cam_open_))
-		return;
-		
 	switch (arg1)
 	{
 		case Qt::Unchecked:
@@ -1008,7 +1009,7 @@ void zscam_client::on_pushButton_clear_ptz_samples_clicked()
 void zscam_client::on_pushButton_add_ptz_sample_clicked()
 {
 	ptz_samples_.push_back(make_pair(ptz_pose_, detect_pose_));
-	ui.spinBox_fit_sample_size->setValue(ptz_samples_.size());
+	ui.spinBox_ptz_sample_size->setValue(ptz_samples_.size());
 }
  
 void zscam_client::on_pushButton_set_ptz_samples_clicked()
@@ -1039,9 +1040,9 @@ void zscam_client::show_ptz_sample()
 	ui.spinBox_ptz_pose1->setValue(ptz_pose_.val[1]);
 	ui.spinBox_ptz_pose2->setValue(ptz_pose_.val[2]);
 	 
-	ui.spinBox_detect_pose0->setValue(detect_pose_.val[0]);
-	ui.spinBox_detect_pose1->setValue(detect_pose_.val[1]);
-	ui.spinBox_detect_pose2->setValue(detect_pose_.val[2]);
+	ui.spinBox_detect_pose0->setValue(detect_pose_.x);
+	ui.spinBox_detect_pose1->setValue(detect_pose_.y);
+	ui.spinBox_detect_pose2->setValue((int)detect_pose_.r);
 }
 
 void zscam_client::show_ptz_samples(QPixmap *dst, QColor color)
@@ -1052,15 +1053,15 @@ void zscam_client::show_ptz_samples(QPixmap *dst, QColor color)
 	painter.setPen(QPen(color, 1.5, Qt::SolidLine));
 	for (int i = 0; i < ptz_samples_.size(); i++) 
 	{
-		x = ptz_samples_[i].first.x;
-		y = ptz_samples_[i].first.y; 
+		x = ptz_samples_[i].second.x;
+		y = ptz_samples_[i].second.y; 
 		
 		painter.drawLine(x - len / 2, y, x + len / 2, y);
 		painter.drawLine(x, y - len / 2, x, y + len / 2);
 	}	
 	
-	x = ptz_pose_.x;
-	y = ptz_pose_.y;
+	x = detect_pose_.x;
+	y = detect_pose_.y;
 	painter.drawLine(x - len / 2, y, x + len / 2, y);
 	painter.drawLine(x, y - len / 2, x, y + len / 2);
 }
@@ -1106,19 +1107,19 @@ int zscam_client::load_config(const char *config_name)
 	svalue = ini.GetValue("ptz_track", "track_mask", "0");
 	value = atoi(svalue.c_str());
 	xtrack_->set_track_mask(value);
-	if (value & PTZ_TRACK_PTZ_PAN_MASK) {
+	if (value & PTZ_PAN_MASK) {
 		ui.checkBox_ptz_track_pan_mask->setCheckState(Qt::Checked);
 	} else {
 		ui.checkBox_ptz_track_pan_mask->setCheckState(Qt::Unchecked);
 	}
 	
-	if (value & PTZ_TRACK_PTZ_TILT_MASK) {
+	if (value & PTZ_TILT_MASK) {
 		ui.checkBox_ptz_track_tilt_mask->setCheckState(Qt::Checked);
 	} else {
 		ui.checkBox_ptz_track_tilt_mask->setCheckState(Qt::Unchecked);
 	}
 	
-	if (value & PTZ_TRACK_PTZ_ZOOM_MASK) {
+	if (value & PTZ_ZOOM_MASK) {
 		ui.checkBox_ptz_track_zoom_mask->setCheckState(Qt::Checked);
 	} else {
 		ui.checkBox_ptz_track_zoom_mask->setCheckState(Qt::Unchecked);

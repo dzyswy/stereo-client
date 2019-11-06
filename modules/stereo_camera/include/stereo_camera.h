@@ -99,9 +99,7 @@ public:
 	int get_gyro_angle(struct stereo_gyro_angle &gyro_angle);
 	int get_reconnect_count();
 	
-	void detect_box_to_pixel(struct stereo_detect_box &detect_box, struct stereo_pixel_point &detect_pixel);
-	void detect_pixel_to_box(struct stereo_pixel_point &detect_pixel, struct stereo_detect_box &detect_box);
-		
+
 protected:
 	int open_;
 	

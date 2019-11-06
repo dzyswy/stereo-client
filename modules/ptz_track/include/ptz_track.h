@@ -22,10 +22,6 @@
 #include "stereo_struct.h"
 
 
-#define PTZ_TRACK_PTZ_PAN_MASK		(1<<0)
-#define PTZ_TRACK_PTZ_TILT_MASK		(1<<1)
-#define PTZ_TRACK_PTZ_ZOOM_MASK		(1<<2)
-#define PTZ_TRACK_PTZ_ALL_MASK		(0x7)
 
 
 
@@ -47,7 +43,7 @@ enum ptz_track_trig_state_type
 
 struct ptz_track_ptz_speed
 {
-	int val[FIT_CALIB_PTZ_MAX_CHANNEL];
+	int val[PTZ_MAX_CHANNEL];
 };
  
 
@@ -91,11 +87,11 @@ protected:
 	int number_state_;
 	int stable_state_;
 	
-	float position_range_[FIT_CALIB_PTZ_MAX_CHANNEL][2];
-	float speed_range_[FIT_CALIB_PTZ_MAX_CHANNEL][2];
-	float dead_zone_[FIT_CALIB_PTZ_MAX_CHANNEL];
+	float position_range_[PTZ_MAX_CHANNEL][2];
+	float speed_range_[PTZ_MAX_CHANNEL][2];
+	float dead_zone_[PTZ_MAX_CHANNEL];
 	 
-	pid_inc *xpid_[FIT_CALIB_PTZ_MAX_CHANNEL];
+	pid_inc *xpid_[PTZ_MAX_CHANNEL];
 	
 	
 	

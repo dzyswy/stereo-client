@@ -47,9 +47,9 @@ int json_ptz_samples::from_string(std::string &value)
 			jdetect_box = jpair_sample["detect_box"];
 			
 			struct stereo_ptz_pose ptz_pose;
-			ptz_pose.val[PTZ_PAN_CHANNEL] = jptz_pose["pan"];
-			ptz_pose.val[PTZ_TILT_CHANNEL] = jptz_pose["tilt"];
-			ptz_pose.val[PTZ_ZOOM_CHANNEL] = jptz_pose["zoom"];
+			ptz_pose.val[PTZ_PAN_CHANNEL] = jptz_pose["pan"].asInt();
+			ptz_pose.val[PTZ_TILT_CHANNEL] = jptz_pose["tilt"].asInt();
+			ptz_pose.val[PTZ_ZOOM_CHANNEL] = jptz_pose["zoom"].asInt();
 			
 			struct stereo_detect_box detect_box;
 			detect_box.id = jdetect_box["id"].asInt();

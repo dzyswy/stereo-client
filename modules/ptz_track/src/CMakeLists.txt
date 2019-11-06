@@ -1,11 +1,9 @@
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/fit_calib)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../3rdparty/libVISCA2/visca)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../3rdparty/jsoncpp/include)
 
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} FILE_SRCS)
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/fit_calib FILE_SRCS)
 
 set(LIBS ${LIBS} jsoncpp)
 set(LIBS ${LIBS} visca) 
