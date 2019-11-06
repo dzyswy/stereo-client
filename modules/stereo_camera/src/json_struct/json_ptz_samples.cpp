@@ -1,46 +1,56 @@
-#include "json_detect_boxes.h"
+#include "json_ptz_samples.h"
 #include "json/json.h"
 
 
 using namespace std;
 
-json_detect_boxes::json_detect_boxes()
+json_ptz_samples::json_ptz_samples()
 {
 	
 }
 
-json_detect_boxes::json_detect_boxes(std::vector<struct stereo_detect_box> &value)
+json_ptz_samples::json_ptz_samples(std::vector<std::pair<struct stereo_ptz_pose, struct stereo_detect_box> > &value)
 {
-	detect_boxes_ = value;
+	ptz_samples_ = value;
 }
 
-std::vector<struct stereo_detect_box> json_detect_boxes::to_struct()
+std::vector<std::pair<struct stereo_ptz_pose, struct stereo_detect_box> > json_ptz_samples::to_struct()
 {
-	return detect_boxes_;
+	return ptz_samples_;
 }
 
 
-int json_detect_boxes::from_string(std::string &value)
+int json_ptz_samples::from_string(std::string &value)
 {
-	vector<struct stereo_detect_box> detect_boxes;
+	std::vector<std::pair<struct stereo_ptz_pose, struct stereo_detect_box> > ptz_samples;
 	
 	try {
 		Json::Reader reader;
 		Json::Value jroot;
-		Json::Value jdetect_boxes;
+		Json::Value jptz_samples;
+		Json::Value jpair_sample;
+		Json::Value jptz_pose;
 		Json::Value jdetect_box;
 		
 		
 		if (!reader.parse(value, jroot))
 			return -1;
 		
-		if (jroot["detect_boxes"].empty())
+		if (jroot["ptz_samples"].empty())
 			return -1; 
 
-		jdetect_boxes = jroot["detect_boxes"];
-		for (int i = 0; i < jdetect_boxes.size(); i++)
+		jptz_samples = jroot["ptz_samples"];
+		for (int i = 0; i < jptz_samples.size(); i++)
 		{
-			jdetect_box = jdetect_boxes[i];
+			jpair_sample = jptz_samples[i];
+			jptz_pose = jpair_sample["ptz_pose"];
+			jdetect_box = jpair_sample["detect_box"];
+			
+			struct stereo_ptz_pose ptz_pose;
+			ptz_pose.val[PTZ_PAN_CHANNEL] = jptz_pose["pan"];
+			ptz_pose.val[PTZ_TILT_CHANNEL] = jptz_pose["tilt"];
+			ptz_pose.val[PTZ_ZOOM_CHANNEL] = jptz_pose["zoom"];
+			
 			struct stereo_detect_box detect_box;
 			detect_box.id = jdetect_box["id"].asInt();
 			detect_box.box_x = jdetect_box["box_x"].asInt();
@@ -62,7 +72,10 @@ int json_detect_boxes::from_string(std::string &value)
 			detect_box.pan = jdetect_box["pan"].asInt();
 			detect_box.tilt = jdetect_box["tilt"].asInt();
 			detect_box.zoom = jdetect_box["zoom"].asInt();
-			detect_boxes.push_back(detect_box);
+			
+			
+			
+			ptz_samples.push_back(make_pair(ptz_pose, detect_box));
 		} 
 		
 	} catch(std::exception &ex)
@@ -70,21 +83,29 @@ int json_detect_boxes::from_string(std::string &value)
         printf( "jsoncpp struct error: %s.\n", ex.what());
         return -1;
 	}
-	detect_boxes_ = detect_boxes;
+	ptz_samples_ = ptz_samples;
 	return 0;
 }
 
-int json_detect_boxes::to_string(std::string &value)
+int json_ptz_samples::to_string(std::string &value)
 {
 	try {
 		Json::Value jroot;
-		Json::Value jdetect_boxes;
+		Json::Value jptz_samples;
+		Json::Value jpair_sample;
+		Json::Value jptz_pose;
 		Json::Value jdetect_box;
 		
-		for (int i = 0; i < detect_boxes_.size(); i++)
+		for (int i = 0; i < ptz_samples_.size(); i++)
 		{
-			struct stereo_detect_box &detect_box = detect_boxes_[i];
+			std::pair<struct stereo_ptz_pose, struct stereo_detect_box> &pair_sample = ptz_samples_[i];
 			
+			struct stereo_ptz_pose ptz_pose = pair_sample.first;
+			jptz_pose["pan"] = ptz_pose.val[PTZ_PAN_CHANNEL];
+			jptz_pose["tilt"] = ptz_pose.val[PTZ_TILT_CHANNEL];
+			jptz_pose["zoom"] = ptz_pose.val[PTZ_ZOOM_CHANNEL];
+			
+			struct stereo_detect_box detect_box = pair_sample.second;
 			jdetect_box["id"] = detect_box.id;
 			jdetect_box["box_x"] = detect_box.box_x;
 			jdetect_box["box_y"] = detect_box.box_y;
@@ -105,9 +126,13 @@ int json_detect_boxes::to_string(std::string &value)
 			jdetect_box["pan"] = detect_box.pan;
 			jdetect_box["tilt"] = detect_box.tilt;
 			jdetect_box["zoom"] = detect_box.zoom;
-			jdetect_boxes.append(jdetect_box);
+			
+			jpair_sample["ptz_pose"] = jptz_pose;
+			jpair_sample["detect_box"] = jdetect_box;
+			
+			jptz_samples.append(jpair_sample);
 		}	
-		jroot["detect_boxes"] = jdetect_boxes;
+		jroot["ptz_samples"] = jptz_samples;
 		
 	//	value = jroot.toStyledString();
 		Json::StreamWriterBuilder builder;

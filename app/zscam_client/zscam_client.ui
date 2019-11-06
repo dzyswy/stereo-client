@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1163</width>
-    <height>661</height>
+    <width>1198</width>
+    <height>644</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -287,7 +287,7 @@
          <attribute name="label">
           <string>双目摄像机</string>
          </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_4">
+         <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
            <widget class="QGroupBox" name="groupBox_3">
             <property name="sizePolicy">
@@ -574,8 +574,8 @@
             <property name="title">
              <string>算法模式</string>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_2">
-             <item>
+            <layout class="QGridLayout" name="gridLayout_11">
+             <item row="0" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_2">
                <item>
                 <widget class="QLabel" name="label_5">
@@ -617,7 +617,7 @@
                </item>
               </layout>
              </item>
-             <item>
+             <item row="1" column="0">
               <layout class="QGridLayout" name="gridLayout_24">
                <item row="0" column="0">
                 <widget class="QCheckBox" name="checkBox_match_mode">
@@ -663,7 +663,7 @@
                </item>
               </layout>
              </item>
-             <item>
+             <item row="2" column="0">
               <layout class="QGridLayout" name="gridLayout_28">
                <item row="0" column="0">
                 <widget class="QCheckBox" name="checkBox_bg_mode">
@@ -883,8 +883,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>320</width>
-           <height>834</height>
+           <width>334</width>
+           <height>838</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -902,7 +902,7 @@
          <attribute name="label">
           <string>双目参数</string>
          </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_5">
+         <layout class="QVBoxLayout" name="verticalLayout_8">
           <item>
            <widget class="QGroupBox" name="groupBox_6">
             <property name="title">
@@ -1468,6 +1468,13 @@
                </property>
               </widget>
              </item>
+             <item row="0" column="2">
+              <widget class="QCheckBox" name="checkBox_show_gray_mode">
+               <property name="text">
+                <string>显示</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
@@ -1476,27 +1483,45 @@
             <property name="title">
              <string>屏蔽区域滤波</string>
             </property>
-            <layout class="QGridLayout" name="gridLayout_19">
-             <item row="0" column="0" colspan="2">
-              <widget class="QCheckBox" name="checkBox_draw_poly_mask">
-               <property name="text">
-                <string>显示屏蔽点</string>
-               </property>
-              </widget>
+            <layout class="QVBoxLayout" name="verticalLayout_5">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_13">
+               <item>
+                <widget class="QCheckBox" name="checkBox_draw_poly_mask">
+                 <property name="text">
+                  <string>使能绘制</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBox_show_poly_mask">
+                 <property name="text">
+                  <string>显示屏蔽区域</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
-             <item row="0" column="2" colspan="2">
-              <widget class="QCheckBox" name="checkBox_show_poly_mask">
-               <property name="text">
-                <string>显示屏蔽区域</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1" colspan="2">
-              <widget class="QPushButton" name="pushButton_set_poly_mask">
-               <property name="text">
-                <string>设置</string>
-               </property>
-              </widget>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_14">
+               <item>
+                <widget class="QPushButton" name="pushButton_clear_poly_mask">
+                 <property name="text">
+                  <string>清空</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="pushButton_set_poly_mask">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="text">
+                  <string>设置</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
             </layout>
            </widget>
@@ -1678,8 +1703,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>210</width>
-           <height>311</height>
+           <width>350</width>
+           <height>474</height>
           </rect>
          </property>
          <property name="autoFillBackground">
@@ -1922,8 +1947,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>311</width>
-           <height>586</height>
+           <width>334</width>
+           <height>560</height>
           </rect>
          </property>
          <attribute name="label">
@@ -1964,13 +1989,6 @@
              </item>
              <item row="1" column="0" colspan="2">
               <layout class="QHBoxLayout" name="horizontalLayout_11">
-               <item>
-                <widget class="QCheckBox" name="checkBox_fit_calib_en">
-                 <property name="text">
-                  <string>使能标定</string>
-                 </property>
-                </widget>
-               </item>
                <item>
                 <widget class="QCheckBox" name="checkBox_datascreen">
                  <property name="text">
@@ -2282,35 +2300,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QGroupBox" name="groupBox_fit_calib">
+           <widget class="QGroupBox" name="groupBox_ptz_calib">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="title">
              <string>联合标定</string>
             </property>
-            <layout class="QGridLayout" name="gridLayout_11">
-             <item row="4" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_detect_pose1">
-               <property name="minimum">
-                <double>-100000.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>1000000.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="2">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_ptz_pose1">
-               <property name="minimum">
-                <double>-100000.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>1000000.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
+            <layout class="QGridLayout" name="gridLayout_7">
+             <item row="0" column="0">
               <widget class="QLabel" name="label_14">
                <property name="text">
                 <string>标定点数量：</string>
@@ -2318,35 +2316,7 @@
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QComboBox" name="comboBox_fit_mode">
-               <item>
-                <property name="text">
-                 <string>重合模式</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>分离模式</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="6" column="0">
-              <widget class="QPushButton" name="pushButton_fit_clear_sample">
-               <property name="text">
-                <string>清空</string>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="2">
-              <widget class="QPushButton" name="pushButton_fit_compute">
-               <property name="text">
-                <string>标定</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QSpinBox" name="spinBox_fit_sample_size">
+              <widget class="QSpinBox" name="spinBox_ptz_sample_size">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -2361,78 +2331,115 @@
                </property>
               </widget>
              </item>
-             <item row="6" column="1">
-              <widget class="QPushButton" name="pushButton_fit_add_sample">
+             <item row="0" column="2">
+              <widget class="QCheckBox" name="checkBox_ptz_calib_en">
                <property name="text">
-                <string>添加</string>
+                <string>使能标定</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="0">
+             <item row="1" column="0">
               <widget class="QLabel" name="label_32">
                <property name="text">
                 <string>水平：</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="2">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_ptz_pose0">
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="spinBox_ptz_pose0">
                <property name="minimum">
-                <double>-100000.000000000000000</double>
+                <number>-100000</number>
                </property>
                <property name="maximum">
-                <double>1000000.000000000000000</double>
+                <number>1000000</number>
                </property>
               </widget>
              </item>
-             <item row="5" column="2">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_ptz_pose2">
+             <item row="1" column="2">
+              <widget class="QSpinBox" name="spinBox_detect_pose0">
                <property name="minimum">
-                <double>-100000.000000000000000</double>
+                <number>-100000</number>
                </property>
                <property name="maximum">
-                <double>1000000.000000000000000</double>
+                <number>1000000</number>
                </property>
               </widget>
              </item>
-             <item row="3" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_detect_pose0">
-               <property name="minimum">
-                <double>-100000.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>1000000.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_detect_pose2">
-               <property name="minimum">
-                <double>-100000.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>1000000.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="0">
-              <widget class="QLabel" name="label_35">
-               <property name="text">
-                <string>左右：</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
+             <item row="2" column="0">
               <widget class="QLabel" name="label_34">
                <property name="text">
                 <string>上下：</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_42">
+             <item row="2" column="1">
+              <widget class="QSpinBox" name="spinBox_ptz_pose1">
+               <property name="minimum">
+                <number>-100000</number>
+               </property>
+               <property name="maximum">
+                <number>1000000</number>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2">
+              <widget class="QSpinBox" name="spinBox_detect_pose1">
+               <property name="minimum">
+                <number>-100000</number>
+               </property>
+               <property name="maximum">
+                <number>1000000</number>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_35">
                <property name="text">
-                <string>安装模式：</string>
+                <string>左右：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QSpinBox" name="spinBox_ptz_pose2">
+               <property name="minimum">
+                <number>-100000</number>
+               </property>
+               <property name="maximum">
+                <number>1000000</number>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="2">
+              <widget class="QSpinBox" name="spinBox_detect_pose2">
+               <property name="minimum">
+                <number>-100000</number>
+               </property>
+               <property name="maximum">
+                <number>1000000</number>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QPushButton" name="pushButton_clear_ptz_samples">
+               <property name="text">
+                <string>清空</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QPushButton" name="pushButton_add_ptz_sample">
+               <property name="text">
+                <string>添加</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="2">
+              <widget class="QPushButton" name="pushButton_set_ptz_samples">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="text">
+                <string>标定</string>
                </property>
               </widget>
              </item>
@@ -2528,8 +2535,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>210</width>
-           <height>346</height>
+           <width>350</width>
+           <height>474</height>
           </rect>
          </property>
          <attribute name="label">

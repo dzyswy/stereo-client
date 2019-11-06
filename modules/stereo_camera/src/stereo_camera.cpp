@@ -121,6 +121,10 @@ int stereo_camera::set_poly_mask(std::vector<std::pair<float, float> > &value, i
 	return xcmd_->set_value("poly_mask", val, timeout);
 }
 
+int stereo_camera::set_ptz_samples(std::vector<std::pair<struct stereo_ptz_pose, struct stereo_detect_box> > &samples, int timeout)
+{
+	
+}
 
 int stereo_camera::get_value(const char *key, int &value, int timeout)
 {
@@ -189,7 +193,7 @@ int stereo_camera::do_action(const char *para, int timeout)
 	return xcmd_->do_action(para, timeout);
 }
  
-int stereo_camera::get_pixel_point(int x, int y, struct stereo_pixel_point &value, int timeout)
+int stereo_camera::get_detect_point(int x, int y, struct stereo_detect_box &value, int timeout)
 {
 	int ret;
 	
@@ -200,16 +204,18 @@ int stereo_camera::get_pixel_point(int x, int y, struct stereo_pixel_point &valu
 	os << x << "," << y;
 	string val = os.str();
 	string result = "";
-	ret = xcmd_->get_value("pixel_point", val, result, timeout);
+	ret = xcmd_->get_value("detect_point", val, result, timeout);
 	if (ret < 0)
 		return -1;
 	
-	json_pixel_point temp;
+	json_detect_boxes temp;
 	ret = temp.from_string(result);
 	if (ret < 0)
 		return -1;
 	
-	value = temp.to_struct();
+	std::vector<struct stereo_detect_box> detect_boxes;
+	detect_boxes = temp.to_struct();
+	value = detect_boxes[0];
 	
 	return 0;
 }

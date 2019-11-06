@@ -32,7 +32,6 @@
 #include "media_record.h"
 #include "stereo_filter.h"
 #include "ptz_ctl_visca.h"
-#include "fit_calib.h"
 #include "ptz_track.h"
 #include "ftp_client.h"
 #include "ftp_dialog.h"
@@ -92,8 +91,8 @@ private:
 	void show_poly_mask(QPixmap *dst, vector<pair<float, float> > &points, QColor color);
 	void show_poly_mask_points(QPixmap *dst, vector<pair<float, float> > &points, QColor color);
 	void show_pid_para();
-	void show_fit_calib_sample();
-	void show_fit_calib_all_samples(QPixmap *dst, QColor color);
+	void show_ptz_sample();
+	void show_ptz_samples(QPixmap *dst, QColor color);
 	int load_config(const char *config_name);
 	int save_config(const char *config_name);
 	
@@ -159,7 +158,6 @@ public:
 	 
 	
 	ptz_ctl_visca *xptz_;
-	fit_calib *xfit_;
 	ptz_track *xtrack_;
 	
 	int ptz_open_;
@@ -167,13 +165,11 @@ public:
 	int ptz_track_mask_;
 	std::string ptz_name_;
 	
-	int fit_calib_en_mode_;
-	int sample_x_;
-	int sample_y_;
-	struct fit_calib_ptz_pose ptz_pose_;
-	struct fit_calib_detect_pose detect_pose_;
-	std::vector<pair<struct fit_calib_ptz_pose, struct fit_calib_detect_pose> > fit_samples_;
-	std::vector<pair<float, float> > sample_points_;
+	int ptz_calib_mode_;
+	
+	struct stereo_ptz_pose ptz_pose_;
+	struct stereo_detect_box detect_pose_;
+	std::vector<std::pair<struct stereo_ptz_pose, struct stereo_pixel_box> > ptz_samples_;
 
 signals:
 	void fresh_frame_signal();	
@@ -409,11 +405,13 @@ private slots:
 			{
 				draw_poly_mask_mode_ = 0;
 				poly_mask_points_[1].clear();
+				ui.pushButton_set_poly_mask->setEnabled(false);
 			}break;
 			case Qt::Checked:
 			{
 				draw_poly_mask_mode_ = 1;
 				poly_mask_points_[1].clear();
+				ui.pushButton_set_poly_mask->setEnabled(true);
 			}break;
 			default:
 				break;
@@ -740,11 +738,10 @@ private slots:
 	//ptz
 	void on_pushButton_open_ptz_clicked();
 	void on_comboBox_ptz_track_mode_currentIndexChanged(int index);
-	void on_checkBox_fit_calib_en_stateChanged(int arg1);
-	void on_comboBox_fit_mode_currentIndexChanged(int index);
-	void on_pushButton_fit_clear_sample_clicked();
-	void on_pushButton_fit_add_sample_clicked();
-	void on_pushButton_fit_compute_clicked();
+	void on_checkBox_ptz_calib_en_stateChanged(int arg1); 
+	void on_pushButton_clear_ptz_samples_clicked();
+	void on_pushButton_add_ptz_sample_clicked();
+	void on_pushButton_set_ptz_samples_clicked();
 	
 
 

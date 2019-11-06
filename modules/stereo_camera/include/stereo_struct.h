@@ -7,29 +7,11 @@
 #include <string.h>
 #include <stdio.h>
 #include <vector>
+#include <map>
 #include <list>
 #include <mutex>
 #include <thread>
 #include <condition_variable>
-
-
-
-struct stereo_pixel_point
-{
-	int x;
-	int y;
-	int d;
-	int xcm;
-	int ycm;
-	int zcm;
-	int xtcm;
-	int ytcm;
-	int ztcm;
-	double xa;
-	double ya;
-	double r;
-};
-
 
 
 struct stereo_detect_box
@@ -51,7 +33,9 @@ struct stereo_detect_box
 	float xa;
 	float ya;
 	float r;
-	
+	int pan;
+	int tilt;
+	int zoom;
 };
 
 struct stereo_gyro_angle
@@ -64,8 +48,18 @@ struct stereo_gyro_angle
 };
 
 
+enum PTZ_CHANNEL_TYPE
+{
+	PTZ_PAN_CHANNEL = 0,
+	PTZ_TILT_CHANNEL = 1,
+	PTZ_ZOOM_CHANNEL = 2,
+	PTZ_MAX_CHANNEL = 3,
+}
 
-
+struct stereo_ptz_pose
+{
+	int val[PTZ_MAX_CHANNEL];
+};
 
 
 

@@ -17,9 +17,9 @@
 #endif
 
 #include "pid_inc.h"
-#include "fit_calib.h"
 #include "stereo_filter.h"
 #include "ptz_ctl_visca.h"
+#include "stereo_struct.h"
 
 
 #define PTZ_TRACK_PTZ_PAN_MASK		(1<<0)
@@ -54,10 +54,10 @@ struct ptz_track_ptz_speed
 class ptz_track
 {
 public:
-	ptz_track(ptz_ctl_visca *ptz, fit_calib *fit, float period = 100, int debug = 0);
+	ptz_track(ptz_ctl_visca *ptz, float period = 100, int debug = 0);
 	~ptz_track();
 	
-	void set_detect_box(struct stereo_detect_box &detect_box, int number_state = STEREO_FILTER_SINGLE_TARGET, int stable_state = 1);
+	void set_focus_pose(int pan_pose, int tilt_pose, int zoom_pose, int number_state = STEREO_FILTER_SINGLE_TARGET, int stable_state = 1);
 	
 	int pid_paras_from_string(std::string value);
 	int pid_paras_to_string(std::string &value);
@@ -66,15 +66,14 @@ protected:
 	void run();
 	void stop();
 	void track_process();
-	void compute(struct fit_calib_ptz_pose &focus_pose, struct fit_calib_ptz_pose &current_pose, struct ptz_track_ptz_speed &ptz_speed);
-	void compute(struct fit_calib_ptz_pose &focus_pose, struct fit_calib_ptz_pose &current_pose, int number_state, int pre_number_state, int stable_state);
+	void compute(struct stereo_ptz_pose &focus_pose, struct stereo_ptz_pose &current_pose, struct ptz_track_ptz_speed &ptz_speed);
+	void compute(struct stereo_ptz_pose &focus_pose, struct stereo_ptz_pose &current_pose, int number_state, int pre_number_state, int stable_state);
 	void pantilt_move_speed(int panSpeed, int tiltSpeed);
 	void zoom_move_speed(int zoomSpeed);
 	
 	
 protected:
-	ptz_ctl_visca *ptz_;
-	fit_calib *fit_;
+	ptz_ctl_visca *ptz_; 
 	int debug_;
 
 	float period_;
@@ -88,7 +87,7 @@ protected:
 	std::mutex mux_;
 	std::thread *run_thread_;
 	
-	struct fit_calib_ptz_pose focus_pose_;
+	struct stereo_ptz_pose focus_pose_;
 	int number_state_;
 	int stable_state_;
 	

@@ -80,6 +80,7 @@ public:
 	int set_value(const char *key, float value, int timeout = 5);
 	int set_value(const char *key, std::string value, int timeout = 5);
 	int set_poly_mask(std::vector<std::pair<float, float> > &value, int timeout = 5);
+	int set_ptz_samples(std::vector<std::pair<struct stereo_ptz_pose, struct stereo_detect_box> > &samples, int timeout = 5);
 	
 	int get_value(const char *key, int &value, int timeout = 5);
 	int get_value(const char *key, float &value, int timeout = 5);
@@ -88,7 +89,7 @@ public:
 	int get_poly_mask(std::vector<std::pair<float, float> > &value, int timeout = 5);
 	
 	
-	int get_pixel_point(int x, int y, struct stereo_pixel_point &value, int timeout = 5);
+	int get_detect_point(int x, int y, struct stereo_detect_box &value, int timeout = 5);
 	int do_action(const char *para, int timeout = 5);
 	
 	int query_frame(int timeout = 5);
