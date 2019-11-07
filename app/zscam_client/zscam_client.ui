@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1198</width>
-    <height>644</height>
+    <width>1141</width>
+    <height>599</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -1478,7 +1478,7 @@
              <item row="0" column="2">
               <widget class="QCheckBox" name="checkBox_post_gray_mode">
                <property name="text">
-                <string>显示</string>
+                <string>显示效果</string>
                </property>
               </widget>
              </item>
@@ -1496,7 +1496,7 @@
                <item>
                 <widget class="QCheckBox" name="checkBox_draw_poly_mask">
                  <property name="text">
-                  <string>使能绘制</string>
+                  <string>使能设置</string>
                  </property>
                 </widget>
                </item>
@@ -1710,8 +1710,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>210</width>
-           <height>311</height>
+           <width>350</width>
+           <height>429</height>
           </rect>
          </property>
          <property name="autoFillBackground">
@@ -1953,9 +1953,9 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>0</y>
-           <width>280</width>
-           <height>560</height>
+           <y>-114</y>
+           <width>334</width>
+           <height>772</height>
           </rect>
          </property>
          <attribute name="label">
@@ -2316,13 +2316,44 @@
             </property>
             <layout class="QGridLayout" name="gridLayout_7">
              <item row="0" column="0">
+              <widget class="QLabel" name="label_88">
+               <property name="text">
+                <string>安装模式:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="comboBox_ptz_install_mode">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <item>
+                <property name="text">
+                 <string>靠近模式</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>远离模式</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QCheckBox" name="checkBox_ptz_calib_en">
+               <property name="text">
+                <string>使能标定</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
               <widget class="QLabel" name="label_14">
                <property name="text">
                 <string>标定点数量：</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
+             <item row="1" column="1">
               <widget class="QSpinBox" name="spinBox_ptz_sample_size">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -2338,21 +2369,14 @@
                </property>
               </widget>
              </item>
-             <item row="0" column="2">
-              <widget class="QCheckBox" name="checkBox_ptz_calib_en">
-               <property name="text">
-                <string>使能标定</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
+             <item row="2" column="0">
               <widget class="QLabel" name="label_32">
                <property name="text">
                 <string>水平：</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
+             <item row="2" column="1">
               <widget class="QSpinBox" name="spinBox_ptz_pose0">
                <property name="minimum">
                 <number>-100000</number>
@@ -2362,7 +2386,7 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="2">
+             <item row="2" column="2">
               <widget class="QSpinBox" name="spinBox_detect_pose0">
                <property name="minimum">
                 <number>-100000</number>
@@ -2372,14 +2396,14 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="0">
+             <item row="3" column="0">
               <widget class="QLabel" name="label_34">
                <property name="text">
                 <string>上下：</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
+             <item row="3" column="1">
               <widget class="QSpinBox" name="spinBox_ptz_pose1">
                <property name="minimum">
                 <number>-100000</number>
@@ -2389,7 +2413,7 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="2">
+             <item row="3" column="2">
               <widget class="QSpinBox" name="spinBox_detect_pose1">
                <property name="minimum">
                 <number>-100000</number>
@@ -2399,14 +2423,14 @@
                </property>
               </widget>
              </item>
-             <item row="3" column="0">
+             <item row="4" column="0">
               <widget class="QLabel" name="label_35">
                <property name="text">
-                <string>左右：</string>
+                <string>远近：</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="1">
+             <item row="4" column="1">
               <widget class="QSpinBox" name="spinBox_ptz_pose2">
                <property name="minimum">
                 <number>-100000</number>
@@ -2416,7 +2440,7 @@
                </property>
               </widget>
              </item>
-             <item row="3" column="2">
+             <item row="4" column="2">
               <widget class="QSpinBox" name="spinBox_detect_pose2">
                <property name="minimum">
                 <number>-100000</number>
@@ -2426,27 +2450,40 @@
                </property>
               </widget>
              </item>
-             <item row="4" column="0">
+             <item row="5" column="0">
               <widget class="QPushButton" name="pushButton_clear_ptz_samples">
                <property name="text">
                 <string>清空</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="1">
+             <item row="5" column="1">
               <widget class="QPushButton" name="pushButton_add_ptz_sample">
                <property name="text">
                 <string>添加</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="2">
+             <item row="5" column="2">
               <widget class="QPushButton" name="pushButton_set_ptz_samples">
                <property name="enabled">
                 <bool>false</bool>
                </property>
                <property name="text">
                 <string>标定</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="0" colspan="3">
+              <widget class="QPlainTextEdit" name="plainTextEdit_ptz_calib">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>180</height>
+                </size>
+               </property>
+               <property name="plainText">
+                <string/>
                </property>
               </widget>
              </item>
@@ -2542,8 +2579,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>210</width>
-           <height>346</height>
+           <width>350</width>
+           <height>429</height>
           </rect>
          </property>
          <attribute name="label">

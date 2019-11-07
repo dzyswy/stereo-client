@@ -23,6 +23,7 @@
 #include <QPen>
 #include <QFileDialog>
 #include <QDir>
+#include <QTextCodec>
 //#include <opencv2/opencv.hpp>
 
 

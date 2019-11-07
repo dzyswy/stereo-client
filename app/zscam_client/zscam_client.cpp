@@ -49,6 +49,7 @@ zscam_client::zscam_client(QWidget *parent)
 	ui.setupUi(this);
 	ui.plainTextEdit_all_boxes->setMaximumBlockCount(500);
 	ui.plainTextEdit_min_boxes->setMaximumBlockCount(500);
+	ui.plainTextEdit_ptz_calib->setMaximumBlockCount(500);
 	
 	
 	width = 960;
@@ -116,7 +117,7 @@ zscam_client::zscam_client(QWidget *parent)
 	connect(ui.toolButton_wide, SIGNAL(released()), this, SLOT(toolButton_zoom_stop()));
 	
 	connect(timer_slow_, SIGNAL(timeout()), this, SLOT(do_timer_slow_timeout()));
-	timer_slow_->start(2500);
+	timer_slow_->start(1000);
 	
 	search_->run();
  
@@ -914,7 +915,11 @@ void zscam_client::show_poly_mask_points(QPixmap *dst, vector<pair<float, float>
 void zscam_client::on_pushButton_update_clicked()
 {
 	int ret;
-	string src_name = QFileDialog::getOpenFileName(0, QString::fromLocal8Bit("选择文件"), QCoreApplication::applicationDirPath(), QString::fromLocal8Bit("所有文件(*)")).toStdString();
+	QString fileName = QFileDialog::getOpenFileName(0, QString::fromLocal8Bit("选择文件"), QCoreApplication::applicationDirPath(), QString::fromLocal8Bit("所有文件(*)"));
+	
+	QTextCodec *code = QTextCodec::codecForName("GB2312");//解决中文路径问题
+    std::string src_name = code->fromUnicode(fileName).data();
+	
 	
 	string ip = ui.comboBox_ip->currentText().toStdString();
 	string ftp_host = ip;
@@ -1016,17 +1021,32 @@ void zscam_client::on_pushButton_clear_ptz_samples_clicked()
 {
 	ptz_samples_.clear();
 	ui.spinBox_ptz_sample_size->setValue(0);
+	ui.plainTextEdit_ptz_calib->clear();
 }
 
 void zscam_client::on_pushButton_add_ptz_sample_clicked()
 {
+	stringstream os;
+	os << ptz_samples_.size() << ": (" << ptz_pose_.val[0] << ", " << ptz_pose_.val[1] << ", "  << ptz_pose_.val[2] << ") (";
+	os << detect_pose_.x << ", " << detect_pose_.y << ", "  << (int)detect_pose_.r << ")";
+	
 	ptz_samples_.push_back(make_pair(ptz_pose_, detect_pose_));
 	ui.spinBox_ptz_sample_size->setValue(ptz_samples_.size());
+	
+	string str = os.str();
+	ui.plainTextEdit_ptz_calib->appendPlainText(QString::fromStdString(str));
 }
  
 void zscam_client::on_pushButton_set_ptz_samples_clicked()
 {
 	int ret; 
+	int ptz_install_mode = ui.comboBox_ptz_install_mode->currentIndex();
+	ret = camera_->set_value("ptz_install_mode", ptz_install_mode);
+	if (ret < 0) {
+		QMessageBox::warning(this, QString::fromLocal8Bit("错误"), QString::fromLocal8Bit("云台校正失败"));			
+		return;
+	}
+	
 	ret = camera_->set_ptz_samples(ptz_samples_);
 	if (ret < 0) {
 		QMessageBox::warning(this, QString::fromLocal8Bit("错误"), QString::fromLocal8Bit("云台校正失败"));			

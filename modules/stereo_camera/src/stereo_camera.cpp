@@ -128,6 +128,13 @@ int stereo_camera::set_ptz_samples(std::vector<std::pair<struct stereo_ptz_pose,
 	if (!open_)
 		return -1;
 	
+	printf("samples:\n");
+	for (int i = 0; i < samples.size(); i++)
+	{
+		printf("%d: (%d %d %d) -> (%d %d %d)\n", i, samples[i].first.val[0], samples[i].first.val[1], samples[i].first.val[2], 
+			samples[i].second.x, samples[i].second.y, (int)samples[i].second.r);
+	}	
+	
 	json_ptz_samples temp(samples);
 	string val = "";
 	ret = temp.to_string(val);
