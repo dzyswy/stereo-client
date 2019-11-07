@@ -117,6 +117,7 @@ public:
 	int space_mode_;
 	int morph_mode_;
 	int poly_mode_;
+	int post_gray_mode_;
 	int detect_mode_;
 	int track_mode_;
 	
@@ -411,6 +412,11 @@ private slots:
 		}
 	}
 	
+	void on_pushButton_clear_poly_mask_clicked()
+	{
+		poly_mask_points_[1].clear();
+	}
+	
 	void on_pushButton_set_poly_mask_clicked()
 	{ 
 		camera_->set_poly_mask(poly_mask_points_[1]);
@@ -429,6 +435,20 @@ private slots:
 				break;
 		}
 		camera_->get_poly_mask(poly_mask_points_[0]);
+	}
+	
+	void on_checkBox_post_gray_mode_stateChanged(int state)
+	{
+		switch (state)
+		{
+			case Qt::Unchecked:
+				post_gray_mode_ = 0;
+				break;
+			case Qt::Checked:
+				post_gray_mode_ = 1;
+				break;
+		}
+		camera_->set_value("post_gray_mode", post_gray_mode_);
 	}
 
 	void on_pushButton_detect_mode_clicked()

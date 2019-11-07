@@ -890,7 +890,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>320</width>
+           <width>334</width>
            <height>838</height>
           </rect>
          </property>
@@ -1476,7 +1476,7 @@
               </widget>
              </item>
              <item row="0" column="2">
-              <widget class="QCheckBox" name="checkBox_show_gray_mode">
+              <widget class="QCheckBox" name="checkBox_post_gray_mode">
                <property name="text">
                 <string>显示</string>
                </property>

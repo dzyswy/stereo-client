@@ -672,6 +672,18 @@ void zscam_client::init_ui()
 		poly_mask_points_[0] = poly_mask_points;
 	}	
 	
+	ret = camera_->get_value("post_gray_mode", value);
+	if (ret == 0) { 
+		if (value == STEREO_CAMERA_POST_GRAY_OPEN_MODE) {
+			post_gray_mode_ = STEREO_CAMERA_POST_GRAY_OPEN_MODE;
+			ui.checkBox_post_gray_mode->setCheckState(Qt::Checked);
+		} else {
+			post_gray_mode_ = STEREO_CAMERA_POST_GRAY_CLOSE_MODE;
+			ui.checkBox_post_gray_mode->setCheckState(Qt::Unchecked); 
+		}	 
+	}
+	
+	
 	ret = camera_->get_value("detect_mode", value);
 	if (ret == 0) {
 		detect_mode_ = value;
