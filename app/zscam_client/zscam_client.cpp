@@ -688,7 +688,7 @@ void zscam_client::init_ui()
 	ret = camera_->get_value("detect_mode", value);
 	if (ret == 0) {
 		detect_mode_ = value;
-		if (detect_mode_ == 0) {
+		if (detect_mode_ == STEREO_CAMERA_DETECT_CLOSE_MODE) {
 			ui.pushButton_detect_mode->setText(QString::fromLocal8Bit("¿ªÊ¼¼ì²â"));
 		} else {
 			ui.pushButton_detect_mode->setText(QString::fromLocal8Bit("Í£Ö¹¼ì²â"));

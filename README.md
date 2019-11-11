@@ -95,6 +95,134 @@ sudo apt-get install lib32ncurses5 lib32z1
 
 
 
+### 最常用接口
+
+```
+开启检测：
+camera_->set_value("http_out_mode", 2);//视差模式
+match_mode_ = STEREO_CAMERA_MATCH_OPEN_MODE;
+camera_->set_value("match_mode", match_mode_);//立体匹配算法打开
+bg_mode_ = STEREO_CAMERA_BG_OPEN_MODE;
+camera_->set_value("bg_mode", bg_mode_);//背景建模算法打开
+median_mode_ = STEREO_CAMERA_MEDIAN_OPEN_MODE;
+camera_->set_value("median_mode", median_mode_);//中值滤波算法打开
+tex_mode_ = STEREO_CAMERA_TEX_OPEN_MODE;
+camera_->set_value("tex_mode", tex_mode_);//纹理滤波算法打开
+space_mode_ = STEREO_CAMERA_SPACE_OPEN_MODE;
+camera_->set_value("space_mode", space_mode_);//空间滤波算法打开
+morph_mode_ = STEREO_CAMERA_MORPH_OPEN_MODE;
+camera_->set_value("morph_mode", morph_mode_);//形态学滤波算法打开
+poly_mode_ = STEREO_CAMERA_POLY_OPEN_MODE;
+camera_->set_value("poly_mode", poly_mode_);//屏蔽滤波算法打开
+post_gray_mode_ = STEREO_CAMERA_POST_GRAY_OPEN_MODE;
+camera_->set_value("post_gray_mode", post_gray_mode_);//灰度后处理算法打开
+detect_mode_ = STEREO_CAMERA_DETECT_OPEN_MODE;
+camera_->set_value("detect_mode", detect_mode_);//检测算法打开
+track_mode_ = STEREO_CAMERA_TRACK_OPEN_MODE;
+camera_->set_value("track_mode", track_mode_);//跟踪算法打开	 
+
+
+camera_->do_action("bg_init");//刷新背景
+
+停止检测： 
+match_mode_ = STEREO_CAMERA_MATCH_OPEN_MODE;
+camera_->set_value("match_mode", match_mode_);//立体匹配算法打开
+bg_mode_ = STEREO_CAMERA_BG_CLOSE_MODE;
+camera_->set_value("bg_mode", bg_mode_);//背景建模算法关闭
+median_mode_ = STEREO_CAMERA_MEDIAN_CLOSE_MODE;
+camera_->set_value("median_mode", median_mode_);//中值滤波算法关闭
+tex_mode_ = STEREO_CAMERA_TEX_CLOSE_MODE;
+camera_->set_value("tex_mode", tex_mode_);//纹理滤波算法关闭
+space_mode_ = STEREO_CAMERA_SPACE_CLOSE_MODE;
+camera_->set_value("space_mode", space_mode_);//空间滤波算法关闭
+morph_mode_ = STEREO_CAMERA_MORPH_CLOSE_MODE;
+camera_->set_value("morph_mode", morph_mode_);//形态学滤波算法关闭
+poly_mode_ = STEREO_CAMERA_POLY_CLOSE_MODE;
+camera_->set_value("poly_mode", poly_mode_);//屏蔽滤波算法关闭
+post_gray_mode_ = STEREO_CAMERA_POST_GRAY_CLOSE_MODE;
+camera_->set_value("post_gray_mode", post_gray_mode_);//灰度后处理算法关闭
+detect_mode_ = STEREO_CAMERA_DETECT_CLOSE_MODE;
+camera_->set_value("detect_mode", detect_mode_);//检测算法关闭
+track_mode_ = STEREO_CAMERA_TRACK_CLOSE_MODE;
+camera_->set_value("track_mode", track_mode_);//跟踪算法关闭	 
+
+
+常用参数设置：
+camera_->set_value("post_tex_th", arg1.toInt());//设置纹理阈值
+camera_->get_value("post_tex_th", value);//获取纹理阈值
+camera_->set_value("install_height", arg1.toInt());//设置安装高度
+camera_->get_value("install_height", value);//获取安装高度
+camera_->set_value("install_x_angle", (float)arg1.toDouble());//设置安装俯仰角
+camera_->get_value("install_x_angle", fvalue);//获取安装俯仰角
+camera_->set_value("install_z_angle", (float)arg1.toDouble());//设置安装横滚角
+camera_->get_value("install_z_angle", fvalue);//获取安装横滚角
+camera_->set_value("detect_miny", arg1.toInt());//设置检测高度的下限
+camera_->get_value("detect_miny", value);//获取检测高度的下限
+camera_->set_value("detect_maxy", arg1.toInt());//设置安装高度的上限
+camera_->get_value("detect_maxy", value);//获取安装高度的上限
+camera_->set_poly_mask(poly_mask_points_[1]);//设置屏蔽区域
+camera_->get_poly_mask(poly_mask_points_[0]);//获取屏蔽区域
+camera_->set_value("http_out_channel", 0);//设置流输出通道号：0->灰度图，1->视差图
+camera_->get_value("http_out_channel", value);//获取流输出通道号
+
+
+云台标定接口：
+struct stereo_ptz_pose ptz_pose_;
+struct stereo_detect_box detect_pose_;
+std::vector<std::pair<struct stereo_ptz_pose, struct stereo_detect_box> > ptz_samples_;
+
+camera_->set_value("ptz_install_mode", ptz_install_mode);
+camera_->set_ptz_samples(ptz_samples_);
+
+流接口：
+std::vector<unsigned char> frame_buffer;
+std::vector<struct stereo_detect_box> detect_boxes;
+struct stereo_gyro_angle gyro_angle;
+
+while(...)
+{
+	//查询是否有新数据
+	int ret = camera_->query_frame(5);
+	if (ret < 0) {
+		std::this_thread::sleep_for (std::chrono::seconds(1));
+		continue;
+	}
+	
+	//获取图像数据，目标检测数据，陀螺仪数据
+	frame_buffer.clear();
+	detect_boxes.clear();
+	memset((void *)&gyro_angle, 0, sizeof(struct stereo_gyro_angle));
+	camera_->get_image(frame_buffer);
+	camera_->get_detect_boxes(detect_boxes);
+	camera_->get_gyro_angle(gyro_angle);
+	
+	//对目标信息进行滤波
+	xfilter_->compute(detect_boxes, number_state_, focus_box_, stable_state_);
+	if ((detect_mode_) && (ptz_track_mode_))
+	{
+		//将最终的滤波信息的PTZ值发送到云台跟踪模块
+		xtrack_->set_focus_pose(focus_box_.pan, focus_box_.tilt, focus_box_.zoom, number_state_, stable_state_);
+	}	
+		
+}
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

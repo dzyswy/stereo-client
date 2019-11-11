@@ -443,10 +443,10 @@ private slots:
 		switch (state)
 		{
 			case Qt::Unchecked:
-				post_gray_mode_ = 0;
+				post_gray_mode_ = STEREO_CAMERA_POST_GRAY_CLOSE_MODE;
 				break;
 			case Qt::Checked:
-				post_gray_mode_ = 1;
+				post_gray_mode_ = STEREO_CAMERA_POST_GRAY_OPEN_MODE;
 				break;
 		}
 		camera_->set_value("post_gray_mode", post_gray_mode_);
@@ -454,14 +454,14 @@ private slots:
 
 	void on_pushButton_detect_mode_clicked()
 	{ 
-		if (detect_mode_ == 0)
+		if (detect_mode_ == STEREO_CAMERA_DETECT_CLOSE_MODE)
 		{
-			detect_mode_ = 1;
+			detect_mode_ = STEREO_CAMERA_DETECT_OPEN_MODE;
 			ui.pushButton_detect_mode->setText(QString::fromLocal8Bit("停止检测"));
 		}
 		else
 		{
-			detect_mode_ = 0;
+			detect_mode_ = STEREO_CAMERA_DETECT_CLOSE_MODE;
 			ui.pushButton_detect_mode->setText(QString::fromLocal8Bit("开始检测"));
 		}
 		camera_->set_value("detect_mode", detect_mode_);
@@ -493,10 +493,10 @@ private slots:
 		switch (state)
 		{
 			case Qt::Unchecked:
-				track_mode_ = 0;
+				track_mode_ = STEREO_CAMERA_TRACK_CLOSE_MODE;
 				break;
 			case Qt::Checked:
-				track_mode_ = 1;
+				track_mode_ = STEREO_CAMERA_TRACK_OPEN_MODE;
 				break;
 		}
 	}
