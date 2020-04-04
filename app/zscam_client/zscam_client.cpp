@@ -88,8 +88,9 @@ zscam_client::zscam_client(QWidget *parent)
 	ptz_track_mode_ = 0;
 	ptz_track_mask_ = PTZ_ALL_MASK;
 	
-	search_ = new search_camera("zynq_stereo_camera", 45789, 5, 0);
+	search_ = new search_camera("zynq_stereo_camera", BROAD_CAST_PORT, 5, 0);
 	camera_ = new stereo_camera(0);
+	boards_ = new search_camera("zscam_board", BROAD_BORAD_PORT, 5, 0);
 	
 	xfilter_ = new stereo_filter(camera_);
 	xptz_ = new ptz_ctl_visca;
@@ -120,7 +121,7 @@ zscam_client::zscam_client(QWidget *parent)
 	timer_slow_->start(1000);
 	
 	search_->run();
- 
+	boards_->run();
 }
 
 zscam_client::~zscam_client()
@@ -342,41 +343,87 @@ void zscam_client::do_fresh_frame()
 
 void zscam_client::do_timer_slow_timeout()
 {
-	vector<string> device_nodes;
-	search_->get_device_nodes(device_nodes);
 	
-	for (int i = 0; i < device_nodes.size(); i++)
+	//服务IP
 	{
-		QString ip = QString::fromStdString(device_nodes[i]);
-		int has = 0;
-		for (int j = 0; j < ui.comboBox_ip->count(); j++)
+		vector<string> device_nodes;
+		search_->get_device_nodes(device_nodes);
+		
+		for (int i = 0; i < device_nodes.size(); i++)
 		{
-			if (ip == ui.comboBox_ip->itemText(j))
+			QString ip = QString::fromStdString(device_nodes[i]);
+			int has = 0;
+			for (int j = 0; j < ui.comboBox_ip->count(); j++)
 			{
-				has = 1;
-				break;
+				if (ip == ui.comboBox_ip->itemText(j))
+				{
+					has = 1;
+					break;
+				}
+			}
+			if (!has)
+				ui.comboBox_ip->addItem(ip);
+		}	
+		
+		for (int i = 0; i < ui.comboBox_ip->count(); i++)
+		{
+			int has = 0;
+			for (int j = 0; j < device_nodes.size(); j++)
+			{
+				QString ip = QString::fromStdString(device_nodes[j]);
+				if (ip == ui.comboBox_ip->itemText(i))
+				{
+					has = 1;
+					break;
+				}	
+			}	
+			if (!has)
+			{
+				ui.comboBox_ip->removeItem(i);
+			}
+		}	
+	}
+	
+	
+	//设备IP
+	{
+		vector<string> device_nodes;
+		boards_->get_device_nodes(device_nodes);
+		
+		for (int i = 0; i < device_nodes.size(); i++)
+		{
+			QString ip = QString::fromStdString(device_nodes[i]);
+			int has = 0;
+			for (int j = 0; j < ui.comboBox_ip_update->count(); j++)
+			{
+				if (ip == ui.comboBox_ip_update->itemText(j))
+				{
+					has = 1;
+					break;
+				}
+			}
+			if (!has)
+				ui.comboBox_ip_update->addItem(ip);
+		}	
+		
+		for (int i = 0; i < ui.comboBox_ip_update->count(); i++)
+		{
+			int has = 0;
+			for (int j = 0; j < device_nodes.size(); j++)
+			{
+				QString ip = QString::fromStdString(device_nodes[j]);
+				if (ip == ui.comboBox_ip_update->itemText(i))
+				{
+					has = 1;
+					break;
+				}	
+			}	
+			if (!has)
+			{
+				ui.comboBox_ip_update->removeItem(i);
 			}
 		}
-		if (!has)
-			ui.comboBox_ip->addItem(ip);
-	}	
-	
-	for (int i = 0; i < ui.comboBox_ip->count(); i++)
-	{
-		int has = 0;
-		for (int j = 0; j < device_nodes.size(); j++)
-		{
-			QString ip = QString::fromStdString(device_nodes[j]);
-			if (ip == ui.comboBox_ip->itemText(i))
-			{
-				has = 1;
-				break;
-			}	
-		}	
-		if (!has)
-		{
-			ui.comboBox_ip->removeItem(i);
-		}
+
 	}
 	
 	if (save_avi_ == 2)
@@ -475,6 +522,17 @@ void zscam_client::init_ui()
 	ret = camera_->get_value("cy", fvalue);
 	if (ret == 0) {
 		cy_ = fvalue;
+	}
+	
+	ret = camera_->get_value("http_out_channel", value);
+	if (ret == 0) {
+		if (value == 0) {
+			ui.radioButton_channel0_mode->setChecked(true);
+			ui.radioButton_channel1_mode->setChecked(false);
+		} else {
+			ui.radioButton_channel0_mode->setChecked(false);
+			ui.radioButton_channel1_mode->setChecked(true);
+		}	
 	}
 	 
 	ret = camera_->get_value("match_mode", value); 
@@ -740,6 +798,11 @@ void zscam_client::init_ui()
 		ui.spinBox_stream_quality->setValue(value);
 	}
 	
+	ret = camera_->get_value("board", svalue);
+	if (ret == 0) {
+		ui.lineEdit_board->setText(QString::fromStdString(svalue));
+	}
+	
 	ret = camera_->get_value("version", svalue);
 	if (ret == 0) {
 		ui.lineEdit_version->setText(QString::fromStdString(svalue));
@@ -750,21 +813,6 @@ void zscam_client::init_ui()
 		ui.lineEdit_serial_number->setText(QString::fromStdString(svalue));
 	}
  
-	ret = camera_->get_value("dhcp", value);
-	if (ret == 0) {
-		if (value) {
-			ui.checkBox_dhcp->setCheckState(Qt::Checked); 
-			ui.lineEdit_ip->setEnabled(false);
-			ui.lineEdit_netmask->setEnabled(false);
-			ui.lineEdit_gateway->setEnabled(false);	
-		} else {
-			ui.checkBox_dhcp->setCheckState(Qt::Unchecked); 
-			ui.lineEdit_ip->setEnabled(true);
-			ui.lineEdit_netmask->setEnabled(true);
-			ui.lineEdit_gateway->setEnabled(true);
-		}	
-	}
-	 
 	ret = camera_->get_value("ip", svalue);
 	if (ret == 0) {
 		ui.lineEdit_ip->setText(QString::fromStdString(svalue));
@@ -921,7 +969,7 @@ void zscam_client::on_pushButton_update_clicked()
     std::string src_name = code->fromUnicode(fileName).data();
 	
 	
-	string ip = ui.comboBox_ip->currentText().toStdString();
+	string ip = ui.comboBox_ip_update->currentText().toStdString();
 	string ftp_host = ip;
 	ftp_host += string(":21");
 	ftp_client xftp(ftp_host.c_str(), "anonymous", "null");
@@ -932,7 +980,7 @@ void zscam_client::on_pushButton_update_clicked()
 		return;
 	}
 		 
-	ftp_dialog dialog(&xftp, src_name.c_str(), "/zscam/update/update.bin");
+	ftp_dialog dialog(&xftp, src_name.c_str(), "/opt/zscam/config/update.zip");
 	
 	
 	dialog.exec();

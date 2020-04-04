@@ -38,3 +38,4 @@ build
 /Win32/Release/ZERO_CHECK
 /x64/Debug/ZERO_CHECK
 /x64/Release/ZERO_CHECK
+/x64

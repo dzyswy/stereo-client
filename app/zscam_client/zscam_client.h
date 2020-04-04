@@ -36,7 +36,7 @@
 #include "ptz_track.h"
 #include "ftp_client.h"
 #include "ftp_dialog.h"
-
+#include "udpcmd.h"
 
 
 
@@ -59,7 +59,9 @@ enum ZSCAM_MOUSE_MODE_TYPE
 };
 
 
- 
+#define BROAD_CAST_PORT 		45789
+#define BROAD_BORAD_PORT		45790
+#define BOARD_CMD_PORT			45791 
 
 
 class zscam_client : public QWidget
@@ -100,6 +102,7 @@ public:
 	
 	search_camera *search_;
 	stereo_camera *camera_;
+	search_camera *boards_;
 	int cam_open_;
 
 	QPixmap pixmap_;
@@ -536,62 +539,50 @@ private slots:
 		camera_->do_action("reboot", 1);
 	}
 	
-	void on_checkBox_dhcp_stateChanged(int state)
+	void on_pushButton_board_reboot_clicked()
 	{
-		if (state == Qt::Checked)
-		{
-			ui.lineEdit_ip->setEnabled(false);
-			ui.lineEdit_netmask->setEnabled(false);
-			ui.lineEdit_gateway->setEnabled(false);	
-		}	
-		else if (state == Qt::Unchecked)
-		{
-			ui.lineEdit_ip->setEnabled(true);
-			ui.lineEdit_netmask->setEnabled(true);
-			ui.lineEdit_gateway->setEnabled(true);	
-		}	
+		string ip = ui.comboBox_ip_update->currentText().toStdString();
+		udpcmd uc(ip.c_str(), BOARD_CMD_PORT);
+		uc.send_cmd("reboot\n");
+		uc.send_cmd("reboot\n");
 	}
-	
+		
 	void on_pushButton_network_clicked()
 	{
 		int ret = 0, value = -1;
-		int dhcp = (Qt::Checked == ui.checkBox_dhcp->checkState()) ? 1 : 0;
 		string ip = ui.lineEdit_ip->text().toStdString();
 		string netmask = ui.lineEdit_netmask->text().toStdString();
 		string gateway = ui.lineEdit_gateway->text().toStdString();
 		string mac = ui.lineEdit_mac->text().toStdString();
-	
-		while(1)
-		{
-			ret = camera_->set_value("dhcp", dhcp);
-			if (ret < 0)
-				break;
-			
-			if (!dhcp)
-			{
-				ret = camera_->set_value("ip", ip);
-				if (ret < 0)
-					break;
-				
-				ret = camera_->set_value("netmask", netmask);
-				if (ret < 0)
-					break;
-				
-				ret = camera_->set_value("gateway", gateway);
-				if (ret < 0)
-					break;
-			}	
-			
-			ret = camera_->set_value("mac", mac);
-			if (ret < 0)
-				break;
-			
-			QMessageBox::warning(this, QString::fromLocal8Bit("成功"), QString::fromLocal8Bit("网络参数设置成功，重启设备生效"));
-			return;
-		}	
 		
+		ret = camera_->set_value("ip", ip);
+		if (ret < 0)
+			goto OUT_SET_NET_ERR;
+		
+		ret = camera_->set_value("netmask", netmask);
+		if (ret < 0)
+			goto OUT_SET_NET_ERR;
+		
+		ret = camera_->set_value("gateway", gateway);
+		if (ret < 0)
+			goto OUT_SET_NET_ERR;
+			
+		
+		ret = camera_->set_value("mac", mac);
+		if (ret < 0)
+			goto OUT_SET_NET_ERR;
+		
+		ret = camera_->do_action("save_config");
+		if (ret < 0)
+			goto OUT_SET_NET_ERR;
+		
+		QMessageBox::warning(this, QString::fromLocal8Bit("成功"), QString::fromLocal8Bit("网络参数设置成功，重启设备生效"));
+		return;
+			
+		
+	OUT_SET_NET_ERR:
 		QMessageBox::warning(this, QString::fromLocal8Bit("错误"), QString::fromLocal8Bit("网络参数设置失败"));
-		
+	
 	}
 	
 	 
