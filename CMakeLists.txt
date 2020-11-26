@@ -7,7 +7,7 @@ ENDIF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 ########################################################################
 # Project setup
 ########################################################################
-CMAKE_MINIMUM_REQUIRED(VERSION 3.9.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.5.0)
 PROJECT(stereo-client CXX)
 ENABLE_TESTING()
 
