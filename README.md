@@ -97,7 +97,7 @@ sudo apt-get install lib32ncurses5 lib32z1
 
 
 
-#### 1.4 搜索设备接口
+### 1.4 搜索设备接口
 ```
 #define BROAD_CAST_PORT 		45789
 
