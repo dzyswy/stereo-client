@@ -274,6 +274,9 @@ camera_->do_action("bg_init");//刷新背景
 camera_->set_value("bg_space_dist", arg1.toInt());//设置背景建模空间距离阈值
 camera_->get_value("bg_space_dist", value);//获取背景建模空间距离阈值
 
+camera_->set_value("bg_update_radio", arg1.toInt());//设置背景更新率
+camera_->get_value("bg_update_radio", value);//获取背景更新率
+
 ```
 
 #### 1.6.8 检测跟踪参数
