@@ -268,8 +268,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>334</width>
-           <height>989</height>
+           <width>367</width>
+           <height>1135</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -914,8 +914,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>334</width>
-           <height>838</height>
+           <width>320</width>
+           <height>894</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -1734,8 +1734,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>350</width>
-           <height>429</height>
+           <width>337</width>
+           <height>519</height>
           </rect>
          </property>
          <property name="autoFillBackground">
@@ -1855,6 +1855,13 @@
                  </property>
                 </widget>
                </item>
+               <item row="3" column="1">
+                <widget class="QLineEdit" name="lineEdit_mac">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
                <item row="2" column="1">
                 <widget class="QLineEdit" name="lineEdit_gateway">
                  <property name="enabled">
@@ -1869,8 +1876,29 @@
                  </property>
                 </widget>
                </item>
-               <item row="3" column="1">
-                <widget class="QLineEdit" name="lineEdit_mac">
+               <item row="4" column="0">
+                <widget class="QLabel" name="label_94">
+                 <property name="text">
+                  <string>UDP IP:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <widget class="QLineEdit" name="lineEdit_udp_ip">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="0">
+                <widget class="QLabel" name="label_97">
+                 <property name="text">
+                  <string>UDP PORT:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="1">
+                <widget class="QLineEdit" name="lineEdit_udp_port">
                  <property name="enabled">
                   <bool>true</bool>
                  </property>
@@ -2039,8 +2067,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>334</width>
-           <height>772</height>
+           <width>328</width>
+           <height>886</height>
           </rect>
          </property>
          <attribute name="label">
@@ -2664,8 +2692,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>350</width>
-           <height>429</height>
+           <width>258</width>
+           <height>420</height>
           </rect>
          </property>
          <attribute name="label">

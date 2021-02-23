@@ -536,11 +536,17 @@ private slots:
 	
 	void on_pushButton_reboot_clicked()
 	{
+		camera_->do_action("save_config"); 
 		camera_->do_action("reboot", 1);
+		close_camera();
+		ui.pushButton_open_camera->setText(QString::fromLocal8Bit("连接"));
 	}
 	
 	void on_pushButton_board_reboot_clicked()
 	{
+		camera_->do_action("save_config");
+		close_camera();
+		ui.pushButton_open_camera->setText(QString::fromLocal8Bit("连接"));
 		string ip = ui.comboBox_ip_update->currentText().toStdString();
 		udpcmd uc(ip.c_str(), BOARD_CMD_PORT);
 		uc.send_cmd("reboot\n");
@@ -554,6 +560,8 @@ private slots:
 		string netmask = ui.lineEdit_netmask->text().toStdString();
 		string gateway = ui.lineEdit_gateway->text().toStdString();
 		string mac = ui.lineEdit_mac->text().toStdString();
+		string udp_ip = ui.lineEdit_udp_ip->text().toStdString();
+		int udp_port = atoi(ui.lineEdit_udp_port->text().toStdString().c_str());
 		
 		ret = camera_->set_value("ip", ip);
 		if (ret < 0)
@@ -569,6 +577,14 @@ private slots:
 			
 		
 		ret = camera_->set_value("mac", mac);
+		if (ret < 0)
+			goto OUT_SET_NET_ERR;
+		
+		ret = camera_->set_value("udp_ip", udp_ip);
+		if (ret < 0)
+			goto OUT_SET_NET_ERR;
+		
+		ret = camera_->set_value("udp_port", udp_port);
 		if (ret < 0)
 			goto OUT_SET_NET_ERR;
 		

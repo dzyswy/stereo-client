@@ -833,6 +833,16 @@ void zscam_client::init_ui()
 		ui.lineEdit_mac->setText(QString::fromStdString(svalue));
 	}
 	
+	ret = camera_->get_value("udp_ip", svalue);
+	if (ret == 0) {
+		ui.lineEdit_udp_ip->setText(QString::fromStdString(svalue));
+	}
+	
+	ret = camera_->get_value("udp_port", value);
+	if (ret == 0) {
+		ui.lineEdit_udp_port->setText(QString::fromStdString(std::to_string(value)));
+	}
+	
 }
 
 
