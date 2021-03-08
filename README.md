@@ -303,10 +303,39 @@ string ip = ui.lineEdit_ip->text().toStdString();
 string netmask = ui.lineEdit_netmask->text().toStdString();
 string gateway = ui.lineEdit_gateway->text().toStdString();
 string mac = ui.lineEdit_mac->text().toStdString();
+string udp_ip = ui.lineEdit_udp_ip->text().toStdString();
+int udp_port = atoi(ui.lineEdit_udp_port->text().toStdString().c_str());
+		
 camera_->set_value("ip", ip);//设置ip
 camera_->set_value("netmask", netmask);//设置netmask
 camera_->set_value("gateway", gateway);//设置gateway
 camera_->set_value("mac", mac);//设置mac
+camera_->set_value("udp_ip", udp_ip);//设置UDP目标信息接收IP
+camera_->set_value("udp_port", udp_port);//设置UDP目标信息接收端口
+```
+
+
+```
+udp发送目标信息的代码，请根据发送代码，写对应的接收代码。
+char sendstring[300]={0};
+if(detect_boxes.size()==1)
+{ 
+	StereoDetectBox &detect_box = detect_boxes[0];
+	sprintf(sendstring,"sender=stsensor,number=1,x=%d,y=%d,z=%d,x=0,y=0,z=0,x=0,y=0,z=0,x=0,y=0,z=0,x=0,y=0,z=0",
+	detect_box.xtcm,  detect_box.ztcm,detect_box.ytcm);
+}
+else if(detect_boxes.size()==0)
+{ 
+	sprintf(sendstring,"sender=stsensor,number=0,x=0,y=0,z=0,x=0,y=0,z=0,x=0,y=0,z=0,x=0,y=0,z=0,x=0,y=0,z=0");
+}
+else if(detect_boxes.size()>1)
+{ 
+	StereoDetectBox &detect_box1 = detect_boxes[0];
+	StereoDetectBox &detect_box2 = detect_boxes[1];
+	sprintf(sendstring,"sender=stsensor,number=2,x=%d,y=%d,z=%d,x=%d,y=%d,z=%d,x=0,y=0,z=0,x=0,y=0,z=0,x=0,y=0,z=0",detect_box1.xtcm, detect_box1.ztcm, detect_box1.ytcm,detect_box2.xtcm, detect_box2.ztcm, detect_box2.ytcm);
+}
+string str(sendstring); 
+udp_->send_data(str);
 ```
 
 
