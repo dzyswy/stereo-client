@@ -248,6 +248,9 @@
       </property>
       <item row="0" column="0">
        <widget class="QToolBox" name="toolBox">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -268,8 +271,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>367</width>
-           <height>1135</height>
+           <width>334</width>
+           <height>989</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -523,7 +526,7 @@
              <item>
               <widget class="QLabel" name="label_86">
                <property name="text">
-                <string>pitch：</string>
+                <string>俯仰角：</string>
                </property>
               </widget>
              </item>
@@ -558,7 +561,7 @@
              <item>
               <widget class="QLabel" name="label_24">
                <property name="text">
-                <string>roll：</string>
+                <string>水平角：</string>
                </property>
               </widget>
              </item>
@@ -915,7 +918,7 @@
            <x>0</x>
            <y>0</y>
            <width>320</width>
-           <height>894</height>
+           <height>838</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -1559,6 +1562,9 @@
           </item>
           <item>
            <widget class="QGroupBox" name="groupBox_9">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="title">
              <string>检测和跟踪</string>
             </property>
@@ -1734,8 +1740,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>337</width>
-           <height>519</height>
+           <width>210</width>
+           <height>430</height>
           </rect>
          </property>
          <property name="autoFillBackground">
@@ -2063,12 +2069,15 @@
          </layout>
         </widget>
         <widget class="QWidget" name="page_3">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="geometry">
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>328</width>
-           <height>886</height>
+           <width>281</width>
+           <height>772</height>
           </rect>
          </property>
          <attribute name="label">
@@ -2422,7 +2431,7 @@
           <item>
            <widget class="QGroupBox" name="groupBox_ptz_calib">
             <property name="enabled">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="title">
              <string>联合标定</string>
@@ -2438,7 +2447,7 @@
              <item row="0" column="1">
               <widget class="QComboBox" name="comboBox_ptz_install_mode">
                <property name="enabled">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
                <item>
                 <property name="text">
@@ -2688,12 +2697,15 @@
          </layout>
         </widget>
         <widget class="QWidget" name="page_6">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="geometry">
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>258</width>
-           <height>420</height>
+           <width>210</width>
+           <height>346</height>
           </rect>
          </property>
          <attribute name="label">
